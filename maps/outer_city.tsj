@@ -1,0 +1,266 @@
+{
+  "type": "tileset",
+  "version": "1.10",
+  "name": "Outer City — 8px terrain",
+  "tilewidth": 8,
+  "tileheight": 8,
+  "tilecount": 56,
+  "columns": 7,
+  "margin": 0,
+  "spacing": 0,
+  "image": "../assets/Outer City/Outer_City_Tileset.png",
+  "imagewidth": 56,
+  "imageheight": 64,
+  "tiles": [
+    {
+      "id": 1,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "surface"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "surface"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "surface"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "surface"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "surface"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "properties": [
+        {
+          "name": "role",
+          "type": "string",
+          "value": "fill"
+        }
+      ]
+    }
+  ]
+}
