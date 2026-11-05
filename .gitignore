@@ -1,0 +1,21 @@
+# Python 실행 환경과 생성 파일
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# 운영체제 생성 파일
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Tiled 자동 백업 (원본 TMJ/TSJ는 추적)
+*.tmj~
+*.tsj~
+*.tmx~
+*.tsx~

@@ -15,43 +15,43 @@
   "tiles": [
     {
       "id": 0,
-      "image": "../assets/Outer City/Two Story/House1.png",
+      "image": "../../assets/Outer City/Two Story/House1.png",
       "imagewidth": 68,
       "imageheight": 67
     },
     {
       "id": 1,
-      "image": "../assets/Outer City/Three Story, wide/House4.png",
+      "image": "../../assets/Outer City/Three Story, wide/House4.png",
       "imagewidth": 100,
       "imageheight": 100
     },
     {
       "id": 2,
-      "image": "../assets/Outer City/Outer_City_Decor_Lamp.png",
+      "image": "../../assets/Outer City/Outer_City_Decor_Lamp.png",
       "imagewidth": 7,
       "imageheight": 33
     },
     {
       "id": 3,
-      "image": "../assets/Outer City/Outer_City_Decor_Railing.png",
+      "image": "../../assets/Outer City/Outer_City_Decor_Railing.png",
       "imagewidth": 24,
       "imageheight": 8
     },
     {
       "id": 4,
-      "image": "../assets/Outer City/Outer_City_Decor_Bench.png",
+      "image": "../../assets/Outer City/Outer_City_Decor_Bench.png",
       "imagewidth": 13,
       "imageheight": 9
     },
     {
       "id": 5,
-      "image": "../assets/Outer City/Outer_City_Decor_Tree_1.png",
+      "image": "../../assets/Outer City/Outer_City_Decor_Tree_1.png",
       "imagewidth": 43,
       "imageheight": 59
     },
     {
       "id": 6,
-      "image": "../assets/Outer City/Outer_City_Moon.png",
+      "image": "../../assets/Outer City/Outer_City_Moon.png",
       "imagewidth": 23,
       "imageheight": 24
     }

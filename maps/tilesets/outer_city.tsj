@@ -8,7 +8,7 @@
   "columns": 7,
   "margin": 0,
   "spacing": 0,
-  "image": "../assets/Outer City/Outer_City_Tileset.png",
+  "image": "../../assets/Outer City/Outer_City_Tileset.png",
   "imagewidth": 56,
   "imageheight": 64,
   "tiles": [
