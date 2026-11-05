@@ -323,8 +323,8 @@
                  "y":0
                 }],
          "name":"Common",
-         "offsetx":51.75,
-         "offsety":96,
+         "offsetx":0,
+         "offsety":0,
          "opacity":1,
          "properties":[
                 {
