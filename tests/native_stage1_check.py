@@ -75,7 +75,18 @@ class StageBackend(ScriptedBackend):
             self.checked.append("respawn_real")
             self.push_key(s.SDLK_LSHIFT, down=False)
             self.phase = "walk_again"
-        elif self.phase == "cross_again" and g.completed:
+        elif self.phase == "cross_again" and g.player_at_exit():
+            assert not g.completed and g.scene.world == "shadow"
+            self.checked.append("shadow_portal_off")
+            self.capture = "portal_off"
+            self.push_key(s.SDLK_d, down=False)
+            self.phase = "portal_wait"
+        elif self.phase == "portal_wait":
+            assert not g.completed
+            self.push_key(s.SDLK_LSHIFT)
+            self.phase = "portal_real"
+        elif self.phase == "portal_real" and g.completed:
+            assert g.scene.world == "real"
             assert g.respawns == 1 and p.vx == p.vy == 0
             self.checked.append("clear")
             self.capture = "clear"

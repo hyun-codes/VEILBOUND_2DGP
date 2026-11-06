@@ -94,7 +94,7 @@ def main():
             assert backend.snapshots["left"][3] == -1
         else:
             assert game.respawns == 0
-            assert game.completed and game.player.y == 183, (game.player.x, game.player.y, game.paused, game.keys)
+            assert not game.completed and game.player.x > 288 and game.player.y == 183
             assert game.camera.x > 0
         print(world, "OK; respawns:", game.respawns, "snapshots:", backend.snapshots)
 

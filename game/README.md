@@ -38,7 +38,7 @@ Glenn Fiedler의 [Fix Your Timestep!](https://gafferongames.com/post/fix_your_ti
 - 지도는 논리 320×240, 타일은 8×8을 유지한다. 현재 실행 확대율은 app.py의 3배이며 TMJ에 남은 과거 2배·여백 메타데이터는 사용하지 않는다.
 - 그룹 오프셋, 이미지 레이어의 반복, 타일 오브젝트의 아래쪽 기준점과 레이어 색조를 반영한다. ShadowOnly의 숨김은 Tiled 초기 표시 설정이며 그림자 미리보기에서는 해당 레이어를 표시한다.
 - 현재 로더는 유한 직교 맵·배열 타일 데이터·외부 TSJ와 이 맵이 사용하는 이미지/오브젝트 레이어를 지원한다. 회전·뒤집힌 GID, 애니메이션 타일, 패럴랙스 등 미지원 형식은 오류로 중단한다. Tiled의 모든 기능을 지원하는 범용 로더가 아니다.
-- solid=true인 타일 레이어만 고체를 만든다. TSJ 타일의 collisionTop=7은 위쪽 투명 7px를 제외한다. 그룹 오프셋은 그림과 고체에 함께 적용한다. 현재 지면은 옆면·천장도 막으며 단방향 발판은 없다. 시작점은 플레이어 발 좌표로 사용하고 출구 사각형은 두 세계 공통 완료 트리거로 사용한다.
+- solid=true인 타일 레이어만 고체를 만든다. TSJ 타일의 collisionTop=7은 위쪽 투명 7px를 제외한다. 그룹 오프셋은 그림과 고체에 함께 적용한다. 현재 지면은 옆면·천장도 막으며 단방향 발판은 없다. 시작점은 플레이어 발 좌표로 사용하고 출구 사각형은 현실 전용 완료 트리거로 사용한다. 그림자에서는 겉 테두리와 EXIT OFF 표시만 제공한다.
 - --world는 시험용 시작 세계만 선택한다. Shift 전환은 고정 갱신 시작에 처리하고 지형 표시와 고체를 함께 변경한다. 위치·속도는 보존하며 R·추락 복귀는 항상 현실로 초기화한다.
 
 ## 다음에 추가할 모듈
@@ -97,3 +97,6 @@ WorldEffects는 활성 상태의 실제 경과 시간을 렌더 프레임마다 
 근거: [Guacamelee 개발자 인터뷰](https://blog.playstation.com/archive/2017/11/06/extended-play-how-guacamelee-went-from-design-pitch-to-indie-sensation/)는 두 세계의 서로 다른 색상 팔레트와 장식 변경을 설명한다. [Giana Sisters 공식 Steam 설명](https://store.steampowered.com/app/223220/Giana_Sisters_Twisted_Dreams/)은 세계 변형과 세계별 음악 교차 전환을 설명한다. 물결 구현과 시간·강도는 VEILBOUND의 시험안이며 두 작품의 원본 구현을 복제한 것이 아니다. F3 옵션은 [Xbox 접근성 지침 117](https://learn.microsoft.com/en-us/xbox/accessibility/xbox-accessibility-guidelines/117)의 화면 움직임 효과 조절 취지를 반영한다.
 
 assets/에서 사용 가능한 음원을 확인하지 못해 음악·효과음 전환은 미구현이다. 가로등 이동과 그림자 지형의 인과 퍼즐도 다음 기능으로 남긴다. 현재 변경은 세계 전환의 시각 인지 개선이다. 효과 강도의 편안함과 다른 PC에서의 성능은 직접 평가가 필요하다.
+
+
+출구 정책 변경: player_at_exit는 몸체·출구 영역 겹침을 계산하고, 완료는 world_state.name이 real일 때만 허용한다. 그림자에서 포털 영역에 들어가면 Shift 복귀 안내를 제공한다. 전환을 먼저 반영한 뒤 출구를 검사하므로 포털 안에서 현실로 돌아온 같은 스텝에 완료할 수 있다. 포털 에셋과 실제 Stage 2 이동은 미구현이며, 현재는 기존 테두리 표시와 Stage 1 완료 화면을 사용한다.

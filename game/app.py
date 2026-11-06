@@ -72,6 +72,11 @@ class Game:
         if fallen:
             self.respawns += 1
 
+    def player_at_exit(self):
+        p, area = self.player, self.data.object_named("Exit")
+        return (p.x + p.WIDTH / 2 > area.x and p.x - p.WIDTH / 2 < area.x + area.width
+                and p.y > area.y and p.y - p.HEIGHT < area.y + area.height)
+
     def handle_events(self, events):
         reset_clock = False
         for event in events:
@@ -132,9 +137,8 @@ class Game:
             return
         elif self.player.y <= self.data.height:
             self.camera.follow(self.player.x, self.player.y, dx, dt)
-        p, exit_area = self.player, self.data.object_named("Exit")
-        if (p.x + p.WIDTH / 2 > exit_area.x and p.x - p.WIDTH / 2 < exit_area.x + exit_area.width
-                and p.y > exit_area.y and p.y - p.HEIGHT < exit_area.y + exit_area.height):
+        p = self.player
+        if self.world_state.name == "real" and self.player_at_exit():
             # Stage 2 데이터가 없으므로 파일을 추측해 읽지 않고 단독 완료 상태로 멈춘다.
             self.completed = True
             p.vx = p.vy = 0.0
@@ -160,6 +164,8 @@ class Game:
             renderer.label(12, HEIGHT - 48, "FELL - returned to start")
         if self.blocked_notice > 0:
             renderer.label(12, HEIGHT - 48, "Cannot switch: solid terrain blocks your body", (255, 181, 142))
+        elif self.scene.world == "shadow" and self.player_at_exit() and not self.completed:
+            renderer.label(12, HEIGHT - 48, "Portal inactive in shadow - press Shift to return")
         elif self.effects.notice > 0 and not self.completed:
             renderer.label(320, HEIGHT - 65, f"{self.scene.world.upper()} WORLD", self.effects.indicator)
         if self.scene.show_markers:

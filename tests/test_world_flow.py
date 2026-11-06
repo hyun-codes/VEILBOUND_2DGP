@@ -147,8 +147,17 @@ class WorldFlowTests(unittest.TestCase):
         self.press(game)
         game.step(DT)
         self.assert_synchronized(game, "shadow")
+        self.release(game)
         for _ in range(220):
             game.step(DT)
+            if game.player_at_exit():
+                break
+        self.assertFalse(game.completed)
+        self.assertTrue(game.player_at_exit())
+        self.release(game, "d")
+        self.press(game)
+        game.step(DT)
+        self.assert_synchronized(game, "real")
         self.assertTrue(game.completed)
         self.assertEqual(game.respawns, 0)
         snapshot = (game.player.x, game.player.y, game.camera.x, game.scene.world)
@@ -166,12 +175,12 @@ class WorldFlowTests(unittest.TestCase):
         self.assertEqual((game.player.x, game.player.y, game.player.vy), (28, 183, 0))
         self.assertEqual((game.camera.x, game.camera.y), (0, 40))
 
-    def test_exit_in_either_world_and_fall_takes_priority_over_exit(self):
+    def test_exit_only_in_real_and_fall_takes_priority_over_exit(self):
         for name in ("real", "shadow"):
             game = Game(self.data, name)
             game.player.x = 290
             game.step(DT)
-            self.assertTrue(game.completed)
+            self.assertEqual(game.completed, name == "real")
             self.assertEqual(game.scene.world, name)
         objects = tuple(replace(obj, x=150, y=260, width=30, height=80)
                         if obj.name == "Exit" else obj for obj in self.data.objects)
@@ -226,6 +235,14 @@ class WorldFlowTests(unittest.TestCase):
         game.draw(r)
         self.assertIn("EXIT", r.labels)
         self.assertTrue(any(text.startswith("Cannot switch") for text in r.labels))
+        shadow = Game(self.data, "shadow")
+        shadow.player.x = 290
+        shadow.step(DT)
+        r.labels.clear()
+        shadow.draw(r)
+        self.assertIn("EXIT OFF", r.labels)
+        self.assertIn("Portal inactive in shadow - press Shift to return", r.labels)
+        self.assertNotIn("STAGE 1 CLEAR", r.labels)
         game.player.x = 290
         game.step(DT)
         r.labels.clear()

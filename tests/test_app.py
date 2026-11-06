@@ -103,13 +103,13 @@ class AppTests(unittest.TestCase):
         self.assertEqual((game.player.x, game.player.y, game.player.vx), (28, 183, 0))
         self.assertEqual((game.camera.x, game.camera.y, game.camera.look_ahead), (0, 40, 0))
 
-    def test_shadow_start_can_walk_to_exit_and_stop_at_completion(self):
+    def test_shadow_start_can_walk_to_exit_but_does_not_complete(self):
         game = Game(self.data, "shadow")
         game.handle_events([InputEvent("key_down", "right")])
         for _ in range(250):
             game.step(1 / 60)
         self.assertGreater(game.player.x + game.player.WIDTH / 2, 288)
-        self.assertTrue(game.completed)
+        self.assertFalse(game.completed)
         self.assertEqual(game.respawns, 0)
         self.assertEqual(game.player.y, 183)
         self.assertGreater(game.camera.x, 0)
