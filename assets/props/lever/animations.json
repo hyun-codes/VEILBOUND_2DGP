@@ -1,0 +1,124 @@
+{
+  "format": "veilbound-grid-animations",
+  "schema_version": 1,
+  "asset_type": "stateful_prop",
+  "image": "lever.png",
+  "image_sha256": "bc52896b2b700b8777998eb75003db3ac3b6cb1f44f3c4551c7129860e9ebf6a",
+  "image_size": {
+    "width": 192,
+    "height": 32
+  },
+  "grid": {
+    "cell_width": 64,
+    "cell_height": 32,
+    "columns": 3,
+    "rows": 1,
+    "margin": 0,
+    "spacing": 0
+  },
+  "coordinates": {
+    "origin": "top_left",
+    "index_base": 0,
+    "units": "source_pixels"
+  },
+  "anchor": {
+    "x": 24,
+    "y": 32,
+    "origin": "frame_top_left",
+    "status": "shared_visible_base_reference_not_gameplay_verified"
+  },
+  "default_animation": "inactive",
+  "timing_status": "initial_tuning_values_not_source_timings",
+  "runtime_status": "metadata_only_not_integrated",
+  "states": {
+    "initial": "inactive",
+    "inactive": {
+      "column": 0,
+      "pose": "handle_left"
+    },
+    "active": {
+      "column": 2,
+      "pose": "handle_right"
+    }
+  },
+  "state_names_status": "project_convention_not_original_author_labels",
+  "animations": {
+    "inactive": {
+      "enabled": true,
+      "loop": false,
+      "row": 0,
+      "columns": [
+        0
+      ],
+      "frame_duration_ms": 80
+    },
+    "active": {
+      "enabled": true,
+      "loop": false,
+      "row": 0,
+      "columns": [
+        2
+      ],
+      "frame_duration_ms": 80
+    },
+    "activate": {
+      "enabled": true,
+      "loop": false,
+      "row": 0,
+      "columns": [
+        0,
+        1,
+        2
+      ],
+      "frame_duration_ms": 80
+    },
+    "deactivate": {
+      "enabled": true,
+      "loop": false,
+      "row": 0,
+      "columns": [
+        2,
+        1,
+        0
+      ],
+      "frame_duration_ms": 80
+    }
+  },
+  "provenance": {
+    "type": "lossless_crop_and_repack_no_generated_pixels",
+    "source_filename": "caslePropsSheet.png",
+    "source_size": [
+      3456,
+      384
+    ],
+    "source_sha256": "72a5561d3eb46c72c2d822cd5114b832daab9c38adc506255215440f624b0901",
+    "source_rects_xywh": [
+      [
+        256,
+        192,
+        64,
+        32
+      ],
+      [
+        640,
+        192,
+        64,
+        32
+      ],
+      [
+        1024,
+        192,
+        64,
+        32
+      ]
+    ],
+    "source_pose_order": [
+      "left",
+      "upright",
+      "right"
+    ],
+    "selected_variant": "upper_filled_gear",
+    "creator": "pokrasmemas",
+    "source_url": "https://pokrasmemas.itch.io/castletileset"
+  }
+}
