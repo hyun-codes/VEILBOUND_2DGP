@@ -68,7 +68,7 @@ class ScriptedBackend(Pico2DBackend):
 
     def present(self):
         p = self.game.player
-        captures = {1: "start", 44: "jump", 76: "left", 240: "end"} if self.world == "real" else {250: "exit"}
+        captures = {1: "start", 36: "jump", 76: "left", 240: "end"} if self.world == "real" else {250: "exit"}
         if self.frames in captures:
             name = captures[self.frames]
             self.save_screenshot(self.output / f"movement_{self.world}_{name}.bmp", WIDTH, HEIGHT)

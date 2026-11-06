@@ -65,6 +65,7 @@ class AppTests(unittest.TestCase):
         self.assertGreater(game.player.jump_buffer, 0)
         game.step(1 / 60)
         self.assertLess(game.player.vy, 0)
+
         for _ in range(90):
             game.handle_events([InputEvent("key_down", "space")])
             game.step(1 / 60)
@@ -73,6 +74,17 @@ class AppTests(unittest.TestCase):
         game.handle_events([InputEvent("key_up", "space"), InputEvent("key_down", "space")])
         game.step(1 / 60)
         self.assertLess(game.player.vy, 0)
+
+    def test_space_release_before_step_and_focus_clear_jump_hold(self):
+        game = Game(self.data)
+        game.handle_events([InputEvent("key_down", "space"), InputEvent("key_up", "space")])
+        game.step(1 / 60)
+        self.assertFalse(game.player.jump_held)
+        self.assertLess(game.player.vy, 0)
+        self.assertGreaterEqual(game.player.vy, -game.player.RELEASE_SPEED)
+        game.handle_events([InputEvent("key_down", "space"), InputEvent("focus_lost")])
+        self.assertFalse(game.player.jump_held)
+        self.assertEqual(game.player.jump_buffer, 0)
 
     def test_fall_and_r_restore_position_inputs_camera_and_animation(self):
         game = Game(self.data)

@@ -49,7 +49,8 @@ class AnimationSet:
 
 class Player:
     WIDTH, HEIGHT = 6, 14
-    SPEED, JUMP_SPEED, GRAVITY, MAX_FALL = 64.0, 180.0, 720.0, 360.0
+    SPEED, JUMP_SPEED, GRAVITY, MAX_FALL = 64.0, 240.0, 1000.0, 360.0
+    FALL_GRAVITY, RELEASE_SPEED = 1600.0, 130.0
     COYOTE_TIME, JUMP_BUFFER = 0.08, 0.10
 
     def __init__(self, animations, collision, map_width, start):
@@ -64,14 +65,20 @@ class Player:
         self.grounded = self.collision.supported(self.x, self.y, self.WIDTH)
         self.coyote = self.COYOTE_TIME if self.grounded else 0.0
         self.jump_buffer = 0.0
+        self.jump_held = False
         self.animation, self.animation_time = "idle", 0.0
 
     def clear_input(self):
         self.direction = 0
         self.jump_buffer = 0.0
+        self.jump_held = False
 
     def request_jump(self):
         self.jump_buffer = self.JUMP_BUFFER
+        self.jump_held = True
+
+    def release_jump(self):
+        self.jump_held = False
 
     def _jump(self):
         self.vy = -self.JUMP_SPEED
@@ -87,7 +94,11 @@ class Player:
         self.vx = self.direction * self.SPEED
         if self.direction:
             self.facing = self.direction
-        self.vy = min(self.MAX_FALL, self.vy + self.GRAVITY * dt)
+        # 상승 중 버튼을 놓으면 짧게 뛴다. 다시 눌러도 위쪽 속도를 더하지 않는다.
+        if self.vy < 0 and not self.jump_held:
+            self.vy = max(self.vy, -self.RELEASE_SPEED)
+        gravity = self.GRAVITY if self.vy < 0 else self.FALL_GRAVITY
+        self.vy = min(self.MAX_FALL, self.vy + gravity * dt)
         self.x, self.y, side, landed, ceiling = self.collision.move(
             self.x, self.y, self.WIDTH, self.HEIGHT, self.vx * dt, self.vy * dt)
         self.x = max(self.WIDTH / 2, min(self.x, self.map_width - self.WIDTH / 2))

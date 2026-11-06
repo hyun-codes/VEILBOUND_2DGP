@@ -64,7 +64,53 @@ class MovementTests(unittest.TestCase):
                 self.assertGreater(p.vy, before)
         self.assertTrue(p.grounded)
         self.assertEqual(p.y, 183)
-        self.assertAlmostEqual(183 - lowest_y, 21, delta=1)
+
+        self.assertAlmostEqual(183 - lowest_y, 27, delta=1)
+
+    def test_tap_and_hold_height_and_faster_descent(self):
+        results = []
+        for release_tick in (0, 2, 6, None):
+            p = self.player()
+            p.request_jump()
+            apex_y, apex_tick, landing_tick = p.y, 0, None
+            for tick in range(90):
+                if tick == release_tick:
+                    p.release_jump()
+                p.update(DT)
+                if p.y < apex_y:
+                    apex_y, apex_tick = p.y, tick + 1
+                if p.grounded:
+                    landing_tick = tick + 1
+                    break
+            self.assertIsNotNone(landing_tick)
+            results.append((183 - apex_y, apex_tick, landing_tick))
+        self.assertLess(results[0][0], results[1][0])
+        self.assertLess(results[1][0], results[2][0])
+        self.assertLess(results[2][0], results[3][0])
+        height, apex_tick, landing_tick = results[-1]
+        self.assertGreater(height, 26)
+        self.assertLess(landing_tick - apex_tick, apex_tick)
+
+    def test_repress_after_jump_cut_does_not_restore_upward_speed(self):
+        p = self.player()
+        p.request_jump()
+        p.update(DT)
+        p.release_jump()
+        p.update(DT)
+        cut_speed = p.vy
+        p.request_jump()
+        p.update(DT)
+        self.assertGreater(p.vy, cut_speed)
+
+    def test_jump_release_during_descent_does_not_change_fall(self):
+        p = self.player()
+        p.request_jump()
+        while p.vy < 0 or p.grounded:
+            p.update(DT)
+        before = p.vy
+        p.release_jump()
+        p.update(DT)
+        self.assertAlmostEqual(p.vy, min(p.MAX_FALL, before + p.FALL_GRAVITY * DT))
 
     def test_coyote_inside_and_outside_window(self):
         # 중심이 가장자리 밖으로 3px 이상 나가면 몸체의 지면 겹침도 끝난다.
@@ -100,6 +146,16 @@ class MovementTests(unittest.TestCase):
         self.assertTrue(p.grounded)
         self.assertEqual(p.y, 183)
 
+        p = self.player((28, 180))
+        p.vy = 60
+        p.request_jump()
+        p.release_jump()  # 착지 전 놓은 입력도 버리지 않고 낮은 점프로 소비한다.
+        for _ in range(4):
+            p.update(DT)
+        self.assertLess(p.vy, 0)
+        self.assertGreaterEqual(p.vy, -p.RELEASE_SPEED)
+        self.assertEqual(p.jump_buffer, 0)
+
     def test_map_bounds_and_opposite_input_never_resize_body(self):
         p = self.player()
         p.direction = -1
@@ -120,6 +176,8 @@ class MovementTests(unittest.TestCase):
                 p.direction = 1 if tick < 45 else -1
                 if tick in (10, 55):
                     p.request_jump()
+                if tick in (12, 64):
+                    p.release_jump()
                 p.update(dt)
                 states.append((p.x, p.y, p.vy, p.grounded))
             for _ in range(fps * 2):

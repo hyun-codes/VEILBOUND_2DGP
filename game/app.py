@@ -68,6 +68,8 @@ class Game:
                 reset_clock = True
             elif event.kind == "key_up":
                 self.keys.discard(event.key)
+                if event.key == "space":
+                    self.player.release_jump()
             elif event.kind == "key_down" and not self.paused:
                 if event.key in self.keys:
                     continue
@@ -100,7 +102,7 @@ class Game:
         title = f"STAGE 1 / {self.scene.world.upper()} - MOVEMENT PROTOTYPE"
         renderer.label(12, HEIGHT - 22, title)
         renderer.rectangle((0, 0, WIDTH, 26), (25, 27, 38), filled=True)
-        status = "PAUSED - focus window to resume" if self.paused else "A/D or arrows: move | Space: jump | R: restart | F1: debug | Esc: quit"
+        status = "PAUSED - focus window to resume" if self.paused else "A/D or arrows: move | Space: tap/hold jump | R: restart | F1: debug | Esc: quit"
         renderer.label(12, 8, status)
         if self.fall_notice > 0:
             renderer.label(12, HEIGHT - 48, "FELL - returned to start")
