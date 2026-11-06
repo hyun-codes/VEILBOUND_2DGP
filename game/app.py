@@ -20,6 +20,7 @@ from game.stage_manager import StageManager
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 STAGE_1 = PROJECT_ROOT / "maps" / "stage_01" / "stage1_missing_bridge.tmj"
 STAGE_2 = PROJECT_ROOT / "maps" / "stage_02" / "stage2_lamp_room.tmj"
+STAGE_3 = PROJECT_ROOT / "maps" / "stage_03" / "stage3_return_circuit.tmj"
 PLAYER_ANIMATIONS = PROJECT_ROOT / "assets" / "characters" / "player" / "animations.json"
 WIDTH, HEIGHT, SCALE = 800, 600, 3
 SHIFT_KEYS = {"shift_left", "shift_right"}
@@ -245,7 +246,7 @@ def _positive_int(text):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="VEILBOUND - light and shadow puzzle platformer")
-    parser.add_argument("--stage", type=int, choices=(1, 2), default=1, help="start stage; Stage 2 is a lamp puzzle prototype")
+    parser.add_argument("--stage", type=int, choices=(1, 2, 3), default=1, help="start stage; Stage 3 is a solver-checked map draft")
     parser.add_argument("--check-map", action="store_true", help="validate map data without opening a window")
     parser.add_argument("--world", choices=("real", "shadow"), default="real", help="initial world for testing; restart always returns to real")
     parser.add_argument("--frames", type=_positive_int, help="close automatically after this many render frames")
@@ -255,7 +256,7 @@ def main(argv=None):
     if args.screenshot and (args.frames is None or args.screenshot.suffix.lower() != ".bmp"):
         parser.error("--screenshot requires --frames and a .bmp output path")
     try:
-        paths = {"Stage1": STAGE_1, "Stage2": STAGE_2}
+        paths = {"Stage1": STAGE_1, "Stage2": STAGE_2, "Stage3": STAGE_3}
         data = load_map(paths[f"Stage{args.stage}"])
         if args.check_map:
             LampPuzzle(data)  # 순수 데이터 검사에서 퍼즐 프리셋·필수 오브젝트도 확인한다.

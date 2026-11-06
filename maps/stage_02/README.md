@@ -42,7 +42,7 @@ A는 아래·위 두 조작점에서 같은 아래 가로등을 제어한다. B�
 
 ## 기본 해법과 복구
 
-아래 A를 STAIRS로 변경 → 그림자 계단 점프 → 위층에서 현실 복귀·A를 BRIDGE로 변경 → 위층 B를 FAR로 변경 → 그림자 앞쪽 다리 통과 → 가운데 공통 섬에서 현실 복귀·B를 NEAR로 변경 → 그림자 뒤쪽 다리 통과 → 출구에서 현실 복귀다. Stage 1 포털에서도 이 방으로 이어진다. Stage 2 뒤에는 등록된 맵이 없으므로 완료 화면을 표시한다.
+아래 A를 STAIRS로 변경 → 그림자 계단 점프 → 위층에서 현실 복귀·A를 BRIDGE로 변경 → 위층 B를 FAR로 변경 → 그림자 앞쪽 다리 통과 → 가운데 공통 섬에서 현실 복귀·B를 NEAR로 변경 → 그림자 뒤쪽 다리 통과 → 출구에서 현실 복귀다. Stage 1 포털에서도 이 방으로 이어진다. 기본 실행에서는 현실 포털에서 등록된 Stage 3 초안으로 진행한다. StageManager 없이 실행하는 단독 검사는 기존 완료 화면을 유지한다.
 
 앞쪽에서 B를 NEAR로 고정하거나, 섬에서 B를 FAR로 고정하면 해당 80px 틈을 넘지 못한다. 현재 최대 점프 높이는 약26.8px다. 잘못 조작해도 두 B 조작점의 공통 바닥은 남아서 그 자리에서 되돌릴 수 있다. A를 STAIRS로 두면 다리가 없지만 위층 A/B 조작점은 유지되어 복구할 수 있다. 정답을 아는 자동 입력의 통과를 재미나 난도 검증으로 해석하지 않는다.
 
@@ -52,7 +52,7 @@ A는 아래·위 두 조작점에서 같은 아래 가로등을 제어한다. B�
 
 BRIDGE 레이어에는 두 구간의 전체 타일이 저장된다. B에 의한 제외는 실행 시 적용하므로 Tiled는 완성된 한 조합의 화면이 아닌 원본 지형과 편집용 Beam 사각형을 보여준다. Objects의 Beam_near=(216,128,80,16), Beam_far=(328,128,80,16)가 제외 영역이며 8px 셀에 맞춘다. 해당 영역 안에 완전히 포함되는 lampState=bridge의 그림과 고체만 함께 제거한다. 임의로 셀 중간에 빛 경계를 두거나 자유 투영을 기대하지 않는다.
 
-맵 속성 puzzleType=lightErasure, lampInitialState=bridge, lightInitialState=near를 사용한다. LampControl.lamp=A / B로 대상, radius로 조작 반경을 지정한다. LampRail.stairsX=68 / bridgeX=92는 Route lamp의 X, EraserRail.nearX=196 / farX=208은 Eraser lamp의 X다. 가로등 이미지 크기는 원본7×33 그대로다. Exit.destination=Complete는 등록된 다음 맵이 없는 현재 마지막 원형이다. 누락된 필수 오브젝트·B 본체·잘못된 상태/빛 사각형은 로딩 검사에서 오류로 보고한다.
+맵 속성 puzzleType=lightErasure, lampInitialState=bridge, lightInitialState=near를 사용한다. LampControl.lamp=A / B로 대상, radius로 조작 반경을 지정한다. LampRail.stairsX=68 / bridgeX=92는 Route lamp의 X, EraserRail.nearX=196 / farX=208은 Eraser lamp의 X다. 가로등 이미지 크기는 원본7×33 그대로다. Exit.destination=Stage3는 등록된 Stage 3 초안으로의 이동이다. 누락된 필수 오브젝트·B 본체·잘못된 상태/빛 사각형은 로딩 검사에서 오류로 보고한다.
 
 지면 GID 2..6, 내부9..13·16..20와 collisionTop=7을 재사용한다. 배경은 기존 반복 이미지를 수평 반복한다. 이미지·TSJ는 프로젝트 내부 상대경로이며 원본 PNG·공유 TSJ를 변경하지 않았다.
 

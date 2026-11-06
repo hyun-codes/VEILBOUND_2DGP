@@ -1,0 +1,432 @@
+{
+  "map": "stage3_return_circuit.tmj",
+  "map_sha256": "11eaec4560d7f5707f49ebe6db81177559a4b430b461803b0e69c0d331acafef",
+  "model": "authored_safe_nodes_world_A_B_with_actual_player_probes",
+  "reachable_states": 57,
+  "recoverable_states": 57,
+  "dead_states": [],
+  "shortest_macro_actions": 25,
+  "route": [
+    {
+      "source": [
+        "Start",
+        "real",
+        "bridge",
+        "near"
+      ],
+      "target": [
+        "StartA",
+        "real",
+        "bridge",
+        "near"
+      ],
+      "kind": "move",
+      "node": "StartA",
+      "jump_x": null,
+      "ticks": 18
+    },
+    {
+      "source": [
+        "StartA",
+        "real",
+        "bridge",
+        "near"
+      ],
+      "target": [
+        "StartB",
+        "real",
+        "bridge",
+        "near"
+      ],
+      "kind": "move",
+      "node": "StartB",
+      "jump_x": null,
+      "ticks": 37
+    },
+    {
+      "source": [
+        "StartB",
+        "real",
+        "bridge",
+        "near"
+      ],
+      "target": [
+        "StartB",
+        "real",
+        "bridge",
+        "far"
+      ],
+      "kind": "e",
+      "lamp": "B"
+    },
+    {
+      "source": [
+        "StartB",
+        "real",
+        "bridge",
+        "far"
+      ],
+      "target": [
+        "StartB",
+        "shadow",
+        "bridge",
+        "far"
+      ],
+      "kind": "shift"
+    },
+    {
+      "source": [
+        "StartB",
+        "shadow",
+        "bridge",
+        "far"
+      ],
+      "target": [
+        "MiddleA",
+        "shadow",
+        "bridge",
+        "far"
+      ],
+      "kind": "move",
+      "node": "MiddleA",
+      "jump_x": null,
+      "ticks": 112
+    },
+    {
+      "source": [
+        "MiddleA",
+        "shadow",
+        "bridge",
+        "far"
+      ],
+      "target": [
+        "MiddleA",
+        "real",
+        "bridge",
+        "far"
+      ],
+      "kind": "shift"
+    },
+    {
+      "source": [
+        "MiddleA",
+        "real",
+        "bridge",
+        "far"
+      ],
+      "target": [
+        "MiddleB",
+        "real",
+        "bridge",
+        "far"
+      ],
+      "kind": "move",
+      "node": "MiddleB",
+      "jump_x": null,
+      "ticks": 22
+    },
+    {
+      "source": [
+        "MiddleB",
+        "real",
+        "bridge",
+        "far"
+      ],
+      "target": [
+        "MiddleB",
+        "real",
+        "bridge",
+        "near"
+      ],
+      "kind": "e",
+      "lamp": "B"
+    },
+    {
+      "source": [
+        "MiddleB",
+        "real",
+        "bridge",
+        "near"
+      ],
+      "target": [
+        "MiddleB",
+        "shadow",
+        "bridge",
+        "near"
+      ],
+      "kind": "shift"
+    },
+    {
+      "source": [
+        "MiddleB",
+        "shadow",
+        "bridge",
+        "near"
+      ],
+      "target": [
+        "FarA",
+        "shadow",
+        "bridge",
+        "near"
+      ],
+      "kind": "move",
+      "node": "FarA",
+      "jump_x": null,
+      "ticks": 119
+    },
+    {
+      "source": [
+        "FarA",
+        "shadow",
+        "bridge",
+        "near"
+      ],
+      "target": [
+        "FarA",
+        "real",
+        "bridge",
+        "near"
+      ],
+      "kind": "shift"
+    },
+    {
+      "source": [
+        "FarA",
+        "real",
+        "bridge",
+        "near"
+      ],
+      "target": [
+        "FarA",
+        "real",
+        "stairs",
+        "near"
+      ],
+      "kind": "e",
+      "lamp": "A"
+    },
+    {
+      "source": [
+        "FarA",
+        "real",
+        "stairs",
+        "near"
+      ],
+      "target": [
+        "FarA",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "kind": "shift"
+    },
+    {
+      "source": [
+        "FarA",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "target": [
+        "Step1",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "kind": "move",
+      "node": "Step1",
+      "jump_x": 382.4,
+      "ticks": 52
+    },
+    {
+      "source": [
+        "Step1",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "target": [
+        "Step2",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "kind": "move",
+      "node": "Step2",
+      "jump_x": 416.0,
+      "ticks": 22
+    },
+    {
+      "source": [
+        "Step2",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "target": [
+        "Step3",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "kind": "move",
+      "node": "Step3",
+      "jump_x": 440.0,
+      "ticks": 22
+    },
+    {
+      "source": [
+        "Step3",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "target": [
+        "Step4",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "kind": "move",
+      "node": "Step4",
+      "jump_x": 464.0,
+      "ticks": 22
+    },
+    {
+      "source": [
+        "Step4",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "target": [
+        "UpperRight",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "kind": "move",
+      "node": "UpperRight",
+      "jump_x": 488.0,
+      "ticks": 37
+    },
+    {
+      "source": [
+        "UpperRight",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "target": [
+        "UpperRight",
+        "real",
+        "stairs",
+        "near"
+      ],
+      "kind": "shift"
+    },
+    {
+      "source": [
+        "UpperRight",
+        "real",
+        "stairs",
+        "near"
+      ],
+      "target": [
+        "UpperRest",
+        "real",
+        "stairs",
+        "near"
+      ],
+      "kind": "move",
+      "node": "UpperRest",
+      "jump_x": null,
+      "ticks": 217
+    },
+    {
+      "source": [
+        "UpperRest",
+        "real",
+        "stairs",
+        "near"
+      ],
+      "target": [
+        "UpperRest",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "kind": "shift"
+    },
+    {
+      "source": [
+        "UpperRest",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "target": [
+        "UpperLeft",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "kind": "move",
+      "node": "UpperLeft",
+      "jump_x": null,
+      "ticks": 142
+    },
+    {
+      "source": [
+        "UpperLeft",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "target": [
+        "Roof",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "kind": "move",
+      "node": "Roof",
+      "jump_x": 144.0,
+      "ticks": 37
+    },
+    {
+      "source": [
+        "Roof",
+        "shadow",
+        "stairs",
+        "near"
+      ],
+      "target": [
+        "Roof",
+        "real",
+        "stairs",
+        "near"
+      ],
+      "kind": "shift"
+    },
+    {
+      "source": [
+        "Roof",
+        "real",
+        "stairs",
+        "near"
+      ],
+      "target": [
+        "Goal",
+        "real",
+        "stairs",
+        "near"
+      ],
+      "kind": "move",
+      "node": "Goal",
+      "jump_x": null,
+      "ticks": 44
+    }
+  ],
+  "limits": "Not exhaustive continuous physics, airborne switches, falls or timed enemies; BFS minimizes macro actions, not time"
+}

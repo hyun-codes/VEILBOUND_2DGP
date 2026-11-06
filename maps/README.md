@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | 1: 사라진 다리 | [설계·에셋 분석·검증 기록](stage_01/README.md) | [TMJ](stage_01/stage1_missing_bridge.tmj), 자동·SDL 경로 검증, 사람의 평가 전 |
 | 2: 뒤틀린 계단 | [퍼즐 원형·검증](stage_02/README.md) | [두 가로등·빛 제거 퍼즐 TMJ](stage_02/stage2_lamp_room.tmj), 자동·SDL 경로 검증, 사람의 평가 전 |
-| 3: 위험한 골목 | [제작 계획](stage_03/README.md) | 아직 TMJ 없음 |
+| 3: 위험한 골목 | [맵·BFS 검증](stage_03/README.md) | [귀환 회로 TMJ](stage_03/stage3_return_circuit.tmj), 정적 퍼즐 초안·순찰 미구현 |
 
 ## 공통 타일셋
 
