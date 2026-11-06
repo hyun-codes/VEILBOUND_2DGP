@@ -1,0 +1,89 @@
+{
+  "format": "veilbound-grid-animations",
+  "schema_version": 1,
+  "image": "rat_walk.png",
+  "image_sha256": "bfe78dae0a1445275088648b371dabd3db269bbc3ea85105e35547a3d6acf157",
+  "image_size": {
+    "width": 384,
+    "height": 64
+  },
+  "grid": {
+    "cell_width": 64,
+    "cell_height": 64,
+    "columns": 6,
+    "rows": 1,
+    "margin": 0,
+    "spacing": 0
+  },
+  "coordinates": {
+    "origin": "top_left",
+    "index_base": 0,
+    "units": "source_pixels"
+  },
+  "anchor": {
+    "x": 32,
+    "y": 44,
+    "origin": "frame_top_left",
+    "status": "prepared_shared_feet_reference_not_gameplay_verified"
+  },
+  "source_facing": "right",
+  "default_animation": "walk",
+  "timing_status": "initial_tuning_values_not_playtested",
+  "runtime_status": "asset_only_not_integrated",
+  "animations": {
+    "walk": {
+      "enabled": true,
+      "loop": true,
+      "row": 0,
+      "columns": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "frame_duration_ms": 100
+    }
+  },
+  "provenance": {
+    "type": "ai_generated_then_python_pixel_cleanup",
+    "source": "generated/rat_walk_ai_source.png",
+    "source_sha256": "e5015d5f6072e80590732a6dfb21f27abb1a2e295bd1b996285ba28c24b59fc0",
+    "source_grid": {
+      "columns": 3,
+      "rows": 2,
+      "cell_width": 512,
+      "cell_height": 512
+    },
+    "processor": "tools/prepare_animal_sprites.py",
+    "body_box_size": [
+      13,
+      5
+    ],
+    "alpha_cutoff": 230,
+    "coverage_cutoff": 96,
+    "palette_rgb": [
+      [
+        89,
+        87,
+        87
+      ],
+      [
+        128,
+        123,
+        122
+      ],
+      [
+        42,
+        30,
+        35
+      ],
+      [
+        79,
+        52,
+        47
+      ]
+    ]
+  }
+}
