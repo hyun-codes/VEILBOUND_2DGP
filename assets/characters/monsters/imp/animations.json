@@ -1,0 +1,110 @@
+{
+  "format": "veilbound-grid-animations",
+  "schema_version": 1,
+  "image": "Imp_spritesheet.png",
+  "image_sha256": "f3ecf3fc5f3e97a01d01c7dfcb5870e906dd3a21cde86b6059e952303fd4c310",
+  "image_size": {
+    "width": 832,
+    "height": 320
+  },
+  "grid": {
+    "cell_width": 64,
+    "cell_height": 64,
+    "columns": 13,
+    "rows": 5,
+    "margin": 0,
+    "spacing": 0
+  },
+  "coordinates": {
+    "origin": "top_left",
+    "index_base": 0,
+    "units": "source_pixels"
+  },
+  "anchor": {
+    "x": 32,
+    "y": 41,
+    "origin": "frame_top_left",
+    "status": "initial_visual_feet_reference_not_gameplay_verified"
+  },
+  "source_facing": "right",
+  "source_facing_status": "visual_inspection_not_author_documentation",
+  "default_animation": "idle",
+  "timing_status": "initial_tuning_values_not_source_timings",
+  "runtime_status": "metadata_only_not_integrated",
+  "animations": {
+    "idle": {
+      "enabled": true,
+      "loop": true,
+      "row": 0,
+      "columns": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "source_frame_numbers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "source_frame_filename_pattern": "Imp animations{}.png",
+      "frame_duration_ms": 140,
+      "classification_status": "visual_inference_with_exact_source_pixel_match"
+    },
+    "run": {
+      "enabled": true,
+      "loop": true,
+      "row": 2,
+      "columns": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "source_frame_numbers": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "source_frame_filename_pattern": "Imp animations{}.png",
+      "frame_duration_ms": 90,
+      "classification_status": "visual_inference_with_exact_source_pixel_match"
+    }
+  },
+  "excluded_animations": [
+    {
+      "rows": [
+        1
+      ],
+      "reason": "transition_or_turn_pose_not_needed_for_initial_patrol; exact_name_unconfirmed"
+    },
+    {
+      "rows": [
+        3
+      ],
+      "reason": "attack_not_used"
+    },
+    {
+      "rows": [
+        4
+      ],
+      "reason": "monster_death_not_used"
+    }
+  ]
+}
