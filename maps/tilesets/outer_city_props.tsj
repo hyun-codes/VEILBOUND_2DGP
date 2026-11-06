@@ -27,6 +27,9 @@
     },
     {
       "id": 2,
+      "properties": [
+        {"name": "visualRole", "type": "string", "value": "lamp"}
+      ],
       "image": "../../assets/Outer City/Outer_City_Decor_Lamp.png",
       "imagewidth": 7,
       "imageheight": 33

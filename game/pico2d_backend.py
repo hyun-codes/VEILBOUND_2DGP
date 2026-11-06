@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 import ctypes
 
+from game.world_effects import shadow_lamp_pixel
+
 
 @dataclass(frozen=True)
 class InputEvent:
@@ -50,7 +52,7 @@ class Pico2DBackend:
                      sdl.SDLK_RIGHT: "right", sdl.SDLK_UP: "up",
                      sdl.SDLK_DOWN: "down", sdl.SDLK_r: "r", sdl.SDLK_F1: "f1",
                      sdl.SDLK_SPACE: "space", sdl.SDLK_a: "a", sdl.SDLK_d: "d",
-                     sdl.SDLK_LSHIFT: "shift_left", sdl.SDLK_RSHIFT: "shift_right"}
+                     sdl.SDLK_LSHIFT: "shift_left", sdl.SDLK_RSHIFT: "shift_right", sdl.SDLK_F3: "f3"}
         event = sdl.SDL_Event()
         result = []
         while sdl.SDL_PollEvent(ctypes.byref(event)):
@@ -74,11 +76,12 @@ class Pico2DBackend:
         self.sdl.SDL_RenderClear(self.native.renderer)
 
     def sprite(self, sprite, rect):
-        image = self.images.get(sprite.image)
+        key = (sprite.image, sprite.palette)
+        image = self.images.get(key)
         if image is None:
-            image = self.pico.load_image(str(sprite.image))
+            image = self._load_palette_image(sprite.image) if sprite.palette == "shadow_lamp" else self.pico.load_image(str(sprite.image))
             self.sdl.SDL_SetTextureScaleMode(image.texture, self.sdl.SDL_ScaleModeNearest)
-            self.images[sprite.image] = image
+            self.images[key] = image
         self.sdl.SDL_SetTextureColorMod(image.texture, *sprite.tint)
         image.opacify(sprite.opacity)
         x, y_top, w, h = sprite.source
@@ -88,6 +91,40 @@ class Pico2DBackend:
                                       dx + dw / 2, dy + dh / 2, dw, dh)
         else:
             image.clip_draw_to_origin(x, image.h - y_top - h, w, h, dx, dy, dw, dh)
+
+    def _load_palette_image(self, path):
+        """원본 PNG는 그대로 두고 SDL 메모리 표면에서 램프의 두 밝은 색만 바꾼다."""
+        from sdl2.sdlimage import IMG_Load
+        sdl = self.sdl
+        original = IMG_Load(str(path).encode("utf-8"))
+        if not original:
+            raise RuntimeError(f"Cannot load lamp image: {path}")
+        try:
+            surface = sdl.SDL_ConvertSurfaceFormat(original, sdl.SDL_PIXELFORMAT_RGBA32, 0)
+        finally:
+            sdl.SDL_FreeSurface(original)
+        if not surface:
+            raise RuntimeError("Cannot prepare lamp palette")
+        try:
+            if sdl.SDL_LockSurface(surface) != 0:
+                raise RuntimeError("Cannot lock lamp palette")
+            try:
+                pixels = ctypes.cast(surface.contents.pixels, ctypes.POINTER(ctypes.c_uint8))
+                for y in range(surface.contents.h):
+                    for x in range(surface.contents.w):
+                        i = y * surface.contents.pitch + x * 4
+                        rgba = shadow_lamp_pixel(tuple(pixels[i + c] for c in range(4)))
+                        for c, value in enumerate(rgba):
+                            pixels[i + c] = value
+            finally:
+                sdl.SDL_UnlockSurface(surface)
+            texture = sdl.SDL_CreateTextureFromSurface(self.native.renderer, surface)
+            if not texture:
+                raise RuntimeError("Cannot create lamp palette texture")
+            sdl.SDL_SetTextureBlendMode(texture, sdl.SDL_BLENDMODE_BLEND)
+            return self.pico.Image(texture)
+        finally:
+            sdl.SDL_FreeSurface(surface)
 
     def rectangle(self, rect, color, filled=False):
         x, y, width, height = rect

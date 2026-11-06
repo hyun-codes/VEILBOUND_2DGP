@@ -55,6 +55,8 @@ class Sprite:
     repeat_x: bool = False
     repeat_y: bool = False
     flip_x: bool = False
+    visual_role: str = "none"
+    palette: str = "original"
 
 
 @dataclass(frozen=True)
@@ -97,6 +99,7 @@ def load_map(path):
         raise MapFormatError("Map dimensions must be positive")
     images, tiles, sprites, objects, solids = {}, {}, [], [], []
     collision_tops = {}
+    visual_roles = {}
 
     def image_info(owner, spec):
         image = (owner.parent / spec["image"]).resolve()
@@ -150,6 +153,7 @@ def load_map(path):
             if not isinstance(inset, (int, float)) or not math.isfinite(inset) or not 0 <= inset < rect[3]:
                 raise MapFormatError(f"Invalid collisionTop for GID {gid}")
             collision_tops[gid] = inset
+            visual_roles[gid] = definitions.get(local, {}).get("visualRole", "prop")
 
     def tile(gid):
         if gid & 0xF0000000:
@@ -187,7 +191,8 @@ def load_map(path):
                 image, iw, ih = image_info(path, layer)
                 sprites.append(Sprite(image, (0, 0, iw, ih), x, y, iw, ih,
                                       active_world, alpha, color,
-                                      layer.get("repeatx", False), layer.get("repeaty", False)))
+                                      layer.get("repeatx", False), layer.get("repeaty", False),
+                                      visual_role=props.get("visualRole", "fog" if name == "Low fog" else "background")))
             elif kind == "tilelayer":
                 data = layer.get("data")
                 if not isinstance(data, list) or len(data) != layer["width"] * layer["height"]:
@@ -199,7 +204,7 @@ def load_map(path):
                     cw, ch = rect[2:]
                     sprites.append(Sprite(image, rect, x + i % layer["width"] * tw,
                                           y + (i // layer["width"] + 1) * th - ch,
-                                          cw, ch, active_world, alpha, color))
+                                          cw, ch, active_world, alpha, color, visual_role="terrain"))
                     if is_solid:
                         item = sprites[-1]
                         inset = collision_tops[gid]
@@ -215,7 +220,8 @@ def load_map(path):
                         image, rect = tile(obj["gid"])
                         w, h = obj.get("width", rect[2]), obj.get("height", rect[3])
                         sprites.append(Sprite(image, rect, ox, oy - h, w, h,
-                                              active_world, alpha * obj.get("opacity", 1), color))
+                                              active_world, alpha * obj.get("opacity", 1), color,
+                                              visual_role=visual_roles[obj["gid"]]))
                     else:
                         if any(k in obj for k in ("ellipse", "polygon", "polyline", "text", "template")):
                             raise MapFormatError("Only point/rectangle game objects are supported")

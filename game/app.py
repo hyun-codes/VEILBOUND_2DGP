@@ -12,6 +12,7 @@ from game.map_scene import MapScene
 from game.timing import FixedStepper
 from game.player import AnimationSet, Player
 from game.world_state import WorldState
+from game.world_effects import WorldEffects
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -25,7 +26,8 @@ class Game:
     def __init__(self, map_data, world="real", camera_position=None):
         self.data = map_data
         self.camera = Camera(map_data.width, map_data.height, WIDTH, HEIGHT, SCALE)
-        self.scene = MapScene(map_data, world)
+        self.effects = WorldEffects(world)
+        self.scene = MapScene(map_data, world, self.effects)
         self.scene.show_markers = False
         self.world_state = WorldState(map_data.solids, world)
         start = map_data.object_named("PlayerStart")
@@ -58,6 +60,7 @@ class Game:
     def restart(self, fallen=False):
         self.world_state.reset()
         self.scene.world = self.world_state.name
+        self.effects.reset(self.world_state.name)
         self.player.collision = self.collision
         self.player.reset()
         self.keys.clear()
@@ -96,6 +99,8 @@ class Game:
                     reset_clock = True
                 elif event.key == "f1":
                     self.scene.show_markers = not self.scene.show_markers
+                elif event.key == "f3":
+                    self.effects.motion_enabled = not self.effects.motion_enabled
                 elif self.completed:
                     continue
                 elif event.key in SHIFT_KEYS and not shift_was_held:
@@ -112,9 +117,11 @@ class Game:
         for _ in range(pending):
             if self.world_state.try_toggle(self.player):
                 self.scene.world = self.world_state.name
+                self.effects.switch(self.world_state.name)
                 self.blocked_notice = 0.0
             else:
                 self.blocked_notice = 0.45
+                self.effects.reject()
         dx = int(bool(self.keys & {"d", "right"})) - int(bool(self.keys & {"a", "left"}))
         self.player.direction = dx
         self.objects.update(dt)
@@ -143,6 +150,9 @@ class Game:
         renderer.rectangle((0, HEIGHT - 31, WIDTH, 31), (25, 27, 38), filled=True)
         title = f"STAGE 1 / {self.scene.world.upper()}"
         renderer.label(12, HEIGHT - 22, title)
+        renderer.rectangle((0, HEIGHT - 31, 5, 31), self.effects.indicator, filled=True)
+        motion = "ON" if self.effects.motion_enabled else "OFF"
+        renderer.label(590, HEIGHT - 22, f"Motion: {motion} (F3)")
         renderer.rectangle((0, 0, WIDTH, 26), (25, 27, 38), filled=True)
         status = "PAUSED - focus window to resume" if self.paused else "A/D: move | Space: tap/hold jump | Shift: switch | R: restart | F1: debug | Esc: quit"
         renderer.label(12, 8, status)
@@ -150,6 +160,8 @@ class Game:
             renderer.label(12, HEIGHT - 48, "FELL - returned to start")
         if self.blocked_notice > 0:
             renderer.label(12, HEIGHT - 48, "Cannot switch: solid terrain blocks your body", (255, 181, 142))
+        elif self.effects.notice > 0 and not self.completed:
+            renderer.label(320, HEIGHT - 65, f"{self.scene.world.upper()} WORLD", self.effects.indicator)
         if self.scene.show_markers:
             p = self.player
             renderer.rectangle(self.camera.screen_rect(p.x - p.WIDTH / 2, p.y - p.HEIGHT,
@@ -173,6 +185,8 @@ class Game:
                 if not self.running:
                     break
                 if not self.paused:
+                    # 새 입력으로 막 시작한 효과에 이전 프레임 지연 시간을 적용하지 않는다.
+                    self.effects.advance(elapsed, environment=not self.completed)
                     self.stepper.advance(elapsed, self.step)
                 self.draw(backend)
                 frames += 1
