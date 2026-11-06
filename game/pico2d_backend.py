@@ -49,7 +49,7 @@ class Pico2DBackend:
         key_names = {sdl.SDLK_ESCAPE: "escape", sdl.SDLK_LEFT: "left",
                      sdl.SDLK_RIGHT: "right", sdl.SDLK_UP: "up",
                      sdl.SDLK_DOWN: "down", sdl.SDLK_r: "r", sdl.SDLK_F1: "f1",
-                     sdl.SDLK_SPACE: "space"}
+                     sdl.SDLK_SPACE: "space", sdl.SDLK_a: "a", sdl.SDLK_d: "d"}
         event = sdl.SDL_Event()
         result = []
         while sdl.SDL_PollEvent(ctypes.byref(event)):

@@ -105,6 +105,25 @@ class AppTests(unittest.TestCase):
         game.step(1 / 60)
         self.assertEqual(game.player.x, before)  # 좌우 동시 입력은 정지한다.
 
+    def test_ad_and_arrow_keys_combine_without_speed_or_release_errors(self):
+        game = Game(self.data)
+        game.handle_events([InputEvent("key_down", "d"), InputEvent("key_down", "right")])
+        game.step(1 / 60)
+        self.assertAlmostEqual(game.player.x, 28 + game.player.SPEED / 60)
+        game.handle_events([InputEvent("key_up", "right")])
+        game.step(1 / 60)
+        self.assertEqual(game.player.direction, 1)  # D가 남아 있으면 계속 이동한다.
+        game.handle_events([InputEvent("key_down", "a")])
+        before = game.player.x
+        game.step(1 / 60)
+        self.assertEqual(game.player.x, before)
+        game.handle_events([InputEvent("key_up", "d")])
+        game.step(1 / 60)
+        self.assertEqual(game.player.direction, -1)
+        game.handle_events([InputEvent("focus_lost"), InputEvent("focus_gained")])
+        game.step(1 / 60)
+        self.assertEqual(game.player.direction, 0)
+
     def test_quit_and_escape_work_even_when_paused(self):
         for event in (InputEvent("quit"), InputEvent("key_down", "escape")):
             game = Game(self.data)

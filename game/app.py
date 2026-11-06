@@ -83,7 +83,7 @@ class Game:
         return reset_clock
 
     def step(self, dt):
-        dx = int("right" in self.keys) - int("left" in self.keys)
+        dx = int(bool(self.keys & {"d", "right"})) - int(bool(self.keys & {"a", "left"}))
         self.player.direction = dx
         self.objects.update(dt)
         self.fall_notice = max(0.0, self.fall_notice - dt)
@@ -100,7 +100,7 @@ class Game:
         title = f"STAGE 1 / {self.scene.world.upper()} - MOVEMENT PROTOTYPE"
         renderer.label(12, HEIGHT - 22, title)
         renderer.rectangle((0, 0, WIDTH, 26), (25, 27, 38), filled=True)
-        status = "PAUSED - focus window to resume" if self.paused else "Left/Right: move | Space: jump | R: restart | F1: debug | Esc: quit"
+        status = "PAUSED - focus window to resume" if self.paused else "A/D or arrows: move | Space: jump | R: restart | F1: debug | Esc: quit"
         renderer.label(12, 8, status)
         if self.fall_notice > 0:
             renderer.label(12, HEIGHT - 48, "FELL - returned to start")
