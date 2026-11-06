@@ -1,4 +1,4 @@
-"""정적 맵 출력 객체. 시작점 표시를 플레이어 구현으로 취급하지 않는다."""
+"""현재 세계 지형과 출구 안내. 시작점은 디버그 표시다."""
 
 import math
 
@@ -32,10 +32,10 @@ class MapScene:
             sx, sy, _, _ = camera.screen_rect(start.x, start.y, 0, 0)
             renderer.rectangle((sx - 3, sy, 6, 6), (116, 223, 188), filled=True)
             renderer.label(sx - 20, sy + 12, "START", (116, 223, 188))
-            end = self.data.object_named("Exit")
-            rect = camera.screen_rect(end.x, end.y, end.width, end.height)
-            renderer.rectangle(rect, (116, 223, 188))
-            renderer.label(rect[0], rect[1] + rect[3] + 6, "EXIT", (116, 223, 188))
+        end = self.data.object_named("Exit")
+        rect = camera.screen_rect(end.x, end.y, end.width, end.height)
+        renderer.rectangle(rect, (116, 223, 188))
+        renderer.label(rect[0], rect[1] + rect[3] + 6, "EXIT", (116, 223, 188))
 
     @staticmethod
     def _copies(origin, size, view_origin, view_size, repeat):

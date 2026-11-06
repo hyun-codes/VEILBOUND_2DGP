@@ -63,6 +63,7 @@ class Player:
         self.vx = self.vy = 0.0
         self.direction, self.facing = 0, 1
         self.grounded = self.collision.supported(self.x, self.y, self.WIDTH)
+        self.last_support = (self.x, self.y)
         self.coyote = self.COYOTE_TIME if self.grounded else 0.0
         self.jump_buffer = 0.0
         self.jump_held = False
@@ -88,6 +89,7 @@ class Player:
     def update(self, dt):
         was_grounded = self.grounded
         if was_grounded:
+            self.last_support = (self.x, self.y)
             self.coyote = self.COYOTE_TIME
         if self.jump_buffer > 0 and (self.grounded or self.coyote > 0):
             self._jump()
@@ -108,6 +110,7 @@ class Player:
             self.vy = 0.0
         self.grounded = landed
         if landed:
+            self.last_support = (self.x, self.y)
             self.coyote = self.COYOTE_TIME
             if self.jump_buffer > 0:
                 self._jump()  # 착지 스텝에서 소비하되 위치를 즉시 옮기지는 않는다.

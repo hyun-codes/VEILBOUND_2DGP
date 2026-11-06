@@ -28,7 +28,7 @@ class Pico2DBackend:
         if not self.native.window or not self.native.renderer:
             raise RuntimeError("SDL could not create a game window/renderer")
         self.pico.hide_lattice()
-        self.sdl.SDL_SetWindowTitle(self.native.window, b"VEILBOUND - Stage 1 Movement Prototype")
+        self.sdl.SDL_SetWindowTitle(self.native.window, b"VEILBOUND - Stage 1")
         self.sdl.SDL_SetRenderDrawBlendMode(self.native.renderer, self.sdl.SDL_BLENDMODE_BLEND)
         font_path = Path(self.pico.__file__).parent / "data" / "ConsolaMalgun.ttf"
         self.font = self.pico.load_font(str(font_path), 15)
@@ -49,7 +49,8 @@ class Pico2DBackend:
         key_names = {sdl.SDLK_ESCAPE: "escape", sdl.SDLK_LEFT: "left",
                      sdl.SDLK_RIGHT: "right", sdl.SDLK_UP: "up",
                      sdl.SDLK_DOWN: "down", sdl.SDLK_r: "r", sdl.SDLK_F1: "f1",
-                     sdl.SDLK_SPACE: "space", sdl.SDLK_a: "a", sdl.SDLK_d: "d"}
+                     sdl.SDLK_SPACE: "space", sdl.SDLK_a: "a", sdl.SDLK_d: "d",
+                     sdl.SDLK_LSHIFT: "shift_left", sdl.SDLK_RSHIFT: "shift_right"}
         event = sdl.SDL_Event()
         result = []
         while sdl.SDL_PollEvent(ctypes.byref(event)):

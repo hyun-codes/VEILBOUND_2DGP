@@ -19,6 +19,12 @@ class CollisionWorld:
     def __init__(self, solids, world="real"):
         self.solids = tuple(s for s in solids if s.world in ("common", world))
 
+    def overlaps(self, x, feet, width, height):
+        """면 접촉을 제외한 몸체 내부 겹침. 전환 시 임의의 밀어내기는 하지 않는다."""
+        return any(x + width / 2 > s.x + EPSILON and x - width / 2 < s.x + s.width - EPSILON
+                   and feet > s.y + EPSILON and feet - height < s.y + s.height - EPSILON
+                   for s in self.solids)
+
     def supported(self, x, feet, width):
         return any(abs(feet - s.y) <= EPSILON and
                    x + width / 2 > s.x + EPSILON and x - width / 2 < s.x + s.width - EPSILON
