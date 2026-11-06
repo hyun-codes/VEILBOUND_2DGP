@@ -71,6 +71,8 @@ class MapLoaderTests(unittest.TestCase):
         self.assertEqual(moved.sprites[0].y, original.sprites[0].y + 11)
         self.assertEqual(moved.object_named("PlayerStart").x, 35)
         self.assertEqual(moved.object_named("PlayerStart").y, 194)
+        self.assertEqual(moved.solids[0].x, original.solids[0].x + 7)
+        self.assertEqual(moved.solids[0].y, original.solids[0].y + 11)
 
     def test_world_preview_uses_hidden_shadow_layer_and_resets_tint_per_sprite(self):
         stage = self.load_fixture()

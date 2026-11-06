@@ -6,6 +6,8 @@ import json
 import math
 import struct
 
+from game.collision import Solid
+
 
 class MapFormatError(ValueError):
     pass
@@ -52,6 +54,7 @@ class Sprite:
     tint: tuple = (255, 255, 255)
     repeat_x: bool = False
     repeat_y: bool = False
+    flip_x: bool = False
 
 
 @dataclass(frozen=True)
@@ -73,6 +76,7 @@ class MapData:
     background: tuple
     sprites: tuple
     objects: tuple
+    solids: tuple = ()
 
     def object_named(self, name):
         found = [obj for obj in self.objects if obj.name == name]
@@ -91,7 +95,8 @@ def load_map(path):
     tw, th = root["tilewidth"], root["tileheight"]
     if min(tw, th, root["width"], root["height"]) <= 0:
         raise MapFormatError("Map dimensions must be positive")
-    images, tiles, sprites, objects = {}, {}, [], []
+    images, tiles, sprites, objects, solids = {}, {}, [], [], []
+    collision_tops = {}
 
     def image_info(owner, spec):
         image = (owner.parent / spec["image"]).resolve()
@@ -110,6 +115,8 @@ def load_map(path):
             raise MapFormatError("Use an external TSJ tileset")
         owner = (path.parent / reference["source"]).resolve()
         ts = _read_json(owner)
+        definitions = {t["id"]: {p["name"]: p["value"] for p in t.get("properties", [])}
+                       for t in ts.get("tiles", [])}
         if ts.get("objectalignment", "bottomleft") not in ("bottomleft", "unspecified"):
             raise MapFormatError(f"Unsupported tile object alignment: {owner}")
         if any("animation" in t for t in ts.get("tiles", [])):
@@ -139,6 +146,10 @@ def load_map(path):
             if gid <= 0 or gid in tiles:
                 raise MapFormatError(f"Overlapping/invalid GID: {gid}")
             tiles[gid] = (image, rect)
+            inset = definitions.get(local, {}).get("collisionTop", 0)
+            if not isinstance(inset, (int, float)) or not math.isfinite(inset) or not 0 <= inset < rect[3]:
+                raise MapFormatError(f"Invalid collisionTop for GID {gid}")
+            collision_tops[gid] = inset
 
     def tile(gid):
         if gid & 0xF0000000:
@@ -147,10 +158,11 @@ def load_map(path):
             raise MapFormatError(f"Unknown tile GID: {gid}")
         return tiles[gid]
 
-    def walk(layers, px=0, py=0, world="common", opacity=1.0, tint=(255, 255, 255), visible=True):
+    def walk(layers, px=0, py=0, world="common", opacity=1.0, tint=(255, 255, 255), visible=True, solid=False):
         for layer in layers:
             name, kind = layer.get("name", ""), layer["type"]
             props = {p["name"]: p["value"] for p in layer.get("properties", [])}
+            is_solid = props.get("solid", solid)
             declared = props.get("world", {"RealOnly": "real", "ShadowOnly": "shadow"}.get(name))
             active_world = {"both": "common", None: world}.get(declared, declared)
             if active_world not in ("common", "real", "shadow"):
@@ -170,7 +182,7 @@ def load_map(path):
             rgb = _color(layer["tintcolor"]) if "tintcolor" in layer else (255, 255, 255)
             color = tuple(round(a * b / 255) for a, b in zip(tint, rgb))
             if kind == "group":
-                walk(layer["layers"], x, y, active_world, alpha, color, show)
+                walk(layer["layers"], x, y, active_world, alpha, color, show, is_solid)
             elif kind == "imagelayer":
                 image, iw, ih = image_info(path, layer)
                 sprites.append(Sprite(image, (0, 0, iw, ih), x, y, iw, ih,
@@ -188,6 +200,10 @@ def load_map(path):
                     sprites.append(Sprite(image, rect, x + i % layer["width"] * tw,
                                           y + (i // layer["width"] + 1) * th - ch,
                                           cw, ch, active_world, alpha, color))
+                    if is_solid:
+                        item = sprites[-1]
+                        inset = collision_tops[gid]
+                        solids.append(Solid(item.x, item.y + inset, cw, ch - inset, active_world))
             elif kind == "objectgroup":
                 for obj in layer.get("objects", []):
                     if not obj.get("visible", True):
@@ -211,7 +227,7 @@ def load_map(path):
 
     walk(root["layers"])
     result = MapData(path, root["width"] * tw, root["height"] * th,
-                     _color(root.get("backgroundcolor", "#272a39")), tuple(sprites), tuple(objects))
+                     _color(root.get("backgroundcolor", "#272a39")), tuple(sprites), tuple(objects), tuple(solids))
     result.object_named("PlayerStart")
     result.object_named("Exit")
     return result

@@ -1,4 +1,4 @@
-"""첫 실행 단위: 고정 루프와 Stage 1 맵 미리보기. 플레이어 물리는 다음 단계다."""
+"""Stage 1 이동 기반: 세계 선택은 고정이며 Shift 전환·클리어는 다음 단계다."""
 
 import argparse
 from pathlib import Path
@@ -10,10 +10,13 @@ from game.game_world import GameWorld
 from game.map_loader import load_map, MapFormatError
 from game.map_scene import MapScene
 from game.timing import FixedStepper
+from game.collision import CollisionWorld
+from game.player import AnimationSet, Player
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 STAGE_1 = PROJECT_ROOT / "maps" / "stage_01" / "stage1_missing_bridge.tmj"
+PLAYER_ANIMATIONS = PROJECT_ROOT / "assets" / "characters" / "player" / "animations.json"
 WIDTH, HEIGHT, SCALE = 800, 600, 3
 
 
@@ -22,12 +25,20 @@ class Game:
         self.data = map_data
         self.camera = Camera(map_data.width, map_data.height, WIDTH, HEIGHT, SCALE)
         self.scene = MapScene(map_data, world)
+        self.scene.show_markers = False
+        self.collision = CollisionWorld(map_data.solids, world)
+        start = map_data.object_named("PlayerStart")
+        self.player = Player(AnimationSet(PLAYER_ANIMATIONS), self.collision,
+                             map_data.width, (start.x, start.y))
         self.objects = GameWorld()
         self.objects.add_object(self.scene)
+        self.objects.add_object(self.player, depth=1)
         self.stepper = FixedStepper()
         self.keys = set()
         self.running = True
         self.paused = False
+        self.fall_notice = 0.0
+        self.respawns = 0
         self.reset_camera()
         if camera_position is not None:
             self.camera.set_position(*camera_position)
@@ -35,6 +46,14 @@ class Game:
     def reset_camera(self):
         start = self.data.object_named("PlayerStart")
         self.camera.focus(start.x, start.y)
+
+    def restart(self, fallen=False):
+        self.player.reset()
+        self.keys.clear()
+        self.reset_camera()
+        self.fall_notice = 0.45 if fallen else 0.0
+        if fallen:
+            self.respawns += 1
 
     def handle_events(self, events):
         reset_clock = False
@@ -44,37 +63,51 @@ class Game:
             elif event.kind in ("focus_lost", "focus_gained"):
                 self.paused = event.kind == "focus_lost"
                 self.keys.clear()
+                self.player.clear_input()
                 self.stepper.reset()
                 reset_clock = True
             elif event.kind == "key_up":
                 self.keys.discard(event.key)
             elif event.kind == "key_down" and not self.paused:
+                if event.key in self.keys:
+                    continue
+                self.keys.add(event.key)
                 if event.key == "r":
-                    self.reset_camera()
-                    self.keys.clear()
+                    self.restart()
                     self.stepper.reset()
                     reset_clock = True
                 elif event.key == "f1":
                     self.scene.show_markers = not self.scene.show_markers
-                else:
-                    self.keys.add(event.key)
+                elif event.key == "space":
+                    self.player.request_jump()
         return reset_clock
 
     def step(self, dt):
         dx = int("right" in self.keys) - int("left" in self.keys)
-        dy = int("down" in self.keys) - int("up" in self.keys)
-        self.camera.set_position(self.camera.x + dx * 80 * dt, self.camera.y + dy * 80 * dt)
+        self.player.direction = dx
         self.objects.update(dt)
+        self.fall_notice = max(0.0, self.fall_notice - dt)
+        if self.player.y - self.player.HEIGHT > self.data.height:
+            # 화면 밖 추락은 가짜 사망 모션 없이 즉시 복귀한다. stepper는 콜백 안에서 초기화하지 않는다.
+            self.restart(fallen=True)
+        elif self.player.y <= self.data.height:
+            self.camera.follow(self.player.x, self.player.y, dx, dt)
 
     def draw(self, renderer):
         renderer.begin(self.data.background)
         self.objects.render(renderer, self.camera)
         renderer.rectangle((0, HEIGHT - 31, WIDTH, 31), (25, 27, 38), filled=True)
-        title = f"STAGE 1 / {self.scene.world.upper()} - MAP PREVIEW"
+        title = f"STAGE 1 / {self.scene.world.upper()} - MOVEMENT PROTOTYPE"
         renderer.label(12, HEIGHT - 22, title)
         renderer.rectangle((0, 0, WIDTH, 26), (25, 27, 38), filled=True)
-        status = "PAUSED - focus window to resume" if self.paused else "Arrows: camera | R: reset | F1: markers | Esc: quit"
+        status = "PAUSED - focus window to resume" if self.paused else "Left/Right: move | Space: jump | R: restart | F1: debug | Esc: quit"
         renderer.label(12, 8, status)
+        if self.fall_notice > 0:
+            renderer.label(12, HEIGHT - 48, "FELL - returned to start")
+        if self.scene.show_markers:
+            p = self.player
+            renderer.rectangle(self.camera.screen_rect(p.x - p.WIDTH / 2, p.y - p.HEIGHT,
+                                                       p.WIDTH, p.HEIGHT), (255, 220, 100))
 
     def run(self, backend, max_frames=None, screenshot=None):
         try:
@@ -113,9 +146,9 @@ def _positive_int(text):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="VEILBOUND Stage 1 map preview (player gameplay not implemented yet)")
+    parser = argparse.ArgumentParser(description="VEILBOUND Stage 1 movement prototype (world switching/clear not implemented)")
     parser.add_argument("--check-map", action="store_true", help="validate map data without opening a window")
-    parser.add_argument("--world", choices=("real", "shadow"), default="real", help="static preview world, not gameplay switching")
+    parser.add_argument("--world", choices=("real", "shadow"), default="real", help="fixed world for movement testing, not gameplay switching")
     parser.add_argument("--frames", type=_positive_int, help="close automatically after this many render frames")
     parser.add_argument("--camera", nargs=2, type=float, metavar=("X", "Y"), help="initial camera top-left in world pixels")
     parser.add_argument("--screenshot", type=Path, metavar="FILE.bmp", help="save actual final frame; requires --frames")

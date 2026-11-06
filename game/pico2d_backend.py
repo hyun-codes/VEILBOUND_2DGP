@@ -28,7 +28,7 @@ class Pico2DBackend:
         if not self.native.window or not self.native.renderer:
             raise RuntimeError("SDL could not create a game window/renderer")
         self.pico.hide_lattice()
-        self.sdl.SDL_SetWindowTitle(self.native.window, b"VEILBOUND - Stage 1 Map Preview")
+        self.sdl.SDL_SetWindowTitle(self.native.window, b"VEILBOUND - Stage 1 Movement Prototype")
         self.sdl.SDL_SetRenderDrawBlendMode(self.native.renderer, self.sdl.SDL_BLENDMODE_BLEND)
         font_path = Path(self.pico.__file__).parent / "data" / "ConsolaMalgun.ttf"
         self.font = self.pico.load_font(str(font_path), 15)
@@ -48,7 +48,8 @@ class Pico2DBackend:
         sdl = self.sdl
         key_names = {sdl.SDLK_ESCAPE: "escape", sdl.SDLK_LEFT: "left",
                      sdl.SDLK_RIGHT: "right", sdl.SDLK_UP: "up",
-                     sdl.SDLK_DOWN: "down", sdl.SDLK_r: "r", sdl.SDLK_F1: "f1"}
+                     sdl.SDLK_DOWN: "down", sdl.SDLK_r: "r", sdl.SDLK_F1: "f1",
+                     sdl.SDLK_SPACE: "space"}
         event = sdl.SDL_Event()
         result = []
         while sdl.SDL_PollEvent(ctypes.byref(event)):
@@ -81,7 +82,11 @@ class Pico2DBackend:
         image.opacify(sprite.opacity)
         x, y_top, w, h = sprite.source
         dx, dy, dw, dh = rect
-        image.clip_draw_to_origin(x, image.h - y_top - h, w, h, dx, dy, dw, dh)
+        if sprite.flip_x:
+            image.clip_composite_draw(x, image.h - y_top - h, w, h, 0, "h",
+                                      dx + dw / 2, dy + dh / 2, dw, dh)
+        else:
+            image.clip_draw_to_origin(x, image.h - y_top - h, w, h, dx, dy, dw, dh)
 
     def rectangle(self, rect, color, filled=False):
         x, y, width, height = rect

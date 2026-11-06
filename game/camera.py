@@ -12,6 +12,7 @@ class Camera:
         self.world_width, self.world_height = world_width, world_height
         self.width, self.height, self.scale = width, height, int(scale)
         self.x = self.y = 0.0
+        self.look_ahead = 0.0
         self.set_position(0, 0)
 
     def set_position(self, x, y):
@@ -27,8 +28,25 @@ class Camera:
         return max(0.0, min(value, world_extent - visible_extent))
 
     def focus(self, x, y):
+        self.look_ahead = 0.0
         self.set_position(x - self.width / self.scale / 2,
                           y - self.height / self.scale / 2)
+
+    def follow(self, x, feet, direction, dt):
+        """중앙 가로 40% 창·완만한 선행 시야. 평소 점프는 세로 창 안에서 유지한다."""
+        blend = 1 - math.exp(-8 * dt)
+        self.look_ahead += (direction * 16 - self.look_ahead) * blend
+        vw, vh = self.width / self.scale, self.height / self.scale
+        focus_x = x + self.look_ahead
+        relative_x = focus_x - self.x
+        target_x = self.x + relative_x - max(vw * 0.3, min(relative_x, vw * 0.7))
+        body_y = feet - 7
+        relative_y = body_y - self.y
+        target_y = self.y + relative_y - max(vh * 0.2, min(relative_y, vh * 0.85))
+        self.set_position(self.x + (target_x - self.x) * blend,
+                          self.y + (target_y - self.y) * blend)
+        # 평활화 때문에 플레이어가 화면 밖으로 나가는 것은 허용하지 않는다.
+        self.set_position(max(x - vw + 8, min(self.x, x - 8)), self.y)
 
     @property
     def view(self):
