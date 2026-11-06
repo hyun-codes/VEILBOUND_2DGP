@@ -1,4 +1,4 @@
-"""Stage 1: 세계 전환으로 다리를 연결하고 출구에 도달한다."""
+"""세계 전환과 가로등 배치로 길을 만들고 현실 포털로 진행한다."""
 
 import argparse
 from pathlib import Path
@@ -13,37 +13,50 @@ from game.timing import FixedStepper
 from game.player import AnimationSet, Player
 from game.world_state import WorldState
 from game.world_effects import WorldEffects
+from game.lamp_puzzle import LampPuzzle
+from game.stage_manager import StageManager
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 STAGE_1 = PROJECT_ROOT / "maps" / "stage_01" / "stage1_missing_bridge.tmj"
+STAGE_2 = PROJECT_ROOT / "maps" / "stage_02" / "stage2_lamp_room.tmj"
 PLAYER_ANIMATIONS = PROJECT_ROOT / "assets" / "characters" / "player" / "animations.json"
 WIDTH, HEIGHT, SCALE = 800, 600, 3
 SHIFT_KEYS = {"shift_left", "shift_right"}
 
 
 class Game:
-    def __init__(self, map_data, world="real", camera_position=None):
-        self.data = map_data
-        self.camera = Camera(map_data.width, map_data.height, WIDTH, HEIGHT, SCALE)
+    def __init__(self, map_data, world="real", camera_position=None, stages=None):
+        self.stages = stages
+        self.animations = AnimationSet(PLAYER_ANIMATIONS)
         self.effects = WorldEffects(world)
-        self.scene = MapScene(map_data, world, self.effects)
-        self.scene.show_markers = False
-        self.world_state = WorldState(map_data.solids, world)
-        start = map_data.object_named("PlayerStart")
-        self.player = Player(AnimationSet(PLAYER_ANIMATIONS), self.collision,
-                             map_data.width, (start.x, start.y))
-        self.objects = GameWorld()
-        self.objects.add_object(self.scene)
-        self.objects.add_object(self.player, depth=1)
         self.stepper = FixedStepper()
         self.keys = set()
         self.running = True
         self.paused = False
-        self.pending_switches = 0
-        self.blocked_notice = 0.0
+        self.enter_map(map_data, world, camera_position)
+
+    def enter_map(self, map_data, world="real", camera_position=None):
+        self.source_data = map_data
+        self.puzzle = LampPuzzle(map_data)
+        self.data = self.puzzle.data
+        self.stage_number = map_data.properties.get("stageNumber", 1)
+        self.camera = Camera(self.data.width, self.data.height, WIDTH, HEIGHT, SCALE)
+        self.effects.reset(world)
+        self.scene = MapScene(self.data, world, self.effects)
+        self.scene.show_markers = False
+        self.world_state = WorldState(self.data.solids, world)
+        start = self.data.object_named("PlayerStart")
+        self.player = Player(self.animations, self.collision, self.data.width, (start.x, start.y))
+        if hasattr(self, "objects"):
+            self.objects.clear()
+        self.objects = GameWorld()
+        self.objects.add_object(self.scene)
+        self.objects.add_object(self.player, depth=1)
+        self.keys.clear()
+        self.pending_switches = self.pending_interactions = 0
+        self.blocked_notice = self.interaction_notice = self.fall_notice = 0.0
         self.completed = False
-        self.fall_notice = 0.0
         self.respawns = 0
         self.reset_camera()
         if camera_position is not None:
@@ -58,19 +71,12 @@ class Game:
         return self.world_state.collision
 
     def restart(self, fallen=False):
-        self.world_state.reset()
-        self.scene.world = self.world_state.name
-        self.effects.reset(self.world_state.name)
-        self.player.collision = self.collision
-        self.player.reset()
-        self.keys.clear()
-        self.pending_switches = 0
-        self.blocked_notice = 0.0
-        self.completed = False
-        self.reset_camera()
+        count = self.respawns + int(fallen)
+        debug = self.scene.show_markers
+        self.enter_map(self.source_data)
+        self.scene.show_markers = debug
+        self.respawns = count
         self.fall_notice = 0.45 if fallen else 0.0
-        if fallen:
-            self.respawns += 1
 
     def player_at_exit(self):
         p, area = self.player, self.data.object_named("Exit")
@@ -86,7 +92,7 @@ class Game:
                 self.paused = event.kind == "focus_lost"
                 self.keys.clear()
                 self.player.clear_input()
-                self.pending_switches = 0
+                self.pending_switches = self.pending_interactions = 0
                 self.stepper.reset()
                 reset_clock = True
             elif event.kind == "key_up":
@@ -110,6 +116,8 @@ class Game:
                     continue
                 elif event.key in SHIFT_KEYS and not shift_was_held:
                     self.pending_switches += 1
+                elif event.key == "e":
+                    self.pending_interactions += 1
                 elif event.key == "space":
                     self.player.request_jump()
         return reset_clock
@@ -127,6 +135,16 @@ class Game:
             else:
                 self.blocked_notice = 0.45
                 self.effects.reject()
+        self.interaction_notice = max(0.0, self.interaction_notice - dt)
+        pending, self.pending_interactions = self.pending_interactions, 0
+        for _ in range(pending):
+            if self.puzzle.interact(self.player, self.world_state.name):
+                self.data = self.puzzle.data
+                self.scene.data = self.data
+                self.world_state = WorldState(self.data.solids, self.scene.world)
+                self.player.collision = self.collision
+            elif self.puzzle.enabled:
+                self.interaction_notice = 0.6
         dx = int(bool(self.keys & {"d", "right"})) - int(bool(self.keys & {"a", "left"}))
         self.player.direction = dx
         self.objects.update(dt)
@@ -139,26 +157,30 @@ class Game:
             self.camera.follow(self.player.x, self.player.y, dx, dt)
         p = self.player
         if self.world_state.name == "real" and self.player_at_exit():
-            # Stage 2 데이터가 없으므로 파일을 추측해 읽지 않고 단독 완료 상태로 멈춘다.
+            next_map = self.stages.next_map(self.data) if self.stages else None
+            if next_map is not None:
+                self.enter_map(next_map)
+                return
+            # 등록한 다음 스테이지가 없으면 현재 완료 상태로 멈춘다.
             self.completed = True
             p.vx = p.vy = 0.0
             p.clear_input()
             p.animation, p.animation_time = "idle", 0.0
             self.keys.clear()
-            self.pending_switches = 0
+            self.pending_switches = self.pending_interactions = 0
             self.blocked_notice = self.fall_notice = 0.0
 
     def draw(self, renderer):
         renderer.begin(self.data.background)
         self.objects.render(renderer, self.camera)
         renderer.rectangle((0, HEIGHT - 31, WIDTH, 31), (25, 27, 38), filled=True)
-        title = f"STAGE 1 / {self.scene.world.upper()}"
+        title = f"STAGE {self.stage_number} / {self.scene.world.upper()}"
         renderer.label(12, HEIGHT - 22, title)
         renderer.rectangle((0, HEIGHT - 31, 5, 31), self.effects.indicator, filled=True)
         motion = "ON" if self.effects.motion_enabled else "OFF"
         renderer.label(590, HEIGHT - 22, f"Motion: {motion} (F3)")
         renderer.rectangle((0, 0, WIDTH, 26), (25, 27, 38), filled=True)
-        status = "PAUSED - focus window to resume" if self.paused else "A/D: move | Space: tap/hold jump | Shift: switch | R: restart | F1: debug | Esc: quit"
+        status = "PAUSED - focus window to resume" if self.paused else "A/D: move | Space: tap/hold | Shift: world | E: lamp | R: restart | F1: debug | Esc: quit"
         renderer.label(12, 8, status)
         if self.fall_notice > 0:
             renderer.label(12, HEIGHT - 48, "FELL - returned to start")
@@ -168,13 +190,19 @@ class Game:
             renderer.label(12, HEIGHT - 48, "Portal inactive in shadow - press Shift to return")
         elif self.effects.notice > 0 and not self.completed:
             renderer.label(320, HEIGHT - 65, f"{self.scene.world.upper()} WORLD", self.effects.indicator)
+        if self.puzzle.enabled:
+            self.puzzle.draw(renderer, self.camera)
+            hint = self.puzzle.hint(self.player, self.scene.world)
+            if self.interaction_notice > 0:
+                hint = "E: use a RAIL control while standing in REAL"
+            renderer.label(12, HEIGHT - 88, hint)
         if self.scene.show_markers:
             p = self.player
             renderer.rectangle(self.camera.screen_rect(p.x - p.WIDTH / 2, p.y - p.HEIGHT,
                                                        p.WIDTH, p.HEIGHT), (255, 220, 100))
         if self.completed:
             renderer.rectangle((200, 245, 400, 110), (25, 27, 38), filled=True)
-            renderer.label(325, 315, "STAGE 1 CLEAR", (116, 223, 188))
+            renderer.label(325, 315, f"STAGE {self.stage_number} CLEAR", (116, 223, 188))
             renderer.label(290, 280, "R: try again   Esc: quit")
 
     def run(self, backend, max_frames=None, screenshot=None):
@@ -216,7 +244,8 @@ def _positive_int(text):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="VEILBOUND Stage 1 - switch worlds and reach the exit")
+    parser = argparse.ArgumentParser(description="VEILBOUND - light and shadow puzzle platformer")
+    parser.add_argument("--stage", type=int, choices=(1, 2), default=1, help="start stage; Stage 2 is a lamp puzzle prototype")
     parser.add_argument("--check-map", action="store_true", help="validate map data without opening a window")
     parser.add_argument("--world", choices=("real", "shadow"), default="real", help="initial world for testing; restart always returns to real")
     parser.add_argument("--frames", type=_positive_int, help="close automatically after this many render frames")
@@ -226,12 +255,14 @@ def main(argv=None):
     if args.screenshot and (args.frames is None or args.screenshot.suffix.lower() != ".bmp"):
         parser.error("--screenshot requires --frames and a .bmp output path")
     try:
-        data = load_map(STAGE_1)
+        paths = {"Stage1": STAGE_1, "Stage2": STAGE_2}
+        data = load_map(paths[f"Stage{args.stage}"])
         if args.check_map:
+            LampPuzzle(data)  # 순수 데이터 검사에서 퍼즐 프리셋·필수 오브젝트도 확인한다.
             print(f"Map OK: {data.width}x{data.height}, {len(data.sprites)} sprites, {len(data.objects)} game objects")
             return 0
         from game.pico2d_backend import Pico2DBackend
-        Game(data, args.world, args.camera).run(Pico2DBackend(), args.frames, args.screenshot)
+        Game(data, args.world, args.camera, StageManager(paths)).run(Pico2DBackend(), args.frames, args.screenshot)
         return 0
     except (MapFormatError, OSError, RuntimeError, ValueError, KeyError, TypeError) as exc:
         print(f"VEILBOUND could not start: {exc}", file=sys.stderr)

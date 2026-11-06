@@ -13,6 +13,7 @@ class Solid:
     width: float
     height: float
     world: str = "common"
+    lamp_state: str = ""
 
 
 class CollisionWorld:

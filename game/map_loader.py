@@ -1,6 +1,6 @@
 """현재 사용하는 유한 직교 TMJ/외부 TSJ를 그래픽 라이브러리 없이 읽는다."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 import json
 import math
@@ -57,6 +57,8 @@ class Sprite:
     flip_x: bool = False
     visual_role: str = "none"
     palette: str = "original"
+    lamp_state: str = ""
+    object_name: str = ""
 
 
 @dataclass(frozen=True)
@@ -79,6 +81,7 @@ class MapData:
     sprites: tuple
     objects: tuple
     solids: tuple = ()
+    properties: dict = field(default_factory=dict)
 
     def object_named(self, name):
         found = [obj for obj in self.objects if obj.name == name]
@@ -162,11 +165,14 @@ def load_map(path):
             raise MapFormatError(f"Unknown tile GID: {gid}")
         return tiles[gid]
 
-    def walk(layers, px=0, py=0, world="common", opacity=1.0, tint=(255, 255, 255), visible=True, solid=False):
+    def walk(layers, px=0, py=0, world="common", opacity=1.0, tint=(255, 255, 255), visible=True, solid=False, lamp_state=""):
         for layer in layers:
             name, kind = layer.get("name", ""), layer["type"]
             props = {p["name"]: p["value"] for p in layer.get("properties", [])}
             is_solid = props.get("solid", solid)
+            state = props.get("lampState", lamp_state)
+            if state not in ("", "stairs", "bridge"):
+                raise MapFormatError(f"Unsupported lampState: {state}")
             declared = props.get("world", {"RealOnly": "real", "ShadowOnly": "shadow"}.get(name))
             active_world = {"both": "common", None: world}.get(declared, declared)
             if active_world not in ("common", "real", "shadow"):
@@ -186,13 +192,13 @@ def load_map(path):
             rgb = _color(layer["tintcolor"]) if "tintcolor" in layer else (255, 255, 255)
             color = tuple(round(a * b / 255) for a, b in zip(tint, rgb))
             if kind == "group":
-                walk(layer["layers"], x, y, active_world, alpha, color, show, is_solid)
+                walk(layer["layers"], x, y, active_world, alpha, color, show, is_solid, state)
             elif kind == "imagelayer":
                 image, iw, ih = image_info(path, layer)
                 sprites.append(Sprite(image, (0, 0, iw, ih), x, y, iw, ih,
                                       active_world, alpha, color,
                                       layer.get("repeatx", False), layer.get("repeaty", False),
-                                      visual_role=props.get("visualRole", "fog" if name == "Low fog" else "background")))
+                                      visual_role=props.get("visualRole", "fog" if name == "Low fog" else "background"), lamp_state=state))
             elif kind == "tilelayer":
                 data = layer.get("data")
                 if not isinstance(data, list) or len(data) != layer["width"] * layer["height"]:
@@ -204,11 +210,11 @@ def load_map(path):
                     cw, ch = rect[2:]
                     sprites.append(Sprite(image, rect, x + i % layer["width"] * tw,
                                           y + (i // layer["width"] + 1) * th - ch,
-                                          cw, ch, active_world, alpha, color, visual_role="terrain"))
+                                          cw, ch, active_world, alpha, color, visual_role="terrain", lamp_state=state))
                     if is_solid:
                         item = sprites[-1]
                         inset = collision_tops[gid]
-                        solids.append(Solid(item.x, item.y + inset, cw, ch - inset, active_world))
+                        solids.append(Solid(item.x, item.y + inset, cw, ch - inset, active_world, state))
             elif kind == "objectgroup":
                 for obj in layer.get("objects", []):
                     if not obj.get("visible", True):
@@ -221,7 +227,8 @@ def load_map(path):
                         w, h = obj.get("width", rect[2]), obj.get("height", rect[3])
                         sprites.append(Sprite(image, rect, ox, oy - h, w, h,
                                               active_world, alpha * obj.get("opacity", 1), color,
-                                              visual_role=visual_roles[obj["gid"]]))
+                                              visual_role=visual_roles[obj["gid"]], lamp_state=state,
+                                              object_name=obj.get("name", "")))
                     else:
                         if any(k in obj for k in ("ellipse", "polygon", "polyline", "text", "template")):
                             raise MapFormatError("Only point/rectangle game objects are supported")
@@ -233,7 +240,8 @@ def load_map(path):
 
     walk(root["layers"])
     result = MapData(path, root["width"] * tw, root["height"] * th,
-                     _color(root.get("backgroundcolor", "#272a39")), tuple(sprites), tuple(objects), tuple(solids))
+                     _color(root.get("backgroundcolor", "#272a39")), tuple(sprites), tuple(objects), tuple(solids),
+                     {p["name"]: p["value"] for p in root.get("properties", [])})
     result.object_named("PlayerStart")
     result.object_named("Exit")
     return result
