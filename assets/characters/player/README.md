@@ -2,6 +2,8 @@
 
 ## 파일
 
+- [밀기 모션 AI 후보](push_candidate/README.md): 사용자 요청으로 생성한 별도 초안. 외형·픽셀 크기·반투명 경계 검수에서 미통과하여 게임에는 등록하지 않았다.
+
 - [Red_Hand_Jack_SPRITESHEET.png](Red_Hand_Jack_SPRITESHEET.png): 사용자가 제공한 원본 시트. 이미지를 수정하지 않았다.
 - [animations.json](animations.json): VEILBOUND에서 사용할 프레임과 재생 설정. `veilbound-grid-animations` 버전 1이라는 프로젝트 자체 형식이며 Aseprite 내보내기 형식이나 Tiled TSJ가 아니다.
 - [전체 스프라이트 분류표](../../../docs/player_sprite_inventory.md): Jack1~139의 액션과 무기 유무를 확인한 기록.

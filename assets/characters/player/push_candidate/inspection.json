@@ -1,0 +1,118 @@
+{
+  "status": "draft_not_runtime_ready",
+  "generator": "built-in image_gen",
+  "image": "push_right_ai_draft.png",
+  "size": [
+    1536,
+    1024
+  ],
+  "mode": "RGBA",
+  "layout": {
+    "columns": 3,
+    "rows": 2,
+    "cell": [
+      512,
+      512
+    ]
+  },
+  "partial_alpha_pixels": 73554,
+  "transparent_pixels": 1499310,
+  "opaque_pixels": 0,
+  "facing": "right",
+  "weapons": "none_visually_observed",
+  "runtime_registered": false,
+  "timing_ms_proposal": 120,
+  "timing_verified": false,
+  "frames": [
+    {
+      "index": 0,
+      "source_rect": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "opaque_body_bbox": [
+        205,
+        190,
+        305,
+        361
+      ]
+    },
+    {
+      "index": 1,
+      "source_rect": [
+        512,
+        0,
+        512,
+        512
+      ],
+      "opaque_body_bbox": [
+        202,
+        190,
+        311,
+        361
+      ]
+    },
+    {
+      "index": 2,
+      "source_rect": [
+        1024,
+        0,
+        512,
+        512
+      ],
+      "opaque_body_bbox": [
+        185,
+        192,
+        316,
+        361
+      ]
+    },
+    {
+      "index": 3,
+      "source_rect": [
+        0,
+        512,
+        512,
+        512
+      ],
+      "opaque_body_bbox": [
+        196,
+        191,
+        313,
+        360
+      ]
+    },
+    {
+      "index": 4,
+      "source_rect": [
+        512,
+        512,
+        512,
+        512
+      ],
+      "opaque_body_bbox": [
+        202,
+        190,
+        311,
+        360
+      ]
+    },
+    {
+      "index": 5,
+      "source_rect": [
+        1024,
+        512,
+        512,
+        512
+      ],
+      "opaque_body_bbox": [
+        212,
+        190,
+        312,
+        360
+      ]
+    }
+  ]
+}
