@@ -4,7 +4,7 @@
   "height": 40,
   "infinite": false,
   "nextlayerid": 15,
-  "nextobjectid": 50,
+  "nextobjectid": 52,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.12.2",
@@ -17,6 +17,10 @@
     {
       "firstgid": 57,
       "source": "../tilesets/outer_city_props.tsj"
+    },
+    {
+      "firstgid": 64,
+      "source": "../tilesets/lever.tsj"
     }
   ],
   "tilewidth": 8,
@@ -3450,6 +3454,18 @@
               "rotation": 0,
               "visible": true,
               "gid": 63
+            },
+            {
+              "id": 50,
+              "gid": 64,
+              "name": "Service lever",
+              "type": "Decoration",
+              "x": 332,
+              "y": 247,
+              "width": 32,
+              "height": 16,
+              "rotation": 0,
+              "visible": true
             }
           ]
         },
@@ -17193,6 +17209,40 @@
               "name": "shadowForm",
               "type": "string",
               "value": "imp"
+            }
+          ]
+        },
+        {
+          "id": 51,
+          "name": "ServiceLever",
+          "type": "Lever",
+          "x": 344,
+          "y": 247,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "state",
+              "type": "string",
+              "value": "inactive"
+            },
+            {
+              "name": "interactionEnabled",
+              "type": "bool",
+              "value": false
+            },
+            {
+              "name": "status",
+              "type": "string",
+              "value": "placement_only"
+            },
+            {
+              "name": "spriteObject",
+              "type": "string",
+              "value": "Service lever"
             }
           ]
         }

@@ -1,6 +1,6 @@
 {
   "map": "stage3_return_circuit.tmj",
-  "map_sha256": "11eaec4560d7f5707f49ebe6db81177559a4b430b461803b0e69c0d331acafef",
+  "map_sha256": "36b95e63a1ca41f1bfe9cac1e871477a5e440e3b5a10f1df4c5d349325f1df0d",
   "model": "authored_safe_nodes_world_A_B_with_actual_player_probes",
   "reachable_states": 57,
   "recoverable_states": 57,
