@@ -34,9 +34,23 @@ class LampRoute:
             return [("d", False), ("shift_left", True), ("shift_left", False), ("e", True), ("e", False)]
         if self.phase == 10 and game.scene.world == "real" and game.puzzle.mode == "bridge":
             self.records.append("upper_bridge")
+            self.phase = 10.2
+            return [("d", True)]
+        if self.phase == 10.2 and p.x >= 204:
+            self.phase = 10.3
+            return [("d", False), ("e", True), ("e", False)]
+        if self.phase == 10.3 and game.puzzle.light_mode == "far":
+            self.records.append("light_far")
             self.phase = 11
             return [("shift_left", True), ("shift_left", False), ("d", True)]
-        if self.phase == 11 and game.player_at_exit():
+        if self.phase == 11 and p.x >= 312:
+            self.phase = 11.2
+            return [("d", False), ("shift_left", True), ("shift_left", False), ("e", True), ("e", False)]
+        if self.phase == 11.2 and game.scene.world == "real" and game.puzzle.light_mode == "near":
+            self.records.append("island_light_near")
+            self.phase = 11.4
+            return [("shift_left", True), ("shift_left", False), ("d", True)]
+        if self.phase == 11.4 and game.player_at_exit():
             assert not game.completed
             self.records.append("shadow_exit_off")
             self.phase = 12

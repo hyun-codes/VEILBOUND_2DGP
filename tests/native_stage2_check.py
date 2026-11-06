@@ -57,6 +57,7 @@ class LampBackend(ScriptedBackend):
             self.restarted = True
         elif self.restarted and not g.completed:
             assert g.puzzle.mode == "bridge" and g.scene.world == "real"
+            assert g.puzzle.light_mode == "near"
             assert (g.player.x, g.player.y) == (28, 183)
             event = s.SDL_Event()
             event.type = s.SDL_QUIT
@@ -74,8 +75,12 @@ class LampBackend(ScriptedBackend):
             name = "stairs"
         elif self.route.phase == 10:
             name = "upper_control"
-        elif self.route.phase == 11 and g.player.x > 220:
+        elif self.route.phase == 11 and g.player.x > 270:
             name = "bridge"
+        elif self.route.phase == 11.2:
+            name = "island"
+        elif self.route.phase == 11.4 and g.player.x > 350:
+            name = "rear_bridge"
         elif g.completed:
             name = "clear"
         if name and name not in self.captured:

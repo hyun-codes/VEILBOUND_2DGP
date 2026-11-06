@@ -191,10 +191,10 @@ class Game:
         elif self.effects.notice > 0 and not self.completed:
             renderer.label(320, HEIGHT - 65, f"{self.scene.world.upper()} WORLD", self.effects.indicator)
         if self.puzzle.enabled:
-            self.puzzle.draw(renderer, self.camera)
+            self.puzzle.draw(renderer, self.camera, self.scene.world)
             hint = self.puzzle.hint(self.player, self.scene.world)
             if self.interaction_notice > 0:
-                hint = "E: use a RAIL control while standing in REAL"
+                hint = "E: stand beside an A / B control in REAL"
             renderer.label(12, HEIGHT - 88, hint)
         if self.scene.show_markers:
             p = self.player

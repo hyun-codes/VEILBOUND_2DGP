@@ -53,8 +53,8 @@ class WorldEffects:
 
     def style(self, sprite):
         role = sprite.visual_role
-        if role == "none":
-            return sprite  # 플레이어는 원본 색·명암을 유지한다.
+        if role in ("none", "direct_light"):
+            return sprite  # 플레이어와 B의 직접광은 두 세계에서 원본 색을 유지한다.
         if role == "terrain":
             # 지형은 전환 즉시 표시한다. 과거 세계의 발판을 겹쳐 그리지 않는다.
             tint = (210, 210, 255) if self.world == "shadow" else (255, 255, 255)

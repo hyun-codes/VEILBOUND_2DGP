@@ -7,6 +7,8 @@ from game.lamp_puzzle import LampPuzzle
 from game.pico2d_backend import InputEvent
 from game.stage_manager import StageManager
 from game.timing import FixedStepper
+from game.collision import CollisionWorld
+from game.world_state import WorldState
 from stage2_route import LampRoute
 
 
@@ -29,7 +31,7 @@ class LampPuzzleTests(unittest.TestCase):
         g = Game(self.data)
         self.assertEqual(g.stage_number, 2)
         self.assertEqual(g.puzzle.mode, "bridge")
-        self.assertEqual(len(g.puzzle.controls), 2)
+        self.assertEqual(len(g.puzzle.controls), 4)
         self.assertTrue(all(s.lamp_state in ("", "bridge") for s in g.data.sprites))
         self.assertTrue(all(s.lamp_state in ("", "bridge") for s in g.collision.solids))
         self.assertFalse(any(s.lamp_state == "stairs" for s in g.data.solids))
@@ -95,7 +97,7 @@ class LampPuzzleTests(unittest.TestCase):
         self.assertEqual(g.respawns, 0)
         self.assertTrue(g.completed)
         self.assertEqual(g.scene.world, "real")
-        self.assertEqual(route.records, ["stairs", "land_4", "land_6", "land_8", "upper_bridge", "shadow_exit_off", "clear"])
+        self.assertEqual(route.records, ["stairs", "land_4", "land_6", "land_8", "upper_bridge", "light_far", "island_light_near", "shadow_exit_off", "clear"])
 
     def test_real_only_and_fixed_bridge_cannot_reach_high_island(self):
         # 위층은 48px 높다. 현재 최대 점프는 27px 미만이며 세계 전환은 위쪽 속도를 늘리지 않는다.
@@ -132,7 +134,7 @@ class LampPuzzleTests(unittest.TestCase):
                 if tick == jump_tick:
                     self.key(g, "space")
                 g.step(DT)
-                self.assertFalse(g.player.grounded and g.player.x >= 272)
+                self.assertFalse(g.player.grounded and g.player.x >= 296)
                 self.assertFalse(g.completed)
                 if g.respawns:
                     break
@@ -146,8 +148,8 @@ class LampPuzzleTests(unittest.TestCase):
                 for key, down in route.commands(g):
                     self.key(g, key, down)
                 g.step(dt)
-                ticks.append((g.player.x, g.player.y, g.puzzle.mode, g.scene.world, g.completed))
-            for _ in range(fps * 7):
+                ticks.append((g.player.x, g.player.y, g.puzzle.mode, g.puzzle.light_mode, g.scene.world, g.completed))
+            for _ in range(fps * 11):
                 clock.advance(1 / fps, update)
             self.assertTrue(g.completed)
             results.append(ticks)
@@ -174,3 +176,136 @@ class LampPuzzleTests(unittest.TestCase):
         solids = tuple(replace(s, world="common") if s.lamp_state else s for s in self.data.solids)
         with self.assertRaisesRegex(MapFormatError, "shadow-only"):
             LampPuzzle(replace(self.data, solids=solids))
+
+    def test_both_lamp_combinations_remove_exactly_the_lit_bridge_section(self):
+        puzzle = LampPuzzle(self.data)
+        for mode in ("stairs", "bridge"):
+            for light in ("near", "far"):
+                puzzle.mode, puzzle.light_mode = mode, light
+                data = puzzle.data
+                shadow = CollisionWorld(data.solids, "shadow")
+                self.assertEqual(shadow.supported(250, 135, 6), mode == "bridge" and light == "far")
+                self.assertEqual(shadow.supported(360, 135, 6), mode == "bridge" and light == "near")
+                self.assertEqual(shadow.supported(120, 167, 6), mode == "stairs")
+                # 지워진 타일은 그림과 충돌 양쪽에 없어야 한다.
+                beam = puzzle.beams[light]
+                self.assertFalse(any(s.lamp_state == "bridge" and puzzle._inside(s, beam) for s in data.sprites))
+                self.assertFalse(any(s.lamp_state == "bridge" and puzzle._inside(s, beam) for s in data.solids))
+                for s in data.solids:
+                    if s.lamp_state:
+                        self.assertTrue(any(t.x == s.x and t.y <= s.y < t.y + t.height
+                                            and t.lamp_state == s.lamp_state for t in data.sprites))
+                for world in ("real", "shadow"):
+                    collision = CollisionWorld(data.solids, world)
+                    for x in (172, 204, 312, 432):
+                        self.assertTrue(collision.supported(x, 135, 6))
+                        self.assertFalse(collision.overlaps(x, 135, 6, 14))
+                b = next(s for s in data.sprites if s.object_name == "Eraser lamp")
+                self.assertEqual(b.x, 196 if light == "near" else 208)
+                from game.world_effects import WorldEffects
+                self.assertEqual(WorldEffects("shadow").style(b).palette, "original")
+
+    def test_b_control_is_independent_real_grounded_and_not_repeated_while_held(self):
+        g = Game(self.data)
+        g.player.x, g.player.y, g.player.grounded = 204, 135, True
+        self.key(g, "e")
+        g.step(DT)
+        self.assertEqual((g.puzzle.mode, g.puzzle.light_mode), ("bridge", "far"))
+        self.assertIs(g.scene.data, g.data)
+        self.assertIs(g.player.collision, g.collision)
+        for _ in range(6):
+            self.key(g, "e")
+            g.step(DT)
+        self.assertEqual(g.puzzle.light_mode, "far")
+        self.key(g, "e", False)
+        self.tap(g, "shift_left")
+        self.tap(g, "e")
+        g.step(DT)
+        self.assertEqual(g.puzzle.light_mode, "far")
+        self.assertTrue(g.collision.supported(250, 135, 6))
+        g.player.x, g.player.y = 312, 135
+        self.tap(g, "shift_left")
+        g.step(DT)
+        g.player.grounded = False
+        self.tap(g, "e")
+        g.step(DT)
+        self.assertEqual(g.puzzle.light_mode, "far")
+        self.tap(g, "e")
+        g.step(DT)
+        self.assertEqual(g.puzzle.light_mode, "near")
+        self.assertEqual(g.player.y, 135)
+        self.assertEqual(g.puzzle.mode, "bridge")
+
+    def test_middle_island_allows_wrong_b_setting_to_be_reversed_without_restart(self):
+        g = Game(self.data)
+        g.player.x, g.player.y, g.player.grounded = 312, 135, True
+        for _ in range(4):
+            self.tap(g, "e")
+            g.step(DT)
+            self.assertTrue(g.player.grounded)
+            self.tap(g, "shift_left")
+            g.step(DT)
+            self.assertTrue(g.player.grounded)
+            self.tap(g, "shift_left")
+            g.step(DT)
+        self.assertEqual(g.respawns, 0)
+        g.effects.motion_enabled = False
+        self.tap(g, "e")
+        g.step(DT)
+        g.restart()
+        self.assertEqual((g.puzzle.mode, g.puzzle.light_mode), ("bridge", "near"))
+        self.assertFalse(g.effects.motion_enabled)
+
+    def test_either_fixed_b_setting_leaves_an_unjumpable_gap(self):
+        # 조작점과 무관한 물리 우회 검사: 가장자리 유예까지 포함해 시작 시점을 훑는다.
+        for light, start, target in (("near", 200, 296), ("far", 312, 408)):
+            for jump_tick in range(50):
+                g = Game(self.data)
+                g.puzzle.light_mode = light
+                g.data = g.puzzle.data
+                g.scene.data = g.data
+                g.world_state = WorldState(g.data.solids, "shadow")
+                g.scene.world = "shadow"
+                g.player.collision = g.collision
+                g.player.x, g.player.y = start, 135
+                g.player.grounded, g.player.coyote = True, 0.08
+                self.key(g, "d")
+                for tick in range(110):
+                    if tick == jump_tick:
+                        self.key(g, "space")
+                    g.step(DT)
+                    self.assertFalse(g.player.grounded and g.player.x >= target)
+                    self.assertFalse(g.completed)
+                    if g.respawns:
+                        break
+
+    def test_invalid_eraser_metadata_is_rejected_before_rendering(self):
+        for name in ("Beam_near", "Beam_far", "EraserRail"):
+            with self.subTest(name=name), self.assertRaises(MapFormatError):
+                LampPuzzle(replace(self.data, objects=tuple(o for o in self.data.objects if o.name != name)))
+        with self.assertRaisesRegex(MapFormatError, "Eraser lamp"):
+            LampPuzzle(replace(self.data, sprites=tuple(s for s in self.data.sprites if s.object_name != "Eraser lamp")))
+        objects = tuple(replace(o, x=o.x + 1) if o.name == "Beam_near" else o for o in self.data.objects)
+        with self.assertRaisesRegex(MapFormatError, "align"):
+            LampPuzzle(replace(self.data, objects=objects))
+        properties = dict(self.data.properties, lightInitialState="both")
+        with self.assertRaisesRegex(MapFormatError, "lightInitialState"):
+            LampPuzzle(replace(self.data, properties=properties))
+
+    def test_light_visuals_remain_visible_without_motion_effects(self):
+        from test_app import FakeBackend
+        g = Game(self.data)
+        g.effects.motion_enabled = False
+        g.camera.set_position(160, 40)
+        class Recorder(FakeBackend):
+            def __init__(self):
+                self.labels, self.boxes = [], []
+            def label(self, x, y, text, color=None):
+                self.labels.append(text)
+            def rectangle(self, rect, color, filled=False):
+                self.boxes.append((rect, color))
+        renderer = Recorder()
+        g.draw(renderer)
+        self.assertIn("LIGHT / NO PATH", renderer.labels)
+        self.assertIn("B", renderer.labels)
+        self.assertTrue(any(color == (243, 199, 107) for _, color in renderer.boxes))
