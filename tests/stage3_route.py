@@ -25,7 +25,7 @@ class SolverRoute:
         if action["kind"] != "move":
             if self.waiting:
                 expected = tuple(action["target"][1:])
-                if (game.scene.world, game.puzzle.mode, game.puzzle.light_mode) == expected:
+                if (game.scene.world, game.puzzle.mode, game.puzzle.light_mode, game.mechanism.is_open) == expected:
                     self.index += 1
                     self.waiting = False
                 return self.keys(set())

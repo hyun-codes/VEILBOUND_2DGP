@@ -15,6 +15,7 @@ from game.world_state import WorldState
 from game.world_effects import WorldEffects
 from game.lamp_puzzle import LampPuzzle
 from game.stage_manager import StageManager
+from game.lever_gate import LeverGate, nearest_control
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -40,7 +41,8 @@ class Game:
     def enter_map(self, map_data, world="real", camera_position=None):
         self.source_data = map_data
         self.puzzle = LampPuzzle(map_data)
-        self.data = self.puzzle.data
+        self.mechanism = LeverGate(map_data)
+        self.data = self.mechanism.compose(self.puzzle.data)
         self.stage_number = map_data.properties.get("stageNumber", 1)
         self.camera = Camera(self.data.width, self.data.height, WIDTH, HEIGHT, SCALE)
         self.effects.reset(world)
@@ -83,6 +85,12 @@ class Game:
         p, area = self.player, self.data.object_named("Exit")
         return (p.x + p.WIDTH / 2 > area.x and p.x - p.WIDTH / 2 < area.x + area.width
                 and p.y > area.y and p.y - p.HEIGHT < area.y + area.height)
+
+    def refresh_layout(self):
+        self.data = self.mechanism.compose(self.puzzle.data)
+        self.scene.data = self.data
+        self.world_state = WorldState(self.data.solids, self.scene.world)
+        self.player.collision = self.collision
 
     def handle_events(self, events):
         reset_clock = False
@@ -139,13 +147,14 @@ class Game:
         self.interaction_notice = max(0.0, self.interaction_notice - dt)
         pending, self.pending_interactions = self.pending_interactions, 0
         for _ in range(pending):
-            if self.puzzle.interact(self.player, self.world_state.name):
-                self.data = self.puzzle.data
-                self.scene.data = self.data
-                self.world_state = WorldState(self.data.solids, self.scene.world)
-                self.player.collision = self.collision
-            elif self.puzzle.enabled:
+            kind, _ = nearest_control(self.player, self.puzzle, self.mechanism)
+            device = self.mechanism if kind == "lever" else self.puzzle
+            if device.interact(self.player, self.world_state.name):
+                self.refresh_layout()
+            elif self.puzzle.enabled or self.mechanism.enabled:
                 self.interaction_notice = 0.6
+        if self.mechanism.advance(dt):
+            self.refresh_layout()
         dx = int(bool(self.keys & {"d", "right"})) - int(bool(self.keys & {"a", "left"}))
         self.player.direction = dx
         self.objects.update(dt)
@@ -174,6 +183,7 @@ class Game:
     def draw(self, renderer):
         renderer.begin(self.data.background)
         self.objects.render(renderer, self.camera)
+        self.mechanism.draw(renderer, self.camera)
         renderer.rectangle((0, HEIGHT - 31, WIDTH, 31), (25, 27, 38), filled=True)
         title = f"STAGE {self.stage_number} / {self.scene.world.upper()}"
         renderer.label(12, HEIGHT - 22, title)
@@ -181,7 +191,7 @@ class Game:
         motion = "ON" if self.effects.motion_enabled else "OFF"
         renderer.label(590, HEIGHT - 22, f"Motion: {motion} (F3)")
         renderer.rectangle((0, 0, WIDTH, 26), (25, 27, 38), filled=True)
-        status = "PAUSED - focus window to resume" if self.paused else "A/D: move | Space: tap/hold | Shift: world | E: lamp | R: restart | F1: debug | Esc: quit"
+        status = "PAUSED - focus window to resume" if self.paused else "A/D: move | Space: tap/hold | Shift: world | E: interact | R: restart | F1: debug | Esc: quit"
         renderer.label(12, 8, status)
         if self.fall_notice > 0:
             renderer.label(12, HEIGHT - 48, "FELL - returned to start")
@@ -193,9 +203,11 @@ class Game:
             renderer.label(320, HEIGHT - 65, f"{self.scene.world.upper()} WORLD", self.effects.indicator)
         if self.puzzle.enabled:
             self.puzzle.draw(renderer, self.camera, self.scene.world)
-            hint = self.puzzle.hint(self.player, self.scene.world)
-            if self.interaction_notice > 0:
-                hint = "E: stand beside an A / B control in REAL"
+            kind, _ = nearest_control(self.player, self.puzzle, self.mechanism)
+            hint = (self.mechanism.hint(self.player, self.scene.world) if kind == "lever"
+                    else self.puzzle.hint(self.player, self.scene.world))
+            if self.interaction_notice > 0 and kind != "lever":
+                hint = "E: stand beside an A / B / LEVER control in REAL"
             renderer.label(12, HEIGHT - 88, hint)
         if self.scene.show_markers:
             p = self.player
@@ -260,6 +272,7 @@ def main(argv=None):
         data = load_map(paths[f"Stage{args.stage}"])
         if args.check_map:
             LampPuzzle(data)  # 순수 데이터 검사에서 퍼즐 프리셋·필수 오브젝트도 확인한다.
+            LeverGate(data)
             print(f"Map OK: {data.width}x{data.height}, {len(data.sprites)} sprites, {len(data.objects)} game objects")
             return 0
         from game.pico2d_backend import Pico2DBackend

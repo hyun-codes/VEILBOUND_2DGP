@@ -29,7 +29,7 @@
   },
   "default_animation": "inactive",
   "timing_status": "initial_tuning_values_not_source_timings",
-  "runtime_status": "static_tiled_placement_only_no_interaction",
+  "runtime_status": "stage3_real_only_latched_gate_interaction",
   "states": {
     "initial": "inactive",
     "inactive": {
@@ -120,5 +120,10 @@
     "selected_variant": "upper_filled_gear",
     "creator": "pokrasmemas",
     "source_url": "https://pokrasmemas.itch.io/castletileset"
+  },
+  "runtime_usage": {
+    "activation_clip": "activate",
+    "closing_supported": false,
+    "reset_restores_initial": true
   }
 }

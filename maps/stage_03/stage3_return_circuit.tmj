@@ -4,7 +4,7 @@
   "height": 40,
   "infinite": false,
   "nextlayerid": 15,
-  "nextobjectid": 52,
+  "nextobjectid": 60,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.12.2",
@@ -3466,6 +3466,66 @@
               "height": 16,
               "rotation": 0,
               "visible": true
+            },
+            {
+              "id": 53,
+              "name": "Service gate bar 0",
+              "type": "Decoration",
+              "x": 392,
+              "y": 135,
+              "width": 24,
+              "height": 8,
+              "rotation": 0,
+              "visible": true,
+              "gid": 60
+            },
+            {
+              "id": 54,
+              "name": "Service gate bar 1",
+              "type": "Decoration",
+              "x": 392,
+              "y": 143,
+              "width": 24,
+              "height": 8,
+              "rotation": 0,
+              "visible": true,
+              "gid": 60
+            },
+            {
+              "id": 55,
+              "name": "Service gate bar 2",
+              "type": "Decoration",
+              "x": 392,
+              "y": 151,
+              "width": 24,
+              "height": 8,
+              "rotation": 0,
+              "visible": true,
+              "gid": 60
+            },
+            {
+              "id": 56,
+              "name": "Service gate bar 3",
+              "type": "Decoration",
+              "x": 392,
+              "y": 159,
+              "width": 24,
+              "height": 8,
+              "rotation": 0,
+              "visible": true,
+              "gid": 60
+            },
+            {
+              "id": 57,
+              "name": "Service gate bar 4",
+              "type": "Decoration",
+              "x": 392,
+              "y": 167,
+              "width": 24,
+              "height": 8,
+              "rotation": 0,
+              "visible": true,
+              "gid": 60
             }
           ]
         },
@@ -16964,7 +17024,7 @@
             {
               "name": "target",
               "type": "string",
-              "value": "FarA"
+              "value": "Lever"
             }
           ]
         },
@@ -17232,17 +17292,91 @@
             {
               "name": "interactionEnabled",
               "type": "bool",
-              "value": false
-            },
-            {
-              "name": "status",
-              "type": "string",
-              "value": "placement_only"
+              "value": true
             },
             {
               "name": "spriteObject",
               "type": "string",
               "value": "Service lever"
+            },
+            {
+              "name": "targetGate",
+              "type": "string",
+              "value": "ServiceGate"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 6
+            }
+          ]
+        },
+        {
+          "id": 52,
+          "name": "ServiceGate",
+          "type": "Gate",
+          "x": 392,
+          "y": 127,
+          "width": 24,
+          "height": 40,
+          "rotation": 0,
+          "visible": true,
+          "properties": [
+            {
+              "name": "openSeconds",
+              "type": "float",
+              "value": 0.4
+            },
+            {
+              "name": "liftHeight",
+              "type": "int",
+              "value": 40
+            },
+            {
+              "name": "spritePrefix",
+              "type": "string",
+              "value": "Service gate bar "
+            },
+            {
+              "name": "cableY",
+              "type": "int",
+              "value": 195
+            }
+          ]
+        },
+        {
+          "id": 58,
+          "name": "Lever",
+          "type": "PuzzleNode",
+          "x": 344,
+          "y": 247,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true
+        },
+        {
+          "id": 59,
+          "name": "Lever to FarA",
+          "type": "PuzzleLink",
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "source",
+              "type": "string",
+              "value": "Lever"
+            },
+            {
+              "name": "target",
+              "type": "string",
+              "value": "FarA"
             }
           ]
         }
@@ -17323,7 +17457,7 @@
     {
       "name": "solverModel",
       "type": "string",
-      "value": "safe_nodes_world_A_B"
+      "value": "safe_nodes_world_A_B_gate"
     },
     {
       "name": "monsterStatus",

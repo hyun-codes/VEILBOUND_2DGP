@@ -17,6 +17,7 @@ from game.collision import CollisionWorld
 from game.lamp_puzzle import LampPuzzle
 from game.map_loader import load_map
 from game.player import AnimationSet, Player
+from game.lever_gate import LeverGate, nearest_control
 
 DT = 1 / 60
 
@@ -42,6 +43,7 @@ class Solver:
     def __init__(self, path=STAGE_3):
         self.data = load_map(path)
         self.puzzle = LampPuzzle(self.data)
+        self.mechanism = LeverGate(self.data)
         self.animations = AnimationSet(PLAYER_ANIMATIONS)
         self.nodes = {o.name: o for o in self.data.objects if o.kind == "PuzzleNode"}
         self.links = {name: [] for name in self.nodes}
@@ -52,7 +54,7 @@ class Solver:
                     raise ValueError("PuzzleLink references a missing node")
                 self.links[a].append(b)
                 self.links[b].append(a)
-        self.start = (self.data.properties["solverStart"], "real", self.puzzle.mode, self.puzzle.light_mode)
+        self.start = (self.data.properties["solverStart"], "real", self.puzzle.mode, self.puzzle.light_mode, False)
         self.goal_name = self.data.properties["solverGoal"]
         start, goal = self.nodes[self.start[0]], self.nodes[self.goal_name]
         actual_start, exit_area = self.data.object_named("PlayerStart"), self.data.object_named("Exit")
@@ -66,16 +68,18 @@ class Solver:
         for a in ("stairs", "bridge"):
             for b in ("near", "far"):
                 self.puzzle.mode, self.puzzle.light_mode = a, b
-                for world in ("real", "shadow"):
-                    self.collisions[world, a, b] = CollisionWorld(self.puzzle.data.solids, world)
+                for opened in (False, True):
+                    layout = self.mechanism.compose(self.puzzle.data, open_state=opened)
+                    for world in ("real", "shadow"):
+                        self.collisions[world, a, b, opened] = CollisionWorld(layout.solids, world)
 
-    def stable(self, name, world, a, b):
-        node, collision = self.nodes[name], self.collisions[world, a, b]
+    def stable(self, name, world, a, b, opened=False):
+        node, collision = self.nodes[name], self.collisions[world, a, b, opened]
         return collision.supported(node.x, node.y, Player.WIDTH) and not collision.overlaps(
             node.x, node.y, Player.WIDTH, Player.HEIGHT)
 
-    def probe(self, source, target, world, a, b):
-        collision = self.collisions[world, a, b]
+    def probe(self, source, target, world, a, b, opened=False):
+        collision = self.collisions[world, a, b, opened]
         key = source, target, collision.solids
         if key in self.cache:
             return self.cache[key]
@@ -108,27 +112,29 @@ class Solver:
         return None
 
     def neighbors(self, state):
-        name, world, a, b = state
+        name, world, a, b, opened = state
         other = "shadow" if world == "real" else "real"
-        if self.stable(name, other, a, b):
-            yield (name, other, a, b), {"kind": "shift"}
+        if self.stable(name, other, a, b, opened):
+            yield (name, other, a, b, opened), {"kind": "shift"}
         node = self.nodes[name]
         if world == "real":
             # 실행과 같은 근접·높이 조건으로 가장 가까운 조작점을 선택한다.
-            control = self.puzzle.nearby_control(node)
-            if control:
+            kind, control = nearest_control(node, self.puzzle, self.mechanism)
+            if kind == "lever" and not opened:
+                yield (name, world, a, b, True), {"kind": "e", "device": "lever", "wait_for": "gate_open"}
+            elif kind == "lamp":
                 aa, bb = a, b
                 if control.properties.get("lamp", "A") == "A":
                     aa = "bridge" if a == "stairs" else "stairs"
                 else:
                     bb = "far" if b == "near" else "near"
-                if self.stable(name, world, aa, bb):
-                    yield (name, world, aa, bb), {"kind": "e", "lamp": control.properties.get("lamp", "A")}
+                if self.stable(name, world, aa, bb, opened):
+                    yield (name, world, aa, bb, opened), {"kind": "e", "lamp": control.properties.get("lamp", "A")}
         for target in self.links[name]:
-            if self.stable(target, world, a, b):
-                action = self.probe(name, target, world, a, b)
+            if self.stable(target, world, a, b, opened):
+                action = self.probe(name, target, world, a, b, opened)
                 if action:
-                    yield (target, world, a, b), action
+                    yield (target, world, a, b, opened), action
 
     def solve(self):
         if not self.stable(*self.start):
@@ -163,7 +169,7 @@ class Solver:
                     recoverable.add(state)
                     queue.append(state)
         return {"map": self.data.path.name, "map_sha256": hashlib.sha256(self.data.path.read_bytes()).hexdigest(),
-                "model": "authored_safe_nodes_world_A_B_with_actual_player_probes",
+                "model": "authored_safe_nodes_world_A_B_gate_with_actual_player_probes",
                 "reachable_states": len(previous), "recoverable_states": len(recoverable),
                 "dead_states": [list(s) for s in previous if s not in recoverable],
                 "shortest_macro_actions": len(route), "route": route,

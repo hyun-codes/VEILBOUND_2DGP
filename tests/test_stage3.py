@@ -27,11 +27,11 @@ class Stage3Tests(unittest.TestCase):
         self.assertGreaterEqual(saved["shortest_macro_actions"], 20)
 
     def test_both_lamp_controls_and_world_switch_are_required_in_authored_graph(self):
-        for blocked in ("A", "B", "shift"):
+        for blocked in ("A", "B", "shift", "lever"):
             seen, queue = {self.solver.start}, deque([self.solver.start])
             while queue:
                 for target, action in self.solver.neighbors(queue.popleft()):
-                    if action.get("lamp") == blocked or action["kind"] == blocked:
+                    if action.get("lamp") == blocked or action.get("device") == blocked or action["kind"] == blocked:
                         continue
                     if target not in seen:
                         seen.add(target)
@@ -47,7 +47,8 @@ class Stage3Tests(unittest.TestCase):
                 g.handle_events([InputEvent("key_down" if down else "key_up", key)
                                  for key, down in route.commands(g)])
                 g.step(dt)
-                ticks.append((g.player.x, g.player.y, g.scene.world, g.puzzle.mode, g.puzzle.light_mode, g.completed))
+                ticks.append((g.player.x, g.player.y, g.scene.world, g.puzzle.mode, g.puzzle.light_mode,
+                              g.mechanism.progress, g.completed))
             for _ in range(fps * 30):
                 clock.advance(1 / fps, update)
             self.assertTrue(g.completed, (route.index, g.player.x, g.player.y, g.respawns))

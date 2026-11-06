@@ -18,6 +18,7 @@
 | `game/world_effects.py` | 표시 전용 세계 색 전환·배경 띠 물결·안개 흐름·램프 팔레트·동작 줄이기 상태 |
 | `game/lamp_puzzle.py` | E 조작 조건과 가로등 위치·계단/다리 표시·충돌 프리셋 선택 |
 | `game/stage_manager.py` | 명시적으로 등록된 다음 맵 로딩 |
+| `game/lever_gate.py` | 가까운 조작점 선택·현실 레버·유지형 차단문·표시/충돌 동기화 |
 | `game/world_state.py` | WorldState: 현실/그림자와 충돌 집합, 전환 가능 여부·기존 지면의 점프 권한 처리 |
 | `game/pico2d_backend.py` | 실제 pico2d 이미지·폰트·창과 SDL 입력·색조·최근접 확대 처리 |
 
@@ -118,3 +119,6 @@ B 직접광(2026-11-06): LampPuzzle은 (A stairs/bridge, B near/far)의 네 MapD
 
 
 Stage 3는 공통 이동·충돌·가로등을 그대로 사용하며 app.py의 등록 경로와 --stage 3만 추가했다. tools/solve_stage3.py는 실행 루프에 포함되지 않는 오프라인 BFS 검사다. Tiled의 안전 지점·연결 후보를 실제 Player 물리로 시험하고 해법·복구 상태를 기록한다. tests/stage3_route.py는 같은 경로를 키 입력으로 재생하며 E/Shift는 고정 갱신에서 반영됐음을 확인한 뒤 다음 행동으로 진행한다. 몬스터·동물은 아직 실행 객체에 추가하지 않았다.
+
+
+레버 연결: Game은 LampPuzzle의 배치에 LeverGate의 문 고체·레버 프레임·문 막대 위치를 합성한다. 입력은 Shift → 가장 가까운 E 장치 하나 → 문 진행/배치 갱신 → 이동·충돌 → 추락·출구 순서다. 장치 선택은 solver와 실행 코드가 nearest_control을 공유한다. LeverGate는 현재 맵당 한 쌍을 지원하며 Stage 1·2처럼 장치가 없는 맵에는 고체나 입력을 추가하지 않는다. 활성화는 유지형으로 R·추락에만 초기화한다. 포커스 상실은 예약 입력을 취소하고 일시 중지 중에는 문 진행도 멈춘다. BFS는 안전 지점·세계·A/B·문 개방의5요소를 탐색하고 실제 재생은 문이 완전히 열릴 때까지 기다린다.

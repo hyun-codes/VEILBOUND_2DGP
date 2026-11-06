@@ -1,24 +1,26 @@
 {
   "map": "stage3_return_circuit.tmj",
-  "map_sha256": "36b95e63a1ca41f1bfe9cac1e871477a5e440e3b5a10f1df4c5d349325f1df0d",
-  "model": "authored_safe_nodes_world_A_B_with_actual_player_probes",
-  "reachable_states": 57,
-  "recoverable_states": 57,
+  "map_sha256": "0086e2199ec471fc65838d85f234da815b6074601a7a1bc29478e22fdcf9b602",
+  "model": "authored_safe_nodes_world_A_B_gate_with_actual_player_probes",
+  "reachable_states": 115,
+  "recoverable_states": 115,
   "dead_states": [],
-  "shortest_macro_actions": 25,
+  "shortest_macro_actions": 27,
   "route": [
     {
       "source": [
         "Start",
         "real",
         "bridge",
-        "near"
+        "near",
+        false
       ],
       "target": [
         "StartA",
         "real",
         "bridge",
-        "near"
+        "near",
+        false
       ],
       "kind": "move",
       "node": "StartA",
@@ -30,13 +32,15 @@
         "StartA",
         "real",
         "bridge",
-        "near"
+        "near",
+        false
       ],
       "target": [
         "StartB",
         "real",
         "bridge",
-        "near"
+        "near",
+        false
       ],
       "kind": "move",
       "node": "StartB",
@@ -48,13 +52,15 @@
         "StartB",
         "real",
         "bridge",
-        "near"
+        "near",
+        false
       ],
       "target": [
         "StartB",
         "real",
         "bridge",
-        "far"
+        "far",
+        false
       ],
       "kind": "e",
       "lamp": "B"
@@ -64,13 +70,15 @@
         "StartB",
         "real",
         "bridge",
-        "far"
+        "far",
+        false
       ],
       "target": [
         "StartB",
         "shadow",
         "bridge",
-        "far"
+        "far",
+        false
       ],
       "kind": "shift"
     },
@@ -79,13 +87,15 @@
         "StartB",
         "shadow",
         "bridge",
-        "far"
+        "far",
+        false
       ],
       "target": [
         "MiddleA",
         "shadow",
         "bridge",
-        "far"
+        "far",
+        false
       ],
       "kind": "move",
       "node": "MiddleA",
@@ -97,13 +107,15 @@
         "MiddleA",
         "shadow",
         "bridge",
-        "far"
+        "far",
+        false
       ],
       "target": [
         "MiddleA",
         "real",
         "bridge",
-        "far"
+        "far",
+        false
       ],
       "kind": "shift"
     },
@@ -112,13 +124,15 @@
         "MiddleA",
         "real",
         "bridge",
-        "far"
+        "far",
+        false
       ],
       "target": [
         "MiddleB",
         "real",
         "bridge",
-        "far"
+        "far",
+        false
       ],
       "kind": "move",
       "node": "MiddleB",
@@ -130,13 +144,15 @@
         "MiddleB",
         "real",
         "bridge",
-        "far"
+        "far",
+        false
       ],
       "target": [
         "MiddleB",
         "real",
         "bridge",
-        "near"
+        "near",
+        false
       ],
       "kind": "e",
       "lamp": "B"
@@ -146,13 +162,15 @@
         "MiddleB",
         "real",
         "bridge",
-        "near"
+        "near",
+        false
       ],
       "target": [
         "MiddleB",
         "shadow",
         "bridge",
-        "near"
+        "near",
+        false
       ],
       "kind": "shift"
     },
@@ -161,46 +179,91 @@
         "MiddleB",
         "shadow",
         "bridge",
-        "near"
+        "near",
+        false
+      ],
+      "target": [
+        "Lever",
+        "shadow",
+        "bridge",
+        "near",
+        false
+      ],
+      "kind": "move",
+      "node": "Lever",
+      "jump_x": null,
+      "ticks": 104
+    },
+    {
+      "source": [
+        "Lever",
+        "shadow",
+        "bridge",
+        "near",
+        false
+      ],
+      "target": [
+        "Lever",
+        "real",
+        "bridge",
+        "near",
+        false
+      ],
+      "kind": "shift"
+    },
+    {
+      "source": [
+        "Lever",
+        "real",
+        "bridge",
+        "near",
+        false
+      ],
+      "target": [
+        "Lever",
+        "real",
+        "bridge",
+        "near",
+        true
+      ],
+      "kind": "e",
+      "device": "lever",
+      "wait_for": "gate_open"
+    },
+    {
+      "source": [
+        "Lever",
+        "real",
+        "bridge",
+        "near",
+        true
       ],
       "target": [
         "FarA",
-        "shadow",
+        "real",
         "bridge",
-        "near"
+        "near",
+        true
       ],
       "kind": "move",
       "node": "FarA",
       "jump_x": null,
-      "ticks": 119
-    },
-    {
-      "source": [
-        "FarA",
-        "shadow",
-        "bridge",
-        "near"
-      ],
-      "target": [
-        "FarA",
-        "real",
-        "bridge",
-        "near"
-      ],
-      "kind": "shift"
+      "ticks": 14
     },
     {
       "source": [
         "FarA",
         "real",
         "bridge",
-        "near"
+        "near",
+        true
       ],
       "target": [
         "FarA",
         "real",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "kind": "e",
       "lamp": "A"
@@ -210,13 +273,15 @@
         "FarA",
         "real",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "target": [
         "FarA",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "kind": "shift"
     },
@@ -225,13 +290,15 @@
         "FarA",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "target": [
         "Step1",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "kind": "move",
       "node": "Step1",
@@ -243,13 +310,15 @@
         "Step1",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "target": [
         "Step2",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "kind": "move",
       "node": "Step2",
@@ -261,13 +330,15 @@
         "Step2",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "target": [
         "Step3",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "kind": "move",
       "node": "Step3",
@@ -279,13 +350,15 @@
         "Step3",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "target": [
         "Step4",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "kind": "move",
       "node": "Step4",
@@ -297,13 +370,15 @@
         "Step4",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "target": [
         "UpperRight",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "kind": "move",
       "node": "UpperRight",
@@ -315,13 +390,15 @@
         "UpperRight",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "target": [
         "UpperRight",
         "real",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "kind": "shift"
     },
@@ -330,13 +407,15 @@
         "UpperRight",
         "real",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "target": [
         "UpperRest",
         "real",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "kind": "move",
       "node": "UpperRest",
@@ -348,13 +427,15 @@
         "UpperRest",
         "real",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "target": [
         "UpperRest",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "kind": "shift"
     },
@@ -363,13 +444,15 @@
         "UpperRest",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "target": [
         "UpperLeft",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "kind": "move",
       "node": "UpperLeft",
@@ -381,13 +464,15 @@
         "UpperLeft",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "target": [
         "Roof",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "kind": "move",
       "node": "Roof",
@@ -399,13 +484,15 @@
         "Roof",
         "shadow",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "target": [
         "Roof",
         "real",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "kind": "shift"
     },
@@ -414,13 +501,15 @@
         "Roof",
         "real",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "target": [
         "Goal",
         "real",
         "stairs",
-        "near"
+        "near",
+        true
       ],
       "kind": "move",
       "node": "Goal",
