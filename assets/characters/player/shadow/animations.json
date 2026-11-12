@@ -1,0 +1,98 @@
+{
+  "format": "veilbound-grid-animations",
+  "schema_version": 1,
+  "image": "shadow_jack.png",
+  "image_sha256": "e54db577036c8ae075fc2f1b29f8b875343c027a3791de653d65d182e430aa34",
+  "image_size": {
+    "width": 512,
+    "height": 320
+  },
+  "grid": {
+    "cell_width": 64,
+    "cell_height": 64,
+    "columns": 8,
+    "rows": 5,
+    "margin": 0,
+    "spacing": 0
+  },
+  "coordinates": {
+    "origin": "top_left",
+    "index_base": 0,
+    "units": "source_pixels"
+  },
+  "anchor": {
+    "x": 32,
+    "y": 44,
+    "origin": "frame_top_left",
+    "status": "initial_shared_feet_reference"
+  },
+  "source_facing": "right",
+  "default_animation": "idle",
+  "timing_status": "initial_tuning_values_not_source_timings",
+  "animations": {
+    "idle": {
+      "enabled": true,
+      "loop": true,
+      "row": 0,
+      "columns": [
+        0,
+        1,
+        2
+      ],
+      "frame_duration_ms": 240
+    },
+    "run": {
+      "enabled": true,
+      "loop": true,
+      "row": 1,
+      "columns": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "frame_duration_ms": 80
+    },
+    "jump_start": {
+      "enabled": true,
+      "loop": false,
+      "row": 2,
+      "columns": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "frame_duration_ms": 40
+    },
+    "fall": {
+      "enabled": true,
+      "loop": true,
+      "row": 3,
+      "columns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "frame_duration_ms": 100
+    },
+    "land": {
+      "enabled": true,
+      "loop": false,
+      "row": 4,
+      "columns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "frame_duration_ms": 40
+    }
+  }
+}
