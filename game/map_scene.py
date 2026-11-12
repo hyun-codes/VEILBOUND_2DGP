@@ -39,13 +39,11 @@ class MapScene:
             start = self.data.object_named("PlayerStart")
             sx, sy, _, _ = camera.screen_rect(start.x, start.y, 0, 0)
             renderer.rectangle((sx - 3, sy, 6, 6), (116, 223, 188), filled=True)
-            renderer.label(sx - 20, sy + 12, "START", (116, 223, 188))
         end = self.data.object_named("Exit")
         rect = camera.screen_rect(end.x, end.y, end.width, end.height)
         active = self.world == "real"
         color = (116, 223, 188) if active else (150, 151, 170)
         renderer.rectangle(rect, color)  # 포털 에셋 도입 전의 임시 테두리. 그림자는 내부를 채우지 않는다.
-        renderer.label(rect[0], rect[1] + rect[3] + 6, "EXIT" if active else "EXIT OFF", color)
 
     @staticmethod
     def _copies(origin, size, view_origin, view_size, repeat):

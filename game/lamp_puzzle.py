@@ -2,9 +2,13 @@
 
 from dataclasses import replace
 import math
+from pathlib import Path
 
 from game.collision import CollisionWorld
-from game.map_loader import MapFormatError
+from game.map_loader import MapFormatError, Sprite
+
+
+SWITCH_IMAGE = Path(__file__).resolve().parents[1] / "assets" / "props" / "lamp_switch" / "lamp_switch.png"
 
 
 class LampPuzzle:
@@ -71,6 +75,12 @@ class LampPuzzle:
                             sprite = replace(sprite, x=self._rail_x(b_rail, f"{light}X"),
                                              visual_role="direct_light")
                         sprites.append(sprite)
+                    for control in self.controls:
+                        eraser = control.properties.get("lamp") == "B"
+                        alternate = light == "far" if eraser else mode == "bridge"
+                        tint = (255, 255, 255) if eraser else (187, 209, 255)
+                        sprites.append(Sprite(SWITCH_IMAGE, (11 * alternate, 0, 11, 9),
+                                              control.x - 5, control.y - 9, 11, 9, tint=tint))
                     self._layouts[mode, light] = replace(source, sprites=tuple(sprites),
                                                          solids=tuple(s for s in source.solids if keep(s)))
             if sum(s.object_name == "Route lamp" for s in source.sprites) != 1:
@@ -100,25 +110,6 @@ class LampPuzzle:
     def near_control(self, player):
         return self.nearby_control(player) is not None
 
-    def hint(self, player, world):
-        if not self.enabled:
-            return ""
-        control = self.nearby_control(player)
-        if control:
-            lamp = control.properties.get("lamp", "A")
-            if world != "real":
-                return f"Lamp {lamp}: return to REAL to use E"
-            if not player.grounded:
-                return "Land beside the lamp control to use E"
-            if lamp == "B":
-                target = "FAR" if self.light_mode == "near" else "NEAR"
-                return f"E: aim B light {target} - light erases shadow paths"
-            target = "BRIDGE" if self.mode == "stairs" else "STAIRS"
-            return f"E: A -> {target}"
-        if self.has_eraser:
-            return f"A: {self.mode.upper()} | B: {self.light_mode.upper()} | Light erases shadow paths"
-        return f"Lamp: {self.mode.upper()} - controls are marked A"
-
     def interact(self, player, world):
         control = self.nearby_control(player)
         if not control or not player.grounded or world != "real":
@@ -147,8 +138,6 @@ class LampPuzzle:
                                        (187, 157, 94), filled=True)
             for x in range(int(beam.x), int(beam.x + beam.width), 8):
                 renderer.rectangle(camera.screen_rect(x, beam.y + 7, 4, 1), (243, 199, 107), filled=True)
-            x, y, _, _ = camera.screen_rect(beam.x + 8, beam.y - 2, 0, 0)
-            renderer.label(x, y, "LIGHT / NO PATH", (243, 199, 107))
             # 현실에서도 다음 그림자 지형과 밝아서 지워진 쪽을 비교할 수 있다.
             if world == "real" and self.mode == "bridge":
                 for other in self.beams.values():
@@ -156,7 +145,3 @@ class LampPuzzle:
                         for x in range(int(other.x), int(other.x + other.width), 8):
                             renderer.rectangle(camera.screen_rect(x, other.y + 7, 4, 1),
                                                (119, 146, 187), filled=True)
-        for control in self.controls:
-            x, y, _, _ = camera.screen_rect(control.x, control.y, 0, 0)
-            color = (243, 199, 107) if control.properties.get("lamp") == "B" else (172, 198, 238)
-            renderer.label(x - 8, y + 16, control.properties.get("lamp", "A"), color)

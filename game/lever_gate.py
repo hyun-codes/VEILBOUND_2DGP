@@ -117,19 +117,6 @@ class LeverGate:
         gate = Solid(self.gate.x, self.gate.y - self.lift * progress, self.gate.width, self.gate.height)
         return replace(data, sprites=tuple(sprites), solids=data.solids + (gate,))
 
-    def hint(self, player, world):
-        if not self.nearby_control(player):
-            return ""
-        if self.is_open:
-            return "LEVER: service gate is OPEN (R resets)"
-        if self.activated:
-            return "LEVER: opening service gate..."
-        if world != "real":
-            return "LEVER: return to REAL to operate the mechanism"
-        if not player.grounded:
-            return "LEVER: land beside the handle to use E"
-        return "E: pull LEVER - open the service gate above"
-
     def draw(self, renderer, camera):
         if not self.enabled:
             return
@@ -146,7 +133,3 @@ class LeverGate:
                            (114, 125, 144))
         renderer.rectangle(camera.screen_rect(gate.x, gate.y - self.lift * self.progress,
                                               gate.width, gate.height), color)
-        x, y, _, _ = camera.screen_rect(lever.x, lever.y - 19, 0, 0)
-        renderer.label(x - 18, y, "LEVER", color)
-        x, y, _, _ = camera.screen_rect(gate.x, gate.y + gate.height + 9, 0, 0)
-        renderer.label(x, y, "GATE OPEN" if self.is_open else "GATE OPENING" if self.activated else "GATE LOCKED", color)

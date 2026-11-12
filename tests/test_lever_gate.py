@@ -36,9 +36,11 @@ class LeverGateTests(unittest.TestCase):
             g.step(DT)
             self.assertFalse(g.mechanism.activated)
         g = self.game_at_lever()
+        self.assertEqual(g.interaction_target()[0], "lever")
         self.tap(g)
         g.step(DT)
         self.assertTrue(g.mechanism.activated)
+        self.assertEqual(g.interaction_target(), (None, None))
         self.assertEqual((g.puzzle.mode, g.puzzle.light_mode), ("bridge", "near"))
         g.player.x = 360
         self.assertEqual(nearest_control(g.player, g.puzzle, g.mechanism)[0], "lamp")

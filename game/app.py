@@ -7,7 +7,7 @@ from time import perf_counter, sleep
 
 from game.camera import Camera
 from game.game_world import GameWorld
-from game.map_loader import load_map, MapFormatError
+from game.map_loader import load_map, MapFormatError, Sprite
 from game.map_scene import MapScene
 from game.timing import FixedStepper
 from game.player import AnimationSet, Player
@@ -23,6 +23,7 @@ STAGE_1 = PROJECT_ROOT / "maps" / "stage_01" / "stage1_missing_bridge.tmj"
 STAGE_2 = PROJECT_ROOT / "maps" / "stage_02" / "stage2_lamp_room.tmj"
 STAGE_3 = PROJECT_ROOT / "maps" / "stage_03" / "stage3_return_circuit.tmj"
 PLAYER_ANIMATIONS = PROJECT_ROOT / "assets" / "characters" / "player" / "animations.json"
+INTERACT_ICON = PROJECT_ROOT / "assets" / "ui" / "interact_e.png"
 WIDTH, HEIGHT, SCALE = 800, 600, 3
 SHIFT_KEYS = {"shift_left", "shift_right"}
 
@@ -61,7 +62,7 @@ class Game:
         self.objects.add_object(self.player, depth=1)
         self.keys.clear()
         self.pending_switches = self.pending_interactions = 0
-        self.blocked_notice = self.interaction_notice = self.fall_notice = 0.0
+        self.blocked_notice = 0.0
         self.completed = False
         self.respawns = 0
         self.reset_camera()
@@ -82,7 +83,6 @@ class Game:
         self.enter_map(self.source_data)
         self.scene.show_markers = debug
         self.respawns = count
-        self.fall_notice = 0.45 if fallen else 0.0
 
     def player_at_exit(self):
         p, area = self.player, self.data.object_named("Exit")
@@ -94,6 +94,14 @@ class Game:
         self.scene.data = self.data
         self.world_state = WorldState(self.data.solids, self.scene.world)
         self.player.collision = self.collision
+
+    def interaction_target(self):
+        if self.scene.world != "real" or not self.player.grounded or self.completed or self.paused:
+            return None, None
+        kind, control = nearest_control(self.player, self.puzzle, self.mechanism)
+        if kind == "lever" and self.mechanism.activated:
+            return None, None
+        return kind, control
 
     def handle_events(self, events):
         reset_clock = False
@@ -148,21 +156,19 @@ class Game:
             else:
                 self.blocked_notice = 0.45
                 self.effects.reject()
-        self.interaction_notice = max(0.0, self.interaction_notice - dt)
         pending, self.pending_interactions = self.pending_interactions, 0
         for _ in range(pending):
-            kind, _ = nearest_control(self.player, self.puzzle, self.mechanism)
+            kind, control = self.interaction_target()
+            if control is None:
+                continue
             device = self.mechanism if kind == "lever" else self.puzzle
             if device.interact(self.player, self.world_state.name):
                 self.refresh_layout()
-            elif self.puzzle.enabled or self.mechanism.enabled:
-                self.interaction_notice = 0.6
         if self.mechanism.advance(dt):
             self.refresh_layout()
         dx = int(bool(self.keys & {"d", "right"})) - int(bool(self.keys & {"a", "left"}))
         self.player.direction = dx
         self.objects.update(dt)
-        self.fall_notice = max(0.0, self.fall_notice - dt)
         if self.player.y - self.player.HEIGHT > self.data.height:
             # 화면 밖 추락은 가짜 사망 모션 없이 즉시 복귀한다. stepper는 콜백 안에서 초기화하지 않는다.
             self.restart(fallen=True)
@@ -182,45 +188,23 @@ class Game:
             p.animation, p.animation_time = "idle", 0.0
             self.keys.clear()
             self.pending_switches = self.pending_interactions = 0
-            self.blocked_notice = self.fall_notice = 0.0
+            self.blocked_notice = 0.0
 
     def draw(self, renderer):
         renderer.begin(self.data.background)
         self.objects.render(renderer, self.camera)
         self.mechanism.draw(renderer, self.camera)
-        renderer.rectangle((0, HEIGHT - 31, WIDTH, 31), (25, 27, 38), filled=True)
-        title = f"STAGE {self.stage_number} / {self.scene.world.upper()}"
-        renderer.label(12, HEIGHT - 22, title)
-        renderer.rectangle((0, HEIGHT - 31, 5, 31), self.effects.indicator, filled=True)
-        motion = "ON" if self.effects.motion_enabled else "OFF"
-        renderer.label(590, HEIGHT - 22, f"Motion: {motion} (F3)")
-        renderer.rectangle((0, 0, WIDTH, 26), (25, 27, 38), filled=True)
-        status = "PAUSED - focus window to resume" if self.paused else "A/D: move | Space: tap/hold | Shift: world | E: interact | R: restart | F1: debug | Esc: quit"
-        renderer.label(12, 8, status)
-        if self.fall_notice > 0:
-            renderer.label(12, HEIGHT - 48, "FELL - returned to start")
-        if self.blocked_notice > 0:
-            renderer.label(12, HEIGHT - 48, "Cannot switch: solid terrain blocks your body", (255, 181, 142))
-        elif self.scene.world == "shadow" and self.player_at_exit() and not self.completed:
-            renderer.label(12, HEIGHT - 48, "Portal inactive in shadow - press Shift to return")
-        elif self.effects.notice > 0 and not self.completed:
-            renderer.label(320, HEIGHT - 65, f"{self.scene.world.upper()} WORLD", self.effects.indicator)
-        if self.puzzle.enabled:
-            self.puzzle.draw(renderer, self.camera, self.scene.world)
-            kind, _ = nearest_control(self.player, self.puzzle, self.mechanism)
-            hint = (self.mechanism.hint(self.player, self.scene.world) if kind == "lever"
-                    else self.puzzle.hint(self.player, self.scene.world))
-            if self.interaction_notice > 0 and kind != "lever":
-                hint = "E: stand beside an A / B / LEVER control in REAL"
-            renderer.label(12, HEIGHT - 88, hint)
+        self.puzzle.draw(renderer, self.camera, self.scene.world)
+        kind, control = self.interaction_target()
+        if control is not None:
+            x = control.x - 7
+            y = control.y - (28 if kind == "lever" else 21)
+            icon = Sprite(INTERACT_ICON, (0, 0, 15, 9), x, y, 15, 9)
+            renderer.sprite(icon, self.camera.screen_rect(x, y, 15, 9))
         if self.scene.show_markers:
             p = self.player
             renderer.rectangle(self.camera.screen_rect(p.x - p.WIDTH / 2, p.y - p.HEIGHT,
                                                        p.WIDTH, p.HEIGHT), (255, 220, 100))
-        if self.completed:
-            renderer.rectangle((200, 245, 400, 110), (25, 27, 38), filled=True)
-            renderer.label(325, 315, f"STAGE {self.stage_number} CLEAR", (116, 223, 188))
-            renderer.label(290, 280, "R: try again   Esc: quit")
 
     def run(self, backend, max_frames=None, screenshot=None):
         try:

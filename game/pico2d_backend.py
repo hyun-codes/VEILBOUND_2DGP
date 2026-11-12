@@ -20,7 +20,6 @@ class Pico2DBackend:
         import sdl2
         self.pico, self.native, self.sdl = pico2d, native, sdl2
         self.images = {}
-        self.font = None
         self.opened = False
 
     def open(self, width, height):
@@ -32,16 +31,10 @@ class Pico2DBackend:
         self.pico.hide_lattice()
         self.sdl.SDL_SetWindowTitle(self.native.window, b"VEILBOUND")
         self.sdl.SDL_SetRenderDrawBlendMode(self.native.renderer, self.sdl.SDL_BLENDMODE_BLEND)
-        font_path = Path(self.pico.__file__).parent / "data" / "ConsolaMalgun.ttf"
-        self.font = self.pico.load_font(str(font_path), 15)
 
     def close(self):
         # pico2d Image의 소멸자가 살아 있는 renderer에서 texture를 정리하게 한다.
         self.images.clear()
-        if self.font is not None:
-            from sdl2.sdlttf import TTF_CloseFont
-            TTF_CloseFont(self.font.font)
-            self.font = None
         if self.opened:
             self.pico.close_canvas()
             self.opened = False
@@ -129,9 +122,6 @@ class Pico2DBackend:
     def rectangle(self, rect, color, filled=False):
         x, y, width, height = rect
         self.pico.draw_rectangle(x, y, x + width, y + height, *color, filled=filled)
-
-    def label(self, x, y, text, color=(244, 237, 228)):
-        self.font.draw(x, y, text, color)
 
     def present(self):
         self.pico.update_canvas()

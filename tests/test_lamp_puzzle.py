@@ -66,7 +66,6 @@ class LampPuzzleTests(unittest.TestCase):
         g.step(DT)
         self.assertEqual(g.scene.world, "shadow")
         self.assertEqual(g.puzzle.mode, "stairs")
-        self.assertGreater(g.interaction_notice, 0)
         self.assertTrue(g.collision.supported(120, 167, 6))
 
     def test_focus_and_restart_clear_e_and_reset_lamp_without_losing_effect_setting(self):
@@ -299,13 +298,44 @@ class LampPuzzleTests(unittest.TestCase):
         g.camera.set_position(160, 40)
         class Recorder(FakeBackend):
             def __init__(self):
-                self.labels, self.boxes = [], []
+                self.boxes = []
             def label(self, x, y, text, color=None):
-                self.labels.append(text)
+                raise AssertionError(f"Unexpected gameplay text: {text}")
             def rectangle(self, rect, color, filled=False):
                 self.boxes.append((rect, color))
         renderer = Recorder()
         g.draw(renderer)
-        self.assertIn("LIGHT / NO PATH", renderer.labels)
-        self.assertIn("B", renderer.labels)
         self.assertTrue(any(color == (243, 199, 107) for _, color in renderer.boxes))
+
+    def test_pixel_prompt_is_drawn_over_a_usable_switch_only(self):
+        from test_app import FakeBackend
+
+        class Recorder(FakeBackend):
+            def __init__(self):
+                self.sprites = []
+
+            def sprite(self, sprite, rect):
+                self.sprites.append(sprite)
+
+        g = Game(self.data)
+        for world, x, grounded, paused, completed, shown in (
+            ("real", 28, True, False, False, False),
+            ("real", 80, True, False, False, True),
+            ("real", 80, False, False, False, False),
+            ("shadow", 80, True, False, False, False),
+            ("real", 80, True, True, False, False),
+            ("real", 80, True, False, True, False),
+        ):
+            with self.subTest(world=world, x=x, grounded=grounded, paused=paused, completed=completed):
+                g.enter_map(self.data, world)
+                g.player.x, g.player.grounded = x, grounded
+                g.paused, g.completed = paused, completed
+                renderer = Recorder()
+                g.draw(renderer)
+                prompts = [s for s in renderer.sprites if s.image.name == "interact_e.png"]
+                self.assertEqual(len(prompts), int(shown))
+                if shown:
+                    switch = next(s for s in renderer.sprites if s.image.name == "lamp_switch.png")
+                    self.assertLess(prompts[0].y + prompts[0].height, switch.y)
+                    self.assertEqual(prompts[0].x + prompts[0].width / 2,
+                                     switch.x + switch.width / 2)

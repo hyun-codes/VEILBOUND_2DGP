@@ -173,12 +173,12 @@ class WorldEffectsTests(unittest.TestCase):
                         edge = max(edge, right)
                 self.assertGreaterEqual(edge, 800)
 
-    def test_f3_input_and_persistent_world_setting_indicator(self):
+    def test_f3_input_changes_motion_without_a_text_indicator(self):
         g, r = Game(self.data), Recorder()
         g.handle_events([InputEvent("key_down", "f3")])
         g.draw(r)
         self.assertFalse(g.effects.motion_enabled)
-        self.assertIn("Motion: OFF (F3)", r.labels)
+        self.assertFalse(r.labels)
         g.handle_events([InputEvent("key_down", "f3")])
         self.assertFalse(g.effects.motion_enabled)
         g.handle_events([InputEvent("key_up", "f3"), InputEvent("key_down", "f3")])

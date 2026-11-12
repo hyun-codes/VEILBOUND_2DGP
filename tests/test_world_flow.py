@@ -221,34 +221,32 @@ class WorldFlowTests(unittest.TestCase):
         self.assertEqual(p.coyote, 0.04)
         self.assertFalse(p.grounded)
 
-    def test_exit_and_blocked_feedback_are_rendered(self):
+    def test_exit_frames_distinguish_worlds_without_text(self):
         game = Game(self.data)
         class Recorder:
             def __init__(self):
-                self.labels = []
+                self.boxes = []
             def begin(self, *args):
                 pass
             def sprite(self, *args):
                 pass
-            def rectangle(self, *args, **kwargs):
-                pass
+            def rectangle(self, rect, color, **kwargs):
+                self.boxes.append(color)
             def label(self, x, y, text, *args):
-                self.labels.append(text)
+                raise AssertionError(f"Unexpected gameplay text: {text}")
         r = Recorder()
         game.blocked_notice = 0.4
         game.draw(r)
-        self.assertIn("EXIT", r.labels)
-        self.assertTrue(any(text.startswith("Cannot switch") for text in r.labels))
+        self.assertIn((116, 223, 188), r.boxes)
         shadow = Game(self.data, "shadow")
         shadow.player.x = 290
         shadow.step(DT)
-        r.labels.clear()
+        r.boxes.clear()
         shadow.draw(r)
-        self.assertIn("EXIT OFF", r.labels)
-        self.assertIn("Portal inactive in shadow - press Shift to return", r.labels)
-        self.assertNotIn("STAGE 1 CLEAR", r.labels)
+        self.assertIn((150, 151, 170), r.boxes)
+        self.assertFalse(shadow.completed)
         game.player.x = 290
         game.step(DT)
-        r.labels.clear()
+        r.boxes.clear()
         game.draw(r)
-        self.assertIn("STAGE 1 CLEAR", r.labels)
+        self.assertTrue(game.completed)
