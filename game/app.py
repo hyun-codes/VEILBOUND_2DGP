@@ -30,7 +30,10 @@ SHIFT_KEYS = {"shift_left", "shift_right"}
 class Game:
     def __init__(self, map_data, world="real", camera_position=None, stages=None):
         self.stages = stages
-        self.animations = AnimationSet(PLAYER_ANIMATIONS)
+        self.animations = {
+            "real": AnimationSet(PLAYER_ANIMATIONS),
+            "shadow": AnimationSet(PLAYER_ANIMATIONS.parent / "shadow" / "animations.json"),
+        }
         self.effects = WorldEffects(world)
         self.stepper = FixedStepper()
         self.keys = set()
@@ -50,7 +53,7 @@ class Game:
         self.scene.show_markers = False
         self.world_state = WorldState(self.data.solids, world)
         start = self.data.object_named("PlayerStart")
-        self.player = Player(self.animations, self.collision, self.data.width, (start.x, start.y))
+        self.player = Player(self.animations[world], self.collision, self.data.width, (start.x, start.y))
         if hasattr(self, "objects"):
             self.objects.clear()
         self.objects = GameWorld()
@@ -139,6 +142,7 @@ class Game:
         for _ in range(pending):
             if self.world_state.try_toggle(self.player):
                 self.scene.world = self.world_state.name
+                self.player.animations = self.animations[self.scene.world]
                 self.effects.switch(self.world_state.name)
                 self.blocked_notice = 0.0
             else:

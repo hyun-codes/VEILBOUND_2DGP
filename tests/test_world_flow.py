@@ -27,14 +27,18 @@ class WorldFlowTests(unittest.TestCase):
         self.assertEqual(game.scene.world, name)
         self.assertIs(game.player.collision, game.collision)
         self.assertTrue(all(s.world in ("common", name) for s in game.collision.solids))
+        image = "shadow_jack_flame.png" if name == "shadow" else "Red_Hand_Jack_SPRITESHEET.png"
+        self.assertEqual(game.player.animations.image.name, image)
 
     def test_shift_consumed_once_on_physics_step_and_taps_are_not_dropped(self):
         game = Game(self.data)
+        game.player.animation_time = 0.3
         self.press(game)
         self.assert_synchronized(game, "real")  # 고정 갱신 전 그리기는 이전 상태 그대로다.
         self.assertEqual(game.pending_switches, 1)
         game.step(DT)
         self.assert_synchronized(game, "shadow")
+        self.assertAlmostEqual(game.player.animation_time, 0.3 + DT)
         for _ in range(10):
             self.press(game)
             game.step(DT)
