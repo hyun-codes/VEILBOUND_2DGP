@@ -1,8 +1,10 @@
-# Stage 3: 옥상 정비구역
+# Stage 3: 사라지는 바닥
 
-기본 실행은 [옥상 정비구역](stage3_rooftop_works.tmj)으로 진입한다. 2304×960px, 8px 타일 288×120칸이다. 하층부터 네 높이를 오가며 시작점보다 768px 위의 현실 포털로 간다. 계단 중간 공통 발판에서 전환해 세계별 계단을 잇고, 벌어진 계단을 짧게 점프한다. 두 구역에서 현실 옥상으로 올라 혼합 세계 다리를 건너뛰고 주 경로에 합류할 수 있다.
+[기본 맵](stage3_block_hatch.tmj)은 320×240px이다. 현실에서 블록을 틈 위로 옮겨 중간 발판으로 쓴다. 오른쪽 바닥에서 그림자로 바꾸면 그 바닥이 사라져 하층으로 내려갈 수 있다. 하층 출구에서 현실로 돌아온다.
 
-`python main.py --stage 3`로 실행한다. `python tools/solve_stage3.py --map maps/stage_03/stage3_rooftop_works.tmj`로 안전 지점 그래프를 검증한다.
+`python main.py --stage 3`로 실행한다. `python -m unittest discover -s tests -p test_block_stages.py`로 풀이와 블록을 옮기지 않았을 때의 점프 우회를 검사한다.
+
+이전 수직 맵 [옥상 정비구역](stage3_rooftop_works.tmj)은 `python tools/solve_stage3.py --map maps/stage_03/stage3_rooftop_works.tmj`로 안전 지점 그래프를 검증한다.
 
 ## 보존한 레버·가로등 원형
 

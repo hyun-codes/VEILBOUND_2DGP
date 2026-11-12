@@ -16,12 +16,13 @@ from game.world_effects import WorldEffects
 from game.lamp_puzzle import LampPuzzle
 from game.stage_manager import StageManager
 from game.lever_gate import LeverGate, nearest_control
+from game.sliding_block import SlidingBlock
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 STAGE_1 = PROJECT_ROOT / "maps" / "stage_01" / "stage1_missing_bridge.tmj"
-STAGE_2 = PROJECT_ROOT / "maps" / "stage_02" / "stage2_lantern_terraces.tmj"
-STAGE_3 = PROJECT_ROOT / "maps" / "stage_03" / "stage3_rooftop_works.tmj"
+STAGE_2 = PROJECT_ROOT / "maps" / "stage_02" / "stage2_block_ledge.tmj"
+STAGE_3 = PROJECT_ROOT / "maps" / "stage_03" / "stage3_block_hatch.tmj"
 STAGE_2_DRAFT = STAGE_2.with_name("stage2_lamp_room.tmj")
 STAGE_3_DRAFT = STAGE_3.with_name("stage3_return_circuit.tmj")
 PLAYER_ANIMATIONS = PROJECT_ROOT / "assets" / "characters" / "player" / "animations.json"
@@ -48,7 +49,8 @@ class Game:
         self.source_data = map_data
         self.puzzle = LampPuzzle(map_data)
         self.mechanism = LeverGate(map_data)
-        self.data = self.mechanism.compose(self.puzzle.data)
+        self.block = SlidingBlock(map_data)
+        self.data = self.block.compose(self.mechanism.compose(self.puzzle.data))
         self.stage_number = map_data.properties.get("stageNumber", 1)
         self.camera = Camera(self.data.width, self.data.height, WIDTH, HEIGHT, SCALE)
         self.effects.reset(world)
@@ -92,7 +94,7 @@ class Game:
                 and p.y > area.y and p.y - p.HEIGHT < area.y + area.height)
 
     def refresh_layout(self):
-        self.data = self.mechanism.compose(self.puzzle.data)
+        self.data = self.block.compose(self.mechanism.compose(self.puzzle.data))
         self.scene.data = self.data
         self.world_state = WorldState(self.data.solids, self.scene.world)
         self.player.collision = self.collision
@@ -100,6 +102,8 @@ class Game:
     def interaction_target(self):
         if self.scene.world != "real" or not self.player.grounded or self.completed or self.paused:
             return None, None
+        if control := self.block.nearby_control(self.player):
+            return "block", control
         kind, control = nearest_control(self.player, self.puzzle, self.mechanism)
         if kind == "lever" and self.mechanism.activated:
             return None, None
@@ -163,7 +167,7 @@ class Game:
             kind, control = self.interaction_target()
             if control is None:
                 continue
-            device = self.mechanism if kind == "lever" else self.puzzle
+            device = {"block": self.block, "lever": self.mechanism, "lamp": self.puzzle}[kind]
             if device.interact(self.player, self.world_state.name):
                 self.refresh_layout()
         if self.mechanism.advance(dt):
@@ -200,7 +204,7 @@ class Game:
         kind, control = self.interaction_target()
         if control is not None:
             x = control.x - 7
-            y = control.y - (28 if kind == "lever" else 21)
+            y = control.y - (28 if kind in ("lever", "block") else 21)
             icon = Sprite(INTERACT_ICON, (0, 0, 15, 9), x, y, 15, 9)
             renderer.sprite(icon, self.camera.screen_rect(x, y, 15, 9))
         if self.scene.show_markers:
@@ -263,6 +267,7 @@ def main(argv=None):
         if args.check_map:
             LampPuzzle(data)  # 순수 데이터 검사에서 퍼즐 프리셋·필수 오브젝트도 확인한다.
             LeverGate(data)
+            SlidingBlock(data)
             print(f"Map OK: {data.width}x{data.height}, {len(data.sprites)} sprites, {len(data.objects)} game objects")
             return 0
         from game.pico2d_backend import Pico2DBackend

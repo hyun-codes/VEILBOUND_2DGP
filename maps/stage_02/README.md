@@ -1,8 +1,10 @@
-# Stage 2: 등불 거리
+# Stage 2: 옮기는 발판
 
-기본 실행은 [등불 거리](stage2_lantern_terraces.tmj)로 진입한다. 1536×640px, 8px 타일 192×80칸이다. 아래층에서 두 차례 계단을 올라 시작점보다 384px 위의 현실 포털에 도달한다. 안전한 공통 바닥에서 세계를 바꾸어 다리와 계단을 이어가고, 중층에서는 현실의 벽을 그림자로 전환해 통과한다. 중층의 현실 옥상으로 오르면 아래쪽의 혼합 세계 다리 두 개를 건너뛰고 같은 길에 합류할 수 있다.
+[기본 맵](stage2_block_ledge.tmj)은 288×240px이다. 현실에서 블록 옆의 E로 블록을 턱 앞으로 옮겨 발판으로 쓴다. 턱 위에서 그림자로 바꿔 다리를 건너고 출구에서 현실로 돌아온다.
 
-`python main.py --stage 2`로 실행한다. Tiled에서는 Objects를 숨기고 두 세계 레이어를 교대로 켜면 발판을 보기 편하다. `python tools/solve_stage3.py --map maps/stage_02/stage2_lantern_terraces.tmj`로 안전 지점 그래프를 검증한다.
+`python main.py --stage 2`로 실행한다. `python -m unittest discover -s tests -p test_block_stages.py`로 풀이와 블록을 옮기지 않았을 때의 점프 우회를 검사한다.
+
+이전 수직 맵 [등불 거리](stage2_lantern_terraces.tmj)는 `python tools/solve_stage3.py --map maps/stage_02/stage2_lantern_terraces.tmj`로 안전 지점 그래프를 검증한다.
 
 ## 보존한 가로등 원형
 

@@ -11,11 +11,13 @@ from tools.solve_stage3 import DT, Solver
 class VerticalStageTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.solvers = [Solver(path) for path in (STAGE_2, STAGE_3)]
+        cls.tower = STAGE_3.with_name("stage3_rooftop_works.tmj")
+        terraces = STAGE_2.with_name("stage2_lantern_terraces.tmj")
+        cls.solvers = [Solver(path) for path in (terraces, cls.tower)]
         cls.solutions = [solver.solve() for solver in cls.solvers]
 
     def test_input_route_climbs_both_maps_and_enters_stage_three(self):
-        game = Game(self.solvers[0].data, stages=StageManager({"Stage3": STAGE_3}))
+        game = Game(self.solvers[0].data, stages=StageManager({"Stage3": self.tower}))
         for number, solver, solution, rise in zip((2, 3), self.solvers, self.solutions, (384, 768)):
             with self.subTest(stage=number):
                 self.assertEqual(game.stage_number, number)
