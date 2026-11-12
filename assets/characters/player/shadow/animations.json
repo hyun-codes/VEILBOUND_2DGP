@@ -2,7 +2,7 @@
   "format": "veilbound-grid-animations",
   "schema_version": 1,
   "image": "shadow_jack_flame.png",
-  "image_sha256": "c24564cfb0c2eedd8a5f5d10a2e6681afffaac0c51dab8480df5745e4ace88ca",
+  "image_sha256": "9d1c6b43ca07b3ceba55b36873a681ed2739936af6314ba3be4a6f69e00b4dac",
   "image_size": {
     "width": 512,
     "height": 320
