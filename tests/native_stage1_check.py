@@ -14,6 +14,7 @@ from game.app import Game, STAGE_1, WIDTH, HEIGHT
 from game.map_loader import load_map
 from game.pico2d_backend import Pico2DBackend
 from native_movement_check import ScriptedBackend
+from stage1_route import stage1_commands
 
 
 class StageBackend(ScriptedBackend):
@@ -31,7 +32,7 @@ class StageBackend(ScriptedBackend):
             event.type = s.SDL_WINDOWEVENT
             event.window.event = s.SDL_WINDOWEVENT_FOCUS_GAINED
             assert s.SDL_PushEvent(ctypes.byref(event)) == 1
-        if self.phase in ("walk", "walk_again", "cross", "cross_again") and "d" not in g.keys:
+        if self.phase in ("walk", "walk_again", "cross") and "d" not in g.keys:
             self.push_key(s.SDLK_d)
 
         if self.phase in ("walk", "walk_again") and p.x >= 100:
@@ -75,12 +76,17 @@ class StageBackend(ScriptedBackend):
             self.checked.append("respawn_real")
             self.push_key(s.SDLK_LSHIFT, down=False)
             self.phase = "walk_again"
-        elif self.phase == "cross_again" and g.player_at_exit():
-            assert not g.completed and g.scene.world == "shadow"
-            self.checked.append("shadow_portal_off")
-            self.capture = "portal_off"
-            self.push_key(s.SDLK_d, down=False)
-            self.phase = "portal_wait"
+        elif self.phase == "cross_again":
+            if g.player_at_exit():
+                assert not g.completed and g.scene.world == "shadow"
+                self.checked.append("shadow_portal_off")
+                self.capture = "portal_off"
+                self.push_key(s.SDLK_d, down=False)
+                self.phase = "portal_wait"
+            else:
+                keys = {"d": s.SDLK_d, "space": s.SDLK_SPACE, "shift_left": s.SDLK_LSHIFT}
+                for key, down in stage1_commands(g):
+                    self.push_key(keys[key], down)
         elif self.phase == "portal_wait":
             assert not g.completed
             self.push_key(s.SDLK_LSHIFT)

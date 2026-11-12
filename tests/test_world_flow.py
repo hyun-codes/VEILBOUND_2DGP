@@ -6,6 +6,7 @@ from game.collision import Solid
 from game.map_loader import load_map
 from game.pico2d_backend import InputEvent
 from game.world_state import WorldState
+from stage1_route import stage1_commands
 
 
 DT = 1 / 60
@@ -144,25 +145,19 @@ class WorldFlowTests(unittest.TestCase):
 
     def test_play_real_switch_cross_bridge_clear_then_restart(self):
         game = Game(self.data)
-        self.press(game, "d")
-        for _ in range(65):
+        worlds = ["real"]
+        for _ in range(700):
+            for key, down in stage1_commands(game):
+                (self.press if down else self.release)(game, key)
             game.step(DT)
-        self.assertFalse(game.completed)
-        self.press(game)
-        game.step(DT)
-        self.assert_synchronized(game, "shadow")
-        self.release(game)
-        for _ in range(220):
-            game.step(DT)
-            if game.player_at_exit():
+            if game.scene.world != worlds[-1]:
+                worlds.append(game.scene.world)
+            if game.completed:
                 break
-        self.assertFalse(game.completed)
-        self.assertTrue(game.player_at_exit())
-        self.release(game, "d")
-        self.press(game)
-        game.step(DT)
+        self.assertEqual(worlds, ["real", "shadow", "real", "shadow", "real"])
         self.assert_synchronized(game, "real")
         self.assertTrue(game.completed)
+        self.assertEqual(game.player.y, 167)
         self.assertEqual(game.respawns, 0)
         snapshot = (game.player.x, game.player.y, game.camera.x, game.scene.world)
         self.press(game, "space")
@@ -182,7 +177,8 @@ class WorldFlowTests(unittest.TestCase):
     def test_exit_only_in_real_and_fall_takes_priority_over_exit(self):
         for name in ("real", "shadow"):
             game = Game(self.data, name)
-            game.player.x = 290
+            portal = self.data.object_named("Exit")
+            game.player.x, game.player.y = portal.x + 2, portal.y + portal.height
             game.step(DT)
             self.assertEqual(game.completed, name == "real")
             self.assertEqual(game.scene.world, name)
@@ -239,13 +235,14 @@ class WorldFlowTests(unittest.TestCase):
         game.draw(r)
         self.assertIn((116, 223, 188), r.boxes)
         shadow = Game(self.data, "shadow")
-        shadow.player.x = 290
+        portal = self.data.object_named("Exit")
+        shadow.player.x, shadow.player.y = portal.x + 2, portal.y + portal.height
         shadow.step(DT)
         r.boxes.clear()
         shadow.draw(r)
         self.assertIn((150, 151, 170), r.boxes)
         self.assertFalse(shadow.completed)
-        game.player.x = 290
+        game.player.x, game.player.y = portal.x + 2, portal.y + portal.height
         game.step(DT)
         r.boxes.clear()
         game.draw(r)

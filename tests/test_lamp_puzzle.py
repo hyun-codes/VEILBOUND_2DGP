@@ -158,7 +158,8 @@ class LampPuzzleTests(unittest.TestCase):
         manager = StageManager({"Stage2": STAGE_2})
         g = Game(load_map(STAGE_1), stages=manager)
         g.effects.motion_enabled = False
-        g.player.x = 290
+        portal = g.data.object_named("Exit")
+        g.player.x, g.player.y = portal.x + 2, portal.y + portal.height
         g.step(DT)
         self.assertEqual(g.stage_number, 2)
         self.assertEqual((g.player.x, g.player.y, g.puzzle.mode), (28, 183, "bridge"))

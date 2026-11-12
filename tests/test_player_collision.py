@@ -22,13 +22,16 @@ class MovementTests(unittest.TestCase):
         return Player(self.animations, collision or self.real, self.data.width, start)
 
     def test_solid_surfaces_match_pixels_and_decorations_are_excluded(self):
-        self.assertEqual(len(self.data.solids), 264)
-        self.assertEqual(min(s.y for s in self.data.solids), 183)
-        self.assertEqual({s.y for s in self.data.solids if s.height == 1}, {183})
+        self.assertEqual(min(s.y for s in self.data.solids), 167)
+        self.assertEqual({s.y for s in self.data.solids if s.height == 1}, {167, 183})
         self.assertTrue(self.real.supported(28, 183, 6))
         self.assertFalse(self.real.supported(160, 183, 6))
         shadow = CollisionWorld(self.data.solids, "shadow")
         self.assertTrue(shadow.supported(160, 183, 6))
+        self.assertTrue(self.real.supported(360, 183, 6))
+        self.assertFalse(shadow.supported(360, 183, 6))
+        self.assertFalse(self.real.supported(520, 167, 6))
+        self.assertTrue(shadow.supported(520, 167, 6))
 
     def test_swept_floor_wall_and_ceiling_do_not_tunnel(self):
         floor = CollisionWorld([Solid(0, 100, 200, 8)])
@@ -185,22 +188,24 @@ class MovementTests(unittest.TestCase):
             logs.append(states)
         self.assertEqual(logs[0], logs[1])
 
-    def test_real_gap_cannot_be_skipped_with_any_edge_jump_tick(self):
+    def test_world_specific_gaps_cannot_be_skipped_with_any_edge_jump_tick(self):
         # 모든 출발 틱을 바꿔 가장자리 겹침과 coyote time까지 포함한다.
-        max_x_at_surface = 0
-        for jump_tick in range(110):
-            p = self.player((60, 183))
-            p.direction = 1
-            for tick in range(200):
-                if tick == jump_tick:
-                    p.request_jump()
-                p.update(DT)
-                if p.y <= 183:
-                    max_x_at_surface = max(max_x_at_surface, p.x)
-                self.assertFalse(p.grounded and p.x > 131)
-                if p.y - p.HEIGHT > self.data.height:
-                    break
-        self.assertLess(max_x_at_surface + Player.WIDTH / 2, 192)
+        shadow = CollisionWorld(self.data.solids, "shadow")
+        for collision, start, target in ((self.real, (60, 183), 192),
+                                         (shadow, (248, 183), 400),
+                                         (self.real, (448, 167), 560)):
+            with self.subTest(start=start):
+                for jump_tick in range(110):
+                    p = self.player(start, collision)
+                    p.direction = 1
+                    for tick in range(200):
+                        if tick == jump_tick:
+                            p.request_jump()
+                        p.update(DT)
+                        if p.y <= start[1]:
+                            self.assertLess(p.x + Player.WIDTH / 2, target)
+                        if p.y - p.HEIGHT > self.data.height:
+                            break
 
     def test_only_enabled_weapon_free_clips_and_stable_flip_anchor(self):
         self.assertEqual(set(self.animations.clips), set(AnimationSet.REQUIRED))

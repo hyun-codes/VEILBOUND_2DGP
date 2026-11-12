@@ -39,7 +39,9 @@ class ScriptedBackend(Pico2DBackend):
             event.window.event = sdl.SDL_WINDOWEVENT_FOCUS_GAINED
             assert sdl.SDL_PushEvent(ctypes.byref(event)) == 1
             self.push_key(sdl.SDLK_RIGHT)
-        elif self.world == "shadow" and "right" not in self.game.keys:
+        elif self.world == "shadow" and self.game.player.x >= 294 and "right" in self.game.keys:
+            self.push_key(sdl.SDLK_RIGHT, down=False)
+        elif self.world == "shadow" and self.game.player.x < 294 and "right" not in self.game.keys:
             # OS의 비동기 창 포커스 알림 뒤에는 새 누름으로 시험 입력을 재개한다.
             self.push_key(sdl.SDLK_RIGHT)
         if self.world == "real":

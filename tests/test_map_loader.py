@@ -54,11 +54,10 @@ class MapLoaderTests(unittest.TestCase):
             stage = load_map(STAGE_1)
         finally:
             os.chdir(previous)
-        self.assertEqual((stage.width, stage.height), (320, 240))
-        self.assertEqual(len(stage.sprites), 277)
+        self.assertEqual((stage.width, stage.height), (640, 240))
         self.assertEqual(len(stage.objects), 3)
         self.assertEqual(stage.object_named("PlayerStart").y, 183)
-        self.assertEqual(stage.object_named("Exit").y + stage.object_named("Exit").height, 183)
+        self.assertEqual(stage.object_named("Exit").y + stage.object_named("Exit").height, 167)
         self.assertTrue(all(sprite.image.is_file() for sprite in stage.sprites))
 
     def test_nested_group_offset_moves_objects_and_sprites_consistently(self):

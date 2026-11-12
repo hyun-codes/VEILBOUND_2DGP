@@ -11,6 +11,7 @@ from game.app import Game, STAGE_1, STAGE_2, WIDTH, HEIGHT
 from game.map_loader import load_map
 from game.pico2d_backend import Pico2DBackend
 from native_movement_check import ScriptedBackend
+from stage1_route import stage1_commands
 from stage2_route import LampRoute
 from game.stage_manager import StageManager
 
@@ -22,7 +23,6 @@ class LampBackend(ScriptedBackend):
         self.captured = set()
         self.finished = False
         self.restarted = False
-        self.stage1_phase = 0
 
     def poll_events(self):
         s, g = self.sdl, self.game
@@ -33,18 +33,8 @@ class LampBackend(ScriptedBackend):
             assert s.SDL_PushEvent(ctypes.byref(event)) == 1
         mapping = {"d": s.SDLK_d, "e": s.SDLK_e, "space": s.SDLK_SPACE, "shift_left": s.SDLK_LSHIFT}
         if g.stage_number == 1:
-            if self.stage1_phase == 0:
-                self.push_key(s.SDLK_d)
-                self.stage1_phase = 1
-            elif self.stage1_phase == 1 and g.player.x >= 100:
-                self.push_key(s.SDLK_LSHIFT)
-                self.push_key(s.SDLK_LSHIFT, False)
-                self.stage1_phase = 2
-            elif self.stage1_phase == 2 and g.player_at_exit():
-                self.push_key(s.SDLK_d, False)
-                self.push_key(s.SDLK_LSHIFT)
-                self.push_key(s.SDLK_LSHIFT, False)
-                self.stage1_phase = 3
+            for key, down in stage1_commands(g):
+                self.push_key(mapping[key], down)
         elif not self.finished:
             for key, down in self.route.commands(g):
                 self.push_key(mapping[key], down)
@@ -99,10 +89,10 @@ def main():
     game = Game(load_map(STAGE_1 if args.from_stage1 else STAGE_2),
                 stages=StageManager({"Stage2": STAGE_2}) if args.from_stage1 else None)
     backend = LampBackend(game, output)
-    game.run(backend, max_frames=900)
+    game.run(backend, max_frames=1600 if args.from_stage1 else 900)
     assert backend.finished and backend.restarted and not game.running, (backend.route.phase, game.player.x, game.player.y, game.respawns)
     if args.from_stage1:
-        assert backend.stage1_phase == 3
+        assert "stage1" in backend.captured
     print("Native Stage 2 OK:", backend.route.records, "captures:", sorted(backend.captured), "frames:", backend.frames)
 
 

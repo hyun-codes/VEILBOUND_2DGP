@@ -4,7 +4,7 @@
 
 ## 현재 상태와 실행
 
-Stage 1의 이동·전환 학습 구간과 Stage 2의 가로등 퍼즐 방 하나를 연결했다. 현실의 E 조작으로 A는 그림자 계단/다리를 만들고 B는 직접광으로 다리 한 구간을 지운다. 가운데 공통 섬에서 빛을 돌려 앞쪽 길을 뒤쪽 길로 교체한다. 기본 실행에서는 Stage 1 현실 포털 다음에 Stage 2로 진행하고, Stage 2 현실 포털에서는 BFS로 검사한 Stage 3 귀환 회로 초안으로 진행한다. Stage 2 전체·Stage 3~5와 사망 모션·소리는 아직 미완성이다. 사람의 난도·재미 평가는 별도로 남아 있다.
+Stage 1의 세 다리를 그림자 → 현실 → 그림자로 건너고, 마지막 현실 포털에서 Stage 2의 가로등 퍼즐 방으로 진행한다. 현실의 E 조작으로 A는 그림자 계단/다리를 만들고 B는 직접광으로 다리 한 구간을 지운다. 가운데 공통 섬에서 빛을 돌려 앞쪽 길을 뒤쪽 길로 교체한다. 기본 실행에서는 Stage 1 현실 포털 다음에 Stage 2로 진행하고, Stage 2 현실 포털에서는 BFS로 검사한 Stage 3 귀환 회로 초안으로 진행한다. Stage 2 전체·Stage 3~5와 사망 모션·소리는 아직 미완성이다. 사람의 난도·재미 평가는 별도로 남아 있다.
 
 Windows의 Python 3.13.15, pico2d 1.5.1, PySDL2 0.9.17, pysdl2-dll 2.32.10에서 실행을 확인했다. 현재 환경에는 이미 설치되어 있었으며 새 환경은 다음과 같이 준비한다.
 
@@ -51,7 +51,7 @@ VEILBOUND_2DGP/
 - [Stage 1 맵](maps/stage_01/stage1_missing_bridge.tmj)
 - [발표 PPT](docs/VEILBOUND_발표.pptx), [기획서 PPT](docs/VEILBOUND_기획서.pptx)
 
-Tiled에서 편집할 때는 `assets/`, `maps/tilesets/`, `maps/stage_01/` 구조를 함께 유지한다. 원본 이미지·프레임 설정·기존 Stage 1 타일 배치는 변경하지 않았다. Stage 2 원형 맵은 별도로 추가했다. 지면 TSJ의 윗면 타일 5개에 collisionTop=7을 추가해 투명 여백 아래의 실제 지면과 충돌을 맞췄다.
+Tiled에서 편집할 때는 `assets/`, `maps/tilesets/`, `maps/stage_01/` 구조를 함께 유지한다. Stage 1 맵은 8px 원본 타일을 사용해 640×240px로 구성했다. Stage 2 원형 맵은 별도 파일로 관리한다. 지면 TSJ의 윗면 타일 5개에 collisionTop=7을 추가해 투명 여백 아래의 실제 지면과 충돌을 맞췄다.
 
 ## 확인 범위
 

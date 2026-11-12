@@ -55,7 +55,7 @@ class WorldEffectsTests(unittest.TestCase):
     def test_visual_roles_come_from_map_and_shared_lamp_definition(self):
         roles = {s.visual_role for s in self.data.sprites}
         self.assertEqual(roles, {"background", "fog", "terrain", "prop", "lamp"})
-        self.assertEqual(sum(s.visual_role == "lamp" for s in self.data.sprites), 2)
+        self.assertTrue(all(s.visual_role == "lamp" for s in self.data.sprites if "lamp" in s.object_name.lower()))
         self.assertEqual(sum(s.visual_role == "fog" for s in self.data.sprites), 1)
 
     def test_transition_uses_elapsed_time_and_interrupts_without_color_jump(self):
