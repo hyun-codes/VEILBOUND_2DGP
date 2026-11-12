@@ -7,7 +7,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from game.app import Game, STAGE_1, STAGE_2, WIDTH, HEIGHT
+from game.app import Game, STAGE_1, STAGE_2_DRAFT as STAGE_2, WIDTH, HEIGHT
 from game.map_loader import load_map
 from game.pico2d_backend import Pico2DBackend
 from native_movement_check import ScriptedBackend

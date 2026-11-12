@@ -1,7 +1,7 @@
 import unittest
 from dataclasses import replace
 
-from game.app import Game, STAGE_1, STAGE_2
+from game.app import Game, STAGE_1, STAGE_2_DRAFT as STAGE_2
 from game.map_loader import load_map, MapFormatError
 from game.lamp_puzzle import LampPuzzle
 from game.pico2d_backend import InputEvent

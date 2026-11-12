@@ -3,6 +3,7 @@
 보수적인 지점 그래프이며 모든 연속 좌표·공중 전환·순찰 시간의 완전 탐색은 아니다.
 """
 
+import argparse
 from collections import deque
 import hashlib
 import json
@@ -12,7 +13,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from game.app import STAGE_3, PLAYER_ANIMATIONS
+from game.app import STAGE_3_DRAFT, PLAYER_ANIMATIONS
 from game.collision import CollisionWorld
 from game.lamp_puzzle import LampPuzzle
 from game.map_loader import load_map
@@ -40,7 +41,7 @@ class Travel:
 
 
 class Solver:
-    def __init__(self, path=STAGE_3):
+    def __init__(self, path=STAGE_3_DRAFT):
         self.data = load_map(path)
         self.puzzle = LampPuzzle(self.data)
         self.mechanism = LeverGate(self.data)
@@ -84,6 +85,12 @@ class Solver:
         if key in self.cache:
             return self.cache[key]
         src, dst = self.nodes[source], self.nodes[target]
+        left, right = min(src.x, dst.x) - 8, max(src.x, dst.x) + 8
+        top, bottom = min(src.y, dst.y) - 64, max(src.y, dst.y) + 48
+        # Travel stays between the two x positions and stops shortly below the lower landing.
+        collision = CollisionWorld((s for s in collision.solids
+                                    if s.x + s.width >= left and s.x <= right
+                                    and s.y + s.height >= top and s.y <= bottom), world)
         # 최대 상승량을 넘는 링크에는 점프를 시도하지 않는다.
         candidates = [None]
         if src.y - dst.y <= 27:
@@ -177,9 +184,13 @@ class Solver:
 
 
 if __name__ == "__main__":
-    result = Solver().solve()
-    if len(sys.argv) > 1:
-        Path(sys.argv[1]).write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("output", nargs="?", type=Path)
+    parser.add_argument("--map", type=Path, default=STAGE_3_DRAFT)
+    args = parser.parse_args()
+    result = Solver(args.map).solve()
+    if args.output is not None:
+        args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({k: v for k, v in result.items() if k != "route"}, ensure_ascii=False, indent=2))
     for step in result["route"]:
         print(step)

@@ -1,12 +1,16 @@
-# Stage 2: 뒤틀린 계단 — 빛이 길을 지우는 퍼즐 원형
+# Stage 2: 등불 거리
+
+기본 실행은 [등불 거리](stage2_lantern_terraces.tmj)로 진입한다. 1536×640px, 8px 타일 192×80칸이다. 아래층에서 두 차례 계단을 올라 시작점보다 384px 위의 현실 포털에 도달한다. 안전한 공통 바닥에서 세계를 바꾸어 다리와 계단을 이어가고, 중층에서는 현실의 벽을 그림자로 전환해 통과한다. 중층의 현실 옥상으로 오르면 아래쪽의 혼합 세계 다리 두 개를 건너뛰고 같은 길에 합류할 수 있다.
+
+`python main.py --stage 2`로 실행한다. Tiled에서는 Objects를 숨기고 두 세계 레이어를 교대로 켜면 발판을 보기 편하다. `python tools/solve_stage3.py --map maps/stage_02/stage2_lantern_terraces.tmj`로 안전 지점 그래프를 검증한다.
+
+## 보존한 가로등 원형
 
 가로등 A가 계단/다리를 만들고, 추가한 가로등 B의 직접광이 다리 한 구간을 지운다. 두 그림자가 겹쳐 사라지는 규칙은 아니다. 실제 광학 투영 대신 Tiled의 사전 정의 영역을 사용한다. 적·시간제한·무기·새 이미지 없이 기존 도시 PNG·공유 TSJ만 재사용했다. Stage 2 전체가 아닌 퍼즐 방 하나이며 사람의 재미·난도 평가는 아직이다.
 
 ## 실행·조작
 
 ```powershell
-python main.py --stage 2
-python main.py --stage 2 --check-map
 python tests/native_stage2_check.py --from-stage1 --output "$env:TEMP\veilbound-stage2-check"
 ```
 

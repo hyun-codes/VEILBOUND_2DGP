@@ -1,7 +1,7 @@
 import unittest
 from dataclasses import replace
 
-from game.app import Game, STAGE_1, STAGE_3
+from game.app import Game, STAGE_1, STAGE_3_DRAFT as STAGE_3
 from game.collision import CollisionWorld
 from game.lever_gate import LeverGate, nearest_control
 from game.map_loader import load_map, MapFormatError

@@ -1,12 +1,16 @@
-# Stage 3: 위험한 골목 — 돌아오는 회로
+# Stage 3: 옥상 정비구역
+
+기본 실행은 [옥상 정비구역](stage3_rooftop_works.tmj)으로 진입한다. 2304×960px, 8px 타일 288×120칸이다. 하층부터 네 높이를 오가며 시작점보다 768px 위의 현실 포털로 간다. 계단 중간 공통 발판에서 전환해 세계별 계단을 잇고, 벌어진 계단을 짧게 점프한다. 두 구역에서 현실 옥상으로 올라 혼합 세계 다리를 건너뛰고 주 경로에 합류할 수 있다.
+
+`python main.py --stage 3`로 실행한다. `python tools/solve_stage3.py --map maps/stage_03/stage3_rooftop_works.tmj`로 안전 지점 그래프를 검증한다.
+
+## 보존한 레버·가로등 원형
 
 상태: Tiled 맵·레버 차단문이 연결된 퍼즐 초안. 사람의 재미·난도 검증 전이다. 걷기 모션 개선은 보류했다. 이번 작업은 두 가로등과 세계별 길의 순서를 검사하며, 동물·몬스터 순찰과 접촉 판정은 아직 없다. EncounterPlan 오브젝트는 향후 쥐→지상 임프 배치 후보일 뿐 실행되는 적이 아니다.
 
 ## 실행과 편집
 
 ```powershell
-python main.py --stage 3
-python main.py --stage 3 --check-map
 python tools/solve_stage3.py maps/stage_03/solution.json
 python -m unittest discover -s tests -v
 python tests/native_stage3_check.py --output "$env:TEMP\veilbound-stage3-check"

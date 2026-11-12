@@ -20,8 +20,10 @@ from game.lever_gate import LeverGate, nearest_control
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 STAGE_1 = PROJECT_ROOT / "maps" / "stage_01" / "stage1_missing_bridge.tmj"
-STAGE_2 = PROJECT_ROOT / "maps" / "stage_02" / "stage2_lamp_room.tmj"
-STAGE_3 = PROJECT_ROOT / "maps" / "stage_03" / "stage3_return_circuit.tmj"
+STAGE_2 = PROJECT_ROOT / "maps" / "stage_02" / "stage2_lantern_terraces.tmj"
+STAGE_3 = PROJECT_ROOT / "maps" / "stage_03" / "stage3_rooftop_works.tmj"
+STAGE_2_DRAFT = STAGE_2.with_name("stage2_lamp_room.tmj")
+STAGE_3_DRAFT = STAGE_3.with_name("stage3_return_circuit.tmj")
 PLAYER_ANIMATIONS = PROJECT_ROOT / "assets" / "characters" / "player" / "animations.json"
 INTERACT_ICON = PROJECT_ROOT / "assets" / "ui" / "interact_e.png"
 WIDTH, HEIGHT, SCALE = 800, 600, 3
@@ -246,7 +248,7 @@ def _positive_int(text):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="VEILBOUND - light and shadow puzzle platformer")
-    parser.add_argument("--stage", type=int, choices=(1, 2, 3), default=1, help="start stage; Stage 3 is a solver-checked map draft")
+    parser.add_argument("--stage", type=int, choices=(1, 2, 3), default=1, help="start at the selected stage")
     parser.add_argument("--check-map", action="store_true", help="validate map data without opening a window")
     parser.add_argument("--world", choices=("real", "shadow"), default="real", help="initial world for testing; restart always returns to real")
     parser.add_argument("--frames", type=_positive_int, help="close automatically after this many render frames")

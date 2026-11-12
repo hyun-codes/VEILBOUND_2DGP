@@ -3,7 +3,7 @@ import json
 from collections import deque
 import unittest
 
-from game.app import Game, STAGE_2, STAGE_3
+from game.app import Game, STAGE_2_DRAFT as STAGE_2, STAGE_3_DRAFT as STAGE_3
 from game.map_loader import load_map
 from game.pico2d_backend import InputEvent
 from game.stage_manager import StageManager
