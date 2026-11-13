@@ -174,6 +174,11 @@ class Game:
             self.refresh_layout()
         dx = int(bool(self.keys & {"d", "right"})) - int(bool(self.keys & {"a", "left"}))
         self.player.direction = dx
+        self.player.push_distance = None
+        if self.block.pushable and self.scene.world == "real" and "e" in self.keys:
+            self.player.push_distance = self.block.push(self.player, dx, dt)
+            if self.player.push_distance:
+                self.refresh_layout()
         self.objects.update(dt)
         if self.player.y - self.player.HEIGHT > self.data.height:
             # 화면 밖 추락은 가짜 사망 모션 없이 즉시 복귀한다. stepper는 콜백 안에서 초기화하지 않는다.

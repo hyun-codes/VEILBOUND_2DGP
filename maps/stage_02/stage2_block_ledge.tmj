@@ -419,6 +419,11 @@
               "name": "destinationX",
               "type": "int",
               "value": 144
+            },
+            {
+              "name": "pushable",
+              "type": "bool",
+              "value": true
             }
           ]
         }

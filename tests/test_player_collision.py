@@ -208,7 +208,9 @@ class MovementTests(unittest.TestCase):
                             break
 
     def test_only_enabled_weapon_free_clips_and_stable_flip_anchor(self):
-        self.assertEqual(set(self.animations.clips), set(AnimationSet.REQUIRED))
+        self.assertEqual(set(self.animations.clips), {*AnimationSet.REQUIRED, "push"})
+        self.assertEqual(self.animations.clip_images["push"].name, "Red_Hand_Jack_PUSH.png")
+        self.assertEqual(self.animations.frame("push", 0.315), (192, 0, 64, 64))
         self.assertEqual(self.animations.frame("run", 0), (0, 192, 64, 64))
         self.assertEqual(self.animations.frame("land", 10), (192, 384, 64, 64))
         p = self.player()

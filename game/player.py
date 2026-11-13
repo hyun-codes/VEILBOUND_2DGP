@@ -27,15 +27,25 @@ class AnimationSet:
         if grid.get("margin", 0) or grid.get("spacing", 0) or data["source_facing"] != "right":
             raise MapFormatError("Unsupported player grid/facing")
         self.clips = {}
-        for name in self.REQUIRED:
+        self.clip_images = {}
+        names = self.REQUIRED + (("push",) if "push" in data["animations"] else ())
+        for name in names:
             clip = data["animations"][name]
             if not clip["enabled"] or not clip["columns"] or clip["frame_duration_ms"] <= 0:
                 raise MapFormatError(f"Missing/invalid weapon-free animation: {name}")
+            image = self.image
+            width, height = iw, ih
+            if "image" in clip:
+                image = (path.parent / clip["image"]).resolve()
+                if hashlib.sha256(image.read_bytes()).hexdigest() != clip["image_sha256"]:
+                    raise MapFormatError(f"Player clip image hash differs: {name}")
+                width, height = _png_size(image)
             rects = tuple((c * self.width, clip["row"] * self.height, self.width, self.height)
                           for c in clip["columns"])
-            if any(x < 0 or y < 0 or x + w > iw or y + h > ih for x, y, w, h in rects):
+            if any(x < 0 or y < 0 or x + w > width or y + h > height for x, y, w, h in rects):
                 raise MapFormatError(f"Player clip exceeds sheet: {name}")
             self.clips[name] = (rects, clip["frame_duration_ms"] / 1000, clip["loop"])
+            self.clip_images[name] = image
 
     def frame(self, name, elapsed):
         rects, duration, loop = self.clips[name]
@@ -67,12 +77,14 @@ class Player:
         self.coyote = self.COYOTE_TIME if self.grounded else 0.0
         self.jump_buffer = 0.0
         self.jump_held = False
+        self.push_distance = None
         self.animation, self.animation_time = "idle", 0.0
 
     def clear_input(self):
         self.direction = 0
         self.jump_buffer = 0.0
         self.jump_held = False
+        self.push_distance = None
 
     def request_jump(self):
         self.jump_buffer = self.JUMP_BUFFER
@@ -94,6 +106,9 @@ class Player:
         if self.jump_buffer > 0 and (self.grounded or self.coyote > 0):
             self._jump()
         self.vx = self.direction * self.SPEED
+        dx = self.vx * dt if self.push_distance is None else self.push_distance
+        if self.push_distance is not None:
+            self.vx = dx / dt
         if self.direction:
             self.facing = self.direction
         # 상승 중 버튼을 놓으면 짧게 뛴다. 다시 눌러도 위쪽 속도를 더하지 않는다.
@@ -102,7 +117,7 @@ class Player:
         gravity = self.GRAVITY if self.vy < 0 else self.FALL_GRAVITY
         self.vy = min(self.MAX_FALL, self.vy + gravity * dt)
         self.x, self.y, side, landed, ceiling = self.collision.move(
-            self.x, self.y, self.WIDTH, self.HEIGHT, self.vx * dt, self.vy * dt)
+            self.x, self.y, self.WIDTH, self.HEIGHT, dx, self.vy * dt)
         self.x = max(self.WIDTH / 2, min(self.x, self.map_width - self.WIDTH / 2))
         if side:
             self.vx = 0.0
@@ -121,6 +136,8 @@ class Player:
             self.jump_buffer = 0.0
         if not self.grounded:
             name = "jump_start" if self.vy < 0 else "fall"
+        elif self.push_distance is not None and "push" in self.animations.clips:
+            name = "push"
         elif self.direction:
             name = "run"
         elif not was_grounded or (self.animation == "land" and
@@ -128,7 +145,7 @@ class Player:
             name = "land"
         else:
             name = "idle"
-        if name != self.animation:
+        if name != self.animation or (name == "push" and not self.push_distance):
             self.animation, self.animation_time = name, 0.0
         else:
             self.animation_time += dt
@@ -137,7 +154,8 @@ class Player:
         ax, ay = self.animations.anchor
         if self.facing < 0:
             ax = self.animations.width - ax
-        sprite = Sprite(self.animations.image, self.animations.frame(self.animation, self.animation_time),
+        image = self.animations.clip_images[self.animation]
+        sprite = Sprite(image, self.animations.frame(self.animation, self.animation_time),
                         self.x - ax, self.y - ay, self.animations.width, self.animations.height,
                         flip_x=self.facing < 0)
         renderer.sprite(sprite, camera.screen_rect(sprite.x, sprite.y, sprite.width, sprite.height))

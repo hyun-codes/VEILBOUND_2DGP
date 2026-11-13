@@ -5,10 +5,11 @@
 - [밀기 모션 AI 후보](push_candidate/README.md): 사용자 요청으로 생성한 별도 초안. 외형·픽셀 크기·반투명 경계 검수에서 미통과하여 게임에는 등록하지 않았다.
 
 - [Red_Hand_Jack_SPRITESHEET.png](Red_Hand_Jack_SPRITESHEET.png): 사용자가 제공한 원본 시트. 이미지를 수정하지 않았다.
+- [Red_Hand_Jack_PUSH.png](Red_Hand_Jack_PUSH.png): Stage 2 밀기 시트. 생성한 포즈를 참고해 Jack 원본 팔레트로 다시 그린 우향 4프레임이다. 투명 256×64 PNG, 64×64 셀, 발 앵커 (32, 44)를 사용한다. 왼쪽으로 밀 때 게임에서 좌우 반전한다.
 - [animations.json](animations.json): VEILBOUND에서 사용할 프레임과 재생 설정. `veilbound-grid-animations` 버전 1이라는 프로젝트 자체 형식이며 Aseprite 내보내기 형식이나 Tiled TSJ가 아니다.
 - [전체 스프라이트 분류표](../../../docs/player_sprite_inventory.md): Jack1~139의 액션과 무기 유무를 확인한 기록.
 
-2026-11-06에 game/player.py의 AnimationSet·Player가 이 JSON을 읽도록 연결했다. 기본 활성 모션 5개만 물리 상태에 맞춰 재생하고 좌우 반전과 발 앵커를 적용한다. 선택 모션 3개와 사망 모션은 사용하지 않는다. 이미지와 JSON 자체는 이번 구현에서 변경하지 않았다.
+game/player.py의 AnimationSet·Player가 이 JSON을 읽어 기본 모션과 밀기 모션을 물리 상태에 맞춰 재생한다. 선택 모션 3개와 사망 모션은 비활성이다.
 
 ## 이미지와 격자
 
@@ -24,6 +25,7 @@ JSON의 `row`와 `columns`는 **좌상단 원점, 0부터 시작하는 인덱스
 | --- | --- | --- | --- | --- | --- | --- |
 | `idle` | 1~3 | 0 | 3 | 예 | 예 | 240ms |
 | `run` | 15~22 | 3 | 8 | 예 | 예 | 80ms |
+| `push` | 별도 시트 | 0 | 4 | 예 | 예 | 105ms |
 | `jump_start` | 23~27 | 4 | 5 | 아니오 | 예 | 40ms |
 | `fall` | 28~31 | 5 | 4 | 예 | 예 | 100ms |
 | `land` | 32~35 | 6 | 4 | 아니오 | 예 | 40ms |

@@ -1,6 +1,6 @@
 # Stage 2: 옮기는 발판
 
-[기본 맵](stage2_block_ledge.tmj)은 288×240px이다. 현실에서 블록 옆의 E로 블록을 턱 앞으로 옮겨 발판으로 쓴다. 턱 위에서 그림자로 바꿔 다리를 건너고 출구에서 현실로 돌아온다.
+[기본 맵](stage2_block_ledge.tmj)은 288×240px이다. 현실에서 박스 옆에 [E]가 뜨면 E를 누른 채 박스 쪽으로 A/D를 눌러 민다. 박스를 턱 앞으로 옮겨 발판으로 쓰고, 턱 위에서 그림자로 바꿔 다리를 건넌 뒤 출구에서 현실로 돌아온다.
 
 `python main.py --stage 2`로 실행한다. `python -m unittest discover -s tests -p test_block_stages.py`로 풀이와 블록을 옮기지 않았을 때의 점프 우회를 검사한다.
 
