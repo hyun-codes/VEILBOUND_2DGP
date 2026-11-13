@@ -34,7 +34,7 @@
       "enabled": true,
       "loop": true,
       "image": "Red_Hand_Jack_PUSH.png",
-      "image_sha256": "3bb83cdadc6a1192f701e4aff04a01dbc9497c365fd0a649cd8cda7a0736f4a4",
+      "image_sha256": "9ef5a5c7585df32a60dda860ecb8778e835ffe936935f5cabb4a72a37a7227c3",
       "row": 0,
       "columns": [0, 1, 2, 3],
       "frame_duration_ms": 105
