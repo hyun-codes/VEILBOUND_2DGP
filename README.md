@@ -4,7 +4,7 @@
 
 ## 현재 상태와 실행
 
-기본 실행은 Stage 1 사라진 다리 → Stage 2 옮기는 발판 → Stage 3 사라지는 바닥으로 이어진다. Stage 2·3에서는 현실의 블록을 옮겨 이동 경로를 만든 뒤, 그림자 세계로 바꿔 다리나 하층 통로를 이용한다. 이전 수직 맵과 가로등·레버 원형은 [맵 목록](maps/README.md)에서 확인할 수 있다.
+기본 실행은 Stage 1 사라진 다리 → Stage 2 옮기는 발판 → Stage 3 사라지는 바닥 → Stage 4 그림자 안뜰로 이어진다. Stage 4에서는 그림자 다리를 건넌 뒤 현실로 복귀해 무해한 고양이 곁을 지나거나, 그림자에 남아 지상 임프의 근접 공격을 피할 수 있다. 이전 수직 맵과 가로등·레버 원형은 [맵 목록](maps/README.md)에서 확인할 수 있다.
 
 Windows의 Python 3.13.15, pico2d 1.5.1, PySDL2 0.9.17, pysdl2-dll 2.32.10에서 실행을 확인했다. 현재 환경에는 이미 설치되어 있었으며 새 환경은 다음과 같이 준비한다.
 
@@ -21,6 +21,7 @@ Stage 2에서는 현실의 박스 옆에 `[E]`가 뜨면 E를 누른 채 A/D로 
 ```powershell
 python main.py --stage 2
 python main.py --stage 3
+python main.py --stage 4
 python main.py --world shadow
 python main.py --check-map
 python -m unittest discover -s tests -v

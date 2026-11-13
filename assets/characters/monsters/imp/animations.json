@@ -30,7 +30,7 @@
   "source_facing_status": "visual_inspection_not_author_documentation",
   "default_animation": "idle",
   "timing_status": "initial_tuning_values_not_source_timings",
-  "runtime_status": "metadata_only_not_integrated",
+  "runtime_status": "stage_4_patrol_and_melee",
   "animations": {
     "idle": {
       "enabled": true,
@@ -85,6 +85,21 @@
       "source_frame_filename_pattern": "Imp animations{}.png",
       "frame_duration_ms": 90,
       "classification_status": "visual_inference_with_exact_source_pixel_match"
+    },
+    "attack": {
+      "enabled": true,
+      "loop": false,
+      "row": 3,
+      "columns": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "frame_duration_ms": 100
     }
   },
   "excluded_animations": [
@@ -93,12 +108,6 @@
         1
       ],
       "reason": "transition_or_turn_pose_not_needed_for_initial_patrol; exact_name_unconfirmed"
-    },
-    {
-      "rows": [
-        3
-      ],
-      "reason": "attack_not_used"
     },
     {
       "rows": [

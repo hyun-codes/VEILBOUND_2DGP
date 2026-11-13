@@ -17,18 +17,28 @@ from game.lamp_puzzle import LampPuzzle
 from game.stage_manager import StageManager
 from game.lever_gate import LeverGate, nearest_control
 from game.sliding_block import SlidingBlock
+from game.cat_encounter import CatEncounter
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 STAGE_1 = PROJECT_ROOT / "maps" / "stage_01" / "stage1_missing_bridge.tmj"
 STAGE_2 = PROJECT_ROOT / "maps" / "stage_02" / "stage2_block_ledge.tmj"
 STAGE_3 = PROJECT_ROOT / "maps" / "stage_03" / "stage3_block_hatch.tmj"
+STAGE_4 = PROJECT_ROOT / "maps" / "stage_04" / "stage4_courtyard.tmj"
 STAGE_2_DRAFT = STAGE_2.with_name("stage2_lamp_room.tmj")
 STAGE_3_DRAFT = STAGE_3.with_name("stage3_return_circuit.tmj")
 PLAYER_ANIMATIONS = PROJECT_ROOT / "assets" / "characters" / "player" / "animations.json"
+CHARACTER_ASSETS = PLAYER_ANIMATIONS.parent.parent
 INTERACT_ICON = PROJECT_ROOT / "assets" / "ui" / "interact_e.png"
 WIDTH, HEIGHT, SCALE = 800, 600, 3
 SHIFT_KEYS = {"shift_left", "shift_right"}
+
+
+def load_encounter(data):
+    cats = [obj for obj in data.objects if obj.kind == "Cat"]
+    if len(cats) > 1:
+        raise MapFormatError("Only one Cat is supported per stage")
+    return CatEncounter(cats[0], data, CHARACTER_ASSETS) if cats else None
 
 
 class Game:
@@ -59,6 +69,10 @@ class Game:
         self.world_state = WorldState(self.data.solids, world)
         start = self.data.object_named("PlayerStart")
         self.player = Player(self.animations[world], self.collision, self.data.width, (start.x, start.y))
+        self.encounter = load_encounter(self.data)
+        if self.encounter:
+            self.encounter.world = world
+        self.dying = False
         if hasattr(self, "objects"):
             self.objects.clear()
         self.objects = GameWorld()
@@ -81,8 +95,8 @@ class Game:
     def collision(self):
         return self.world_state.collision
 
-    def restart(self, fallen=False):
-        count = self.respawns + int(fallen)
+    def restart(self, failed=False):
+        count = self.respawns + int(failed)
         debug = self.scene.show_markers
         self.enter_map(self.source_data)
         self.scene.show_markers = debug
@@ -100,7 +114,7 @@ class Game:
         self.player.collision = self.collision
 
     def interaction_target(self):
-        if self.scene.world != "real" or not self.player.grounded or self.completed or self.paused:
+        if self.scene.world != "real" or not self.player.grounded or self.completed or self.paused or self.dying:
             return None, None
         if control := self.block.nearby_control(self.player):
             return "block", control
@@ -131,14 +145,14 @@ class Game:
                 shift_was_held = bool(self.keys & SHIFT_KEYS)
                 self.keys.add(event.key)
                 if event.key == "r":
-                    self.restart()
+                    self.restart(failed=self.dying)
                     self.stepper.reset()
                     reset_clock = True
                 elif event.key == "f1":
                     self.scene.show_markers = not self.scene.show_markers
                 elif event.key == "f3":
                     self.effects.motion_enabled = not self.effects.motion_enabled
-                elif self.completed:
+                elif self.completed or self.dying:
                     continue
                 elif event.key in SHIFT_KEYS and not shift_was_held:
                     self.pending_switches += 1
@@ -150,6 +164,17 @@ class Game:
 
     def step(self, dt):
         if self.completed:
+            return
+        if self.dying:
+            p = self.player
+            self.encounter.finish_attack(dt)
+            p.animation_time += dt
+            if p.animation_time + 1e-9 >= p.animations.duration(p.animation):
+                if p.animation == "hurt":
+                    p.animation = "death"
+                    p.animation_time = 0.0
+                else:
+                    self.restart(failed=True)
             return
         self.blocked_notice = max(0.0, self.blocked_notice - dt)
         pending, self.pending_switches = self.pending_switches, 0
@@ -182,11 +207,18 @@ class Game:
         self.objects.update(dt)
         if self.player.y - self.player.HEIGHT > self.data.height:
             # 화면 밖 추락은 가짜 사망 모션 없이 즉시 복귀한다. stepper는 콜백 안에서 초기화하지 않는다.
-            self.restart(fallen=True)
+            self.restart(failed=True)
             return
         elif self.player.y <= self.data.height:
             self.camera.follow(self.player.x, self.player.y, dx, dt)
         p = self.player
+        if self.encounter and self.encounter.step(dt, p, self.scene.world):
+            self.dying = True
+            p.clear_input()
+            p.vx = p.vy = 0.0
+            p.animation, p.animation_time = "hurt", 0.0
+            self.keys.clear()
+            return
         if self.world_state.name == "real" and self.player_at_exit():
             next_map = self.stages.next_map(self.data) if self.stages else None
             if next_map is not None:
@@ -204,6 +236,8 @@ class Game:
     def draw(self, renderer):
         renderer.begin(self.data.background)
         self.objects.render(renderer, self.camera)
+        if self.encounter:
+            self.encounter.draw(renderer, self.camera)
         self.mechanism.draw(renderer, self.camera)
         self.puzzle.draw(renderer, self.camera, self.scene.world)
         kind, control = self.interaction_target()
@@ -257,7 +291,7 @@ def _positive_int(text):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="VEILBOUND - light and shadow puzzle platformer")
-    parser.add_argument("--stage", type=int, choices=(1, 2, 3), default=1, help="start at the selected stage")
+    parser.add_argument("--stage", type=int, choices=(1, 2, 3, 4), default=1, help="start at the selected stage")
     parser.add_argument("--check-map", action="store_true", help="validate map data without opening a window")
     parser.add_argument("--world", choices=("real", "shadow"), default="real", help="initial world for testing; restart always returns to real")
     parser.add_argument("--frames", type=_positive_int, help="close automatically after this many render frames")
@@ -267,12 +301,13 @@ def main(argv=None):
     if args.screenshot and (args.frames is None or args.screenshot.suffix.lower() != ".bmp"):
         parser.error("--screenshot requires --frames and a .bmp output path")
     try:
-        paths = {"Stage1": STAGE_1, "Stage2": STAGE_2, "Stage3": STAGE_3}
+        paths = {"Stage1": STAGE_1, "Stage2": STAGE_2, "Stage3": STAGE_3, "Stage4": STAGE_4}
         data = load_map(paths[f"Stage{args.stage}"])
         if args.check_map:
             LampPuzzle(data)  # 순수 데이터 검사에서 퍼즐 프리셋·필수 오브젝트도 확인한다.
             LeverGate(data)
             SlidingBlock(data)
+            load_encounter(data)
             print(f"Map OK: {data.width}x{data.height}, {len(data.sprites)} sprites, {len(data.objects)} game objects")
             return 0
         from game.pico2d_backend import Pico2DBackend

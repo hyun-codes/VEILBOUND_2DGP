@@ -93,6 +93,33 @@
         3
       ],
       "frame_duration_ms": 40
+    },
+    "hurt": {
+      "enabled": true,
+      "loop": false,
+      "row": 0,
+      "columns": [
+        0,
+        1,
+        2
+      ],
+      "frame_duration_ms": 60,
+      "image": "shadow_jack_fall.png",
+      "image_sha256": "06705d709fb6ed81feccec14d56dce9a9cd261281f6fc1f353186b4c6e4aff12"
+    },
+    "death": {
+      "enabled": true,
+      "loop": false,
+      "row": 0,
+      "columns": [
+        3,
+        4,
+        5,
+        5
+      ],
+      "frame_duration_ms": 75,
+      "image": "shadow_jack_fall.png",
+      "image_sha256": "06705d709fb6ed81feccec14d56dce9a9cd261281f6fc1f353186b4c6e4aff12"
     }
   }
 }

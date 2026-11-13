@@ -10,7 +10,7 @@ from game.map_loader import Sprite, MapFormatError, _png_size
 class AnimationSet:
     REQUIRED = ("idle", "run", "jump_start", "fall", "land")
 
-    def __init__(self, path):
+    def __init__(self, path, required=None):
         path = Path(path)
         data = json.loads(path.read_text(encoding="utf-8"))
         if data.get("format") != "veilbound-grid-animations" or data.get("schema_version") != 1:
@@ -28,7 +28,9 @@ class AnimationSet:
             raise MapFormatError("Unsupported player grid/facing")
         self.clips = {}
         self.clip_images = {}
-        names = self.REQUIRED + (("push",) if "push" in data["animations"] else ())
+        names = self.REQUIRED if required is None else required
+        names += tuple(name for name in ("push", "hurt", "death")
+                       if name not in names and data["animations"].get(name, {}).get("enabled"))
         for name in names:
             clip = data["animations"][name]
             if not clip["enabled"] or not clip["columns"] or clip["frame_duration_ms"] <= 0:
@@ -55,6 +57,13 @@ class AnimationSet:
     def duration(self, name):
         rects, duration, _ = self.clips[name]
         return len(rects) * duration
+
+    def sprite(self, name, elapsed, x, y, facing):
+        ax, ay = self.anchor
+        if facing < 0:
+            ax = self.width - ax
+        return Sprite(self.clip_images[name], self.frame(name, elapsed), x - ax, y - ay,
+                      self.width, self.height, flip_x=facing < 0)
 
 
 class Player:
@@ -151,11 +160,5 @@ class Player:
             self.animation_time += dt
 
     def draw(self, renderer, camera):
-        ax, ay = self.animations.anchor
-        if self.facing < 0:
-            ax = self.animations.width - ax
-        image = self.animations.clip_images[self.animation]
-        sprite = Sprite(image, self.animations.frame(self.animation, self.animation_time),
-                        self.x - ax, self.y - ay, self.animations.width, self.animations.height,
-                        flip_x=self.facing < 0)
+        sprite = self.animations.sprite(self.animation, self.animation_time, self.x, self.y, self.facing)
         renderer.sprite(sprite, camera.screen_rect(sprite.x, sprite.y, sprite.width, sprite.height))

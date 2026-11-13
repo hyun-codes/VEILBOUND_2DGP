@@ -7,6 +7,7 @@
 | 1: 사라진 다리 | [설계·에셋 분석·검증 기록](stage_01/README.md) | [TMJ](stage_01/stage1_missing_bridge.tmj), 자동·SDL 경로 검증, 사람의 평가 전 |
 | 2: 옮기는 발판 | [배치·검증](stage_02/README.md) | [288×240px TMJ](stage_02/stage2_block_ledge.tmj) |
 | 3: 사라지는 바닥 | [배치·검증](stage_03/README.md) | [320×240px TMJ](stage_03/stage3_block_hatch.tmj) |
+| 4: 그림자 안뜰 | 그림자 다리와 고양이·임프 순찰 | [320×240px TMJ](stage_04/stage4_courtyard.tmj) |
 
 ## 공통 타일셋
 

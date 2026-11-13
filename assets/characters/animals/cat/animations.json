@@ -27,9 +27,9 @@
     "status": "prepared_shared_feet_reference_not_gameplay_verified"
   },
   "source_facing": "right",
-  "default_animation": "walk",
+  "default_animation": "idle",
   "timing_status": "initial_tuning_values_not_playtested",
-  "runtime_status": "asset_only_not_integrated",
+  "runtime_status": "stage_4_patrol",
   "animations": {
     "walk": {
       "enabled": true,
@@ -44,6 +44,20 @@
         5
       ],
       "frame_duration_ms": 100
+    },
+    "idle": {
+      "enabled": true,
+      "loop": true,
+      "row": 0,
+      "columns": [
+        0,
+        1,
+        2,
+        1
+      ],
+      "frame_duration_ms": 120,
+      "image": "cat_idle.png",
+      "image_sha256": "c8b82a3f839c45bcb9e01f7c50fedba2f96e8ef83607e5b37e0ad93b299f3ada"
     }
   },
   "provenance": {
