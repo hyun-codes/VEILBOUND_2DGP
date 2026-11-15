@@ -1,0 +1,108 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 33,
+  "height": 25,
+  "tilewidth": 8,
+  "tileheight": 8,
+  "backgroundcolor": "#10111b",
+  "nextlayerid": 2,
+  "nextobjectid": 9,
+  "layers": [
+    {
+      "id": 1,
+      "type": "objectgroup",
+      "name": "Objects",
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 1,
+          "name": "PlayerStart",
+          "type": "Spawn",
+          "x": 22,
+          "y": 142,
+          "width": 0,
+          "height": 0,
+          "point": true
+        },
+        {
+          "id": 2,
+          "name": "Exit",
+          "type": "Exit",
+          "x": 224,
+          "y": 78,
+          "width": 13,
+          "height": 24
+        },
+        {
+          "id": 3,
+          "name": "Entry ledge",
+          "type": "Ground",
+          "x": 0,
+          "y": 142,
+          "width": 144,
+          "height": 16
+        },
+        {
+          "id": 4,
+          "name": "Lower platform",
+          "type": "LightPlatform",
+          "x": 152,
+          "y": 122,
+          "width": 28,
+          "height": 5
+        },
+        {
+          "id": 5,
+          "name": "Upper platform",
+          "type": "LightPlatform",
+          "x": 196,
+          "y": 102,
+          "width": 53,
+          "height": 5
+        },
+        {
+          "id": 6,
+          "name": "Left socket",
+          "type": "Socket",
+          "x": 48,
+          "y": 142,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "initial",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "name": "Middle socket",
+          "type": "Socket",
+          "x": 100,
+          "y": 142,
+          "width": 0,
+          "height": 0,
+          "point": true
+        },
+        {
+          "id": 8,
+          "name": "Edge socket",
+          "type": "Socket",
+          "x": 137,
+          "y": 142,
+          "width": 0,
+          "height": 0,
+          "point": true
+        }
+      ]
+    }
+  ]
+}
