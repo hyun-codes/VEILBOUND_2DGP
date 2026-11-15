@@ -1,0 +1,76 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 26,
+  "height": 18,
+  "tilewidth": 8,
+  "tileheight": 8,
+  "backgroundcolor": "#181a25",
+  "nextlayerid": 2,
+  "nextobjectid": 6,
+  "tilesets": [
+    {
+      "firstgid": 1,
+      "source": "../tilesets/stage2_machinery.tsj"
+    }
+  ],
+  "layers": [
+    {
+      "id": 1,
+      "type": "objectgroup",
+      "name": "Profiles",
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 1,
+          "gid": 1,
+          "name": "buckled_conduit",
+          "x": 25,
+          "y": 130,
+          "width": 45,
+          "height": 24
+        },
+        {
+          "id": 2,
+          "gid": 3,
+          "name": "turbine_vane",
+          "x": 79,
+          "y": 119,
+          "width": 55,
+          "height": 22
+        },
+        {
+          "id": 3,
+          "gid": 2,
+          "name": "split_gear",
+          "x": 144,
+          "y": 107,
+          "width": 37,
+          "height": 30
+        },
+        {
+          "id": 4,
+          "gid": 3,
+          "name": "turbine_vane",
+          "x": 97,
+          "y": 76,
+          "width": 55,
+          "height": 22
+        },
+        {
+          "id": 5,
+          "gid": 1,
+          "name": "buckled_conduit",
+          "x": 46,
+          "y": 56,
+          "width": 45,
+          "height": 24
+        }
+      ]
+    }
+  ]
+}
