@@ -69,6 +69,7 @@ class CrossedLensesTest(unittest.TestCase):
         self.act(interact=True)
         self.go(108)
         self.act(interact=True)
+        self.act(37)
 
     def climb_to_exit(self):
         self.go(104)
@@ -110,3 +111,23 @@ class CrossedLensesTest(unittest.TestCase):
                 if opened_receivers == (True, True):
                     self.assertEqual(positions, (2, 2))
                     self.assertEqual(reachable_keys, (False, False))
+
+    def test_light_and_collision_follow_turn_and_retarget_without_jumping(self):
+        room = self.room
+        self.go(149)
+        name = room.projectors[1].name
+        before = room.projected_light(name)
+        self.act(interact=True)
+        self.assertEqual(room.projected_light(name), before)
+        self.assertTrue(room.collision().supported(182, 152, room.WIDTH))
+        self.act(18)
+        midpoint = room.projected_light(name)
+        self.assertAlmostEqual(midpoint[0], (177 + 39) / 2)
+        self.assertFalse(room.collision().supported(182, 152, room.WIDTH))
+        self.act(interact=True)
+        retargeted = room.projected_light(name)
+        self.assertLess(abs(retargeted[0] - midpoint[0]), 6)
+        self.act(37)
+        self.assertEqual(room.projected_light(name), (136, 65, 43))
+        room.reset()
+        self.assertEqual(room.projected_light(name), before)

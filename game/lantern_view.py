@@ -1,6 +1,6 @@
 """Lantern room sprites and the light overlay, drawn at integer scale."""
 
-from math import hypot
+from math import atan2, ceil, floor, hypot
 from pathlib import Path
 
 from game.camera import Camera
@@ -38,6 +38,25 @@ def draw_combined_darkness(backend, camera, lights):
                 cursor = max(cursor, right)
 
 
+def draw_projector_beam(backend, camera, x, y, target_x, target_y, color):
+    dx, dy = target_x - x, target_y - y
+    length = hypot(dx, dy)
+    if length < 1:
+        return
+    # A faint cone through the air marks aim. The illuminated surface is handled by the light mask.
+    for spread, alpha in ((9, 13), (4, 19)):
+        nx, ny = -dy / length * spread, dx / length * spread
+        points = ((x, y), (target_x + nx, target_y + ny), (target_x - nx, target_y - ny))
+        for row in range(floor(min(p[1] for p in points)), ceil(max(p[1] for p in points))):
+            sample = row + 0.5
+            edges = [ax + (bx - ax) * (sample - ay) / (by - ay)
+                     for (ax, ay), (bx, by) in zip(points, points[1:] + points[:1])
+                     if min(ay, by) <= sample < max(ay, by)]
+            if len(edges) == 2:
+                left, right = sorted(edges)
+                backend.overlay(camera.screen_rect(left, row, right - left, 1), (*color, alpha))
+
+
 class LanternView:
     def __init__(self, room, width, height):
         self.room = room
@@ -55,8 +74,8 @@ class LanternView:
         def rect(x, y, w, h, color, filled=True):
             backend.rectangle(self.camera.screen_rect(x, y, w, h), color, filled)
 
-        def sprite(path, source, x, y, width, height, flip=False):
-            backend.image(ASSETS / path, source, self.camera.screen_rect(x, y, width, height), flip)
+        def sprite(path, source, x, y, width, height, flip=False, angle=0.0):
+            backend.image(ASSETS / path, source, self.camera.screen_rect(x, y, width, height), flip, angle)
 
         def ledge(path, platform, tile_height):
             for offset in range(0, round(platform.width), 16):
@@ -95,28 +114,24 @@ class LanternView:
                door.x, door.y, door.width, door.height)
         for socket in room.sockets:
             sprite("props/lantern_socket.png", (0, 0, 10, 7), socket.x - 5, socket.y - 7, 10, 7)
-        for projector, (target_x, target_y, _) in zip(room.projectors, room.projected_lights):
-            x, y = projector.x, projector.y
-            color = (196, 135, 89) if projector.x < room.start.x else (154, 182, 190)
-            marks = max(2, round(hypot(target_x - x, target_y - y) / 7))
-            for i in range(1, marks):
-                t = i / marks
-                rect(round(x + (target_x - x) * t), round(y - 12 + (target_y - y + 12) * t),
-                     2, 1, color)
-            rect(x - 4, y - 11, 8, 11, (88, 78, 88))
-            active = room.aim_indices[projector.name]
-            for index in range(len(room.aims[projector.name])):
-                rect(x - 3 + index * 3, y - 9, 2, 3,
-                     color if active == index else (48, 43, 58))
         for receiver in room.receivers:
-            rect(receiver.x - 2, receiver.y - 2, 5, 5,
-                 (246, 210, 144) if room.receiver_lit(receiver) else (76, 67, 78))
+            sprite("props/lens_receiver.png", (9 if room.receiver_lit(receiver) else 0, 0, 9, 11),
+                   receiver.x - 4, receiver.y - 5, 9, 11)
 
         lx, ly, radius = room.light
         if room.rail or room.projectors:
             draw_combined_darkness(backend, self.camera, room.lights)
         else:
             draw_darkness(backend, self.camera, lx, ly, radius)
+        for projector, (target_x, target_y, _) in zip(room.projectors, room.projected_lights):
+            x, y = projector.x, projector.y
+            copper = x < room.start.x
+            color = (209, 155, 103) if copper else (155, 183, 205)
+            head = "props/projector_head_copper.png" if copper else "props/projector_head_silver.png"
+            draw_projector_beam(backend, self.camera, x, y - 13, target_x, target_y, color)
+            sprite("props/projector_stand.png", (0, 0, 15, 16), x - 7, y - 16, 15, 16)
+            angle = atan2(y - 13 - target_y, target_x - x)
+            sprite(head, (0, 0, 18, 12), x - 9, y - 19, 18, 12, angle=angle)
         if room.rail:
             rx, ry, _ = room.lights[1]
             rect(rx - 4, ry - 3, 8, 5, (105, 91, 77))

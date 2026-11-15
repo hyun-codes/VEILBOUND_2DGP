@@ -19,6 +19,7 @@ class LanternRoom:
     RADIUS = 110
     CARRY_RADIUS = 46
     START_RADIUS = 39
+    PROJECTOR_TURN = 0.60
     WIDTH, HEIGHT = 6, 13
 
     def __init__(self, data):
@@ -80,6 +81,7 @@ class LanternRoom:
         self.collected = set()
         self.elapsed = 0.0
         self.aim_indices = dict.fromkeys(self.aims, 0)
+        self.turning = {}
 
     @property
     def light(self):
@@ -96,8 +98,18 @@ class LanternRoom:
 
     @property
     def projected_lights(self):
-        focuses = (targets[self.aim_indices[name]] for name, targets in self.aims.items())
-        return tuple((o.x, o.y, o.properties["radius"]) for o in focuses)
+        return tuple(self.projected_light(name) for name in self.aims)
+
+    def projected_light(self, name):
+        focus = self.aims[name][self.aim_indices[name]]
+        destination = focus.x, focus.y, focus.properties["radius"]
+        turn = self.turning.get(name)
+        if turn is None:
+            return destination
+        origin, started = turn
+        t = min(1.0, (self.elapsed - started) / self.PROJECTOR_TURN)
+        ease = t * t * (3 - 2 * t)
+        return tuple(a + (b - a) * ease for a, b in zip(origin, destination))
 
     def receiver_lit(self, receiver):
         return any((receiver.x - x) ** 2 + (receiver.y - y) ** 2 <= radius ** 2
@@ -140,6 +152,7 @@ class LanternRoom:
         if interact and (target := self.interaction()):
             if target.kind == "Projector":
                 name = target.name
+                self.turning[name] = self.projected_light(name), self.elapsed
                 self.aim_indices[name] = (self.aim_indices[name] + 1) % len(self.aims[name])
             else:
                 self.socket = None if self.socket else target

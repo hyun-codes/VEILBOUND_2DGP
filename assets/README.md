@@ -10,3 +10,5 @@ Stage 1 전용 배경과 공용으로 쓸 수 있는 지형·소품 PNG를 직�
 - `props/lantern.png`(7×9)는 들거나 내려놓을 때 공유한다. `props/lantern_socket.png`(10×7)는 세 받침대에 반복 배치한다.
 
 Stage 2의 발판은 `tiles/stage_02/`의 기계 부품 세 종류를 사용한다. 구부러진 배관은 완만한 계단, 깨진 기어는 가파른 층계, 터빈 날개는 기울어진 착지면으로 그렸다. Tiled에서 볼 수 있는 발판 배치와 충돌 윤곽은 [맵 편집 안내](../maps/README.md)에 있다.
+
+Stage 3의 투광기는 `props/projector_stand.png`와 회전하는 구리·은색 렌즈 헤드로 구성한다. `props/lens_receiver.png`의 두 셀은 벽에 붙은 수광부의 소등·점등 상태다.

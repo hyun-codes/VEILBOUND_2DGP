@@ -75,7 +75,7 @@ class Pico2DBackend:
         self.sdl.SDL_SetRenderDrawColor(self.native.renderer, *color)
         self.sdl.SDL_RenderFillRect(self.native.renderer, ctypes.byref(area))
 
-    def image(self, path, source, destination, flip=False):
+    def image(self, path, source, destination, flip=False, angle=0.0):
         image = self.images.get(path)
         if image is None:
             image = self.pico.load_image(str(path))
@@ -84,8 +84,9 @@ class Pico2DBackend:
         x, y, width, height = source
         y = image.h - y - height
         dx, dy, dw, dh = destination
-        if flip:
-            image.clip_composite_draw(x, y, width, height, 0, "h", dx + dw / 2, dy + dh / 2, dw, dh)
+        if flip or angle:
+            image.clip_composite_draw(x, y, width, height, angle, "h" if flip else "",
+                                      dx + dw / 2, dy + dh / 2, dw, dh)
         else:
             image.clip_draw_to_origin(x, y, width, height, dx, dy, dw, dh)
 
