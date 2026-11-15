@@ -13,7 +13,8 @@ from game.timing import FixedStepper
 
 STAGE_1 = Path(__file__).resolve().parents[1] / "maps/stage_01/stage1_lantern_room.tmj"
 STAGE_2 = STAGE_1.parent.parent / "stage_02/stage2_rail_light.tmj"
-STAGES = {1: STAGE_1, 2: STAGE_2}
+STAGE_3 = STAGE_1.parent.parent / "stage_03/stage3_crossed_lenses.tmj"
+STAGES = {1: STAGE_1, 2: STAGE_2, 3: STAGE_3}
 WIDTH, HEIGHT = 800, 600
 
 
@@ -30,10 +31,10 @@ def run(room, frames, screenshot, next_room=None):
         direction = int(bool(keys & {"d", "right"})) - int(bool(keys & {"a", "left"}))
         room.step(dt, direction, "space" in pending, "e" in pending)
         pending.clear()
-        if room.complete and next_room:
-            room = LanternRoom(load_map(next_room))
+        if room.complete and next_room is not None:
+            room = LanternRoom(load_map(STAGES[next_room]))
             view = LanternView(room, WIDTH, HEIGHT)
-            next_room = None
+            next_room = next_room + 1 if next_room + 1 in STAGES else None
             keys.clear()
 
     try:
@@ -91,7 +92,7 @@ def main(argv=None):
         if args.check_map:
             print(f"Map OK: {room.data.width}x{room.data.height}, {len(room.platforms)} light platforms")
         else:
-            run(room, args.frames, args.screenshot, STAGES.get(args.stage + 1))
+            run(room, args.frames, args.screenshot, args.stage + 1 if args.stage + 1 in STAGES else None)
         return 0
     except (MapFormatError, OSError, RuntimeError, ValueError, KeyError, TypeError) as exc:
         parser.exit(1, f"VEILBOUND could not start: {exc}\n")

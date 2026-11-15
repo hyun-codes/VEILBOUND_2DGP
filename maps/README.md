@@ -10,3 +10,5 @@
 `python main.py --check-map`으로 편집 결과를 검사한다.
 
 [Stage 2 왕복 탐조등](stage_02/stage2_rail_light.tmj)은 오른쪽 덮개를 지나 아래층 열쇠를 얻고, 왼쪽의 터빈 날개로 올라와 출구에 닿는 방이다. 광원은 `RailPoint`를 Tiled 오브젝트 순서대로 왕복한다. `railRadius`, `railSpeed`, `railPause`는 각각 반지름, 초당 이동 픽셀, 지점 체류 시간(초)이다. 받침대에서 `radius`를 지정하면 휴대등을 꽂았을 때의 범위를 정할 수 있다. Machinery 레이어의 타일은 [기계 부품 타일셋](tilesets/stage2_machinery.tsj)에 정의된 충돌 윤곽을 사용한다. [발판 샘플](stage_02/platform_samples.tmj)은 Tiled에서 모양을 비교할 때 쓴다.
+
+[Stage 3 교차 렌즈](stage_03/stage3_crossed_lenses.tmj)는 중앙 조작대에서 두 갈래 열쇠 경로와 위쪽 출구를 비추는 방이다. `Projector` 옆에서 E를 누를 때마다 같은 이름을 `projector` 속성에 적은 `Focus` 지점을 맵 순서대로 바꾼다. 각 목표점은 `radius`에 비출 범위를 갖는다. `Receiver`는 투광기 빛을 받으면 켜지며, 출구는 두 열쇠와 모든 수광부가 필요하다. `fixed=true`가 붙은 시작 등불은 중앙 조작대를 비춘다.

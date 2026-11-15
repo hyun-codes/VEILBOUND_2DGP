@@ -95,15 +95,32 @@ class LanternView:
                door.x, door.y, door.width, door.height)
         for socket in room.sockets:
             sprite("props/lantern_socket.png", (0, 0, 10, 7), socket.x - 5, socket.y - 7, 10, 7)
+        for projector, (target_x, target_y, _) in zip(room.projectors, room.projected_lights):
+            x, y = projector.x, projector.y
+            color = (196, 135, 89) if projector.x < room.start.x else (154, 182, 190)
+            marks = max(2, round(hypot(target_x - x, target_y - y) / 7))
+            for i in range(1, marks):
+                t = i / marks
+                rect(round(x + (target_x - x) * t), round(y - 12 + (target_y - y + 12) * t),
+                     2, 1, color)
+            rect(x - 4, y - 11, 8, 11, (88, 78, 88))
+            active = room.aim_indices[projector.name]
+            for index in range(len(room.aims[projector.name])):
+                rect(x - 3 + index * 3, y - 9, 2, 3,
+                     color if active == index else (48, 43, 58))
+        for receiver in room.receivers:
+            rect(receiver.x - 2, receiver.y - 2, 5, 5,
+                 (246, 210, 144) if room.receiver_lit(receiver) else (76, 67, 78))
 
         lx, ly, radius = room.light
-        if room.rail:
+        if room.rail or room.projectors:
             draw_combined_darkness(backend, self.camera, room.lights)
+        else:
+            draw_darkness(backend, self.camera, lx, ly, radius)
+        if room.rail:
             rx, ry, _ = room.lights[1]
             rect(rx - 4, ry - 3, 8, 5, (105, 91, 77))
             rect(rx - 2, ry - 2, 4, 3, (239, 199, 132))
-        else:
-            draw_darkness(backend, self.camera, lx, ly, radius)
 
         x, y = round(room.x), round(room.y)
         if not room.grounded:
