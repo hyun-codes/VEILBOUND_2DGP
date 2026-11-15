@@ -4,6 +4,15 @@ from math import ceil, floor, isfinite, sqrt
 
 from game.collision import CollisionWorld, Solid
 from game.map_loader import MapFormatError
+from game.rail_light import RailLight
+
+
+def light_span(light, row, fraction=1):
+    x, y, radius = light
+    remaining = (radius * fraction) ** 2 - (row + 0.5 - y) ** 2
+    if remaining >= 0:
+        span = sqrt(remaining)
+        return ceil(x - span - 0.5), floor(x + span - 0.5) + 1
 
 
 class LanternRoom:
@@ -22,10 +31,10 @@ class LanternRoom:
         self.props = tuple(o for o in data.objects if o.kind in ("Wall", "Box"))
         self.keys = tuple(o for o in data.objects if o.kind == "Key")
         self.terrain = self.ground + self.platforms + tuple(
-            Solid(o.x, o.y, o.width, o.height) for o in self.props)
+            Solid(o.x, o.y, o.width, o.height) for o in self.props) + data.solids
         self.sockets = tuple(o for o in data.objects if o.kind == "Socket")
         initial = [o for o in self.sockets if o.properties.get("initial") is True]
-        if len(initial) != 1 or not self.ground or not self.platforms:
+        if len(initial) != 1 or not self.ground or not (self.platforms or data.solids):
             raise MapFormatError("A lantern room needs ground, light platforms and exactly one starting socket")
         for obj in (*self.terrain, *self.keys, self.exit):
             if not (0 <= obj.x < obj.x + obj.width <= data.width
@@ -37,7 +46,13 @@ class LanternRoom:
             if not (isfinite(obj.x) and self.WIDTH / 2 <= obj.x <= data.width - self.WIDTH / 2
                     and ground.supported(obj.x, obj.y, self.WIDTH)):
                 raise MapFormatError("Starts and sockets must be on a Ground surface")
+        for socket in self.sockets:
+            radius = socket.properties.get("radius", self.RADIUS)
+            if type(radius) not in (int, float) or not isfinite(radius) or radius <= 0:
+                raise MapFormatError("Socket radius must be positive")
         self.initial_socket = initial[0]
+        points = [obj for obj in data.objects if obj.kind == "RailPoint"]
+        self.rail = RailLight(data, points) if points else None
         self.reset()
 
     def reset(self):
@@ -49,30 +64,32 @@ class LanternRoom:
         self.complete = False
         self.socket = self.initial_socket
         self.collected = set()
+        self.elapsed = 0.0
 
     @property
     def light(self):
         if self.socket is None:
             return self.x + 6 * self.facing, self.y - 7, self.CARRY_RADIUS
-        radius = self.START_RADIUS if self.socket is self.initial_socket else self.RADIUS
+        radius = self.socket.properties.get(
+            "radius", self.START_RADIUS if self.socket is self.initial_socket else self.RADIUS)
         return self.socket.x, self.socket.y - 10, radius
 
+    @property
+    def lights(self):
+        return (self.light, self.rail.at(self.elapsed)) if self.rail else (self.light,)
+
     def illuminated(self, x, y):
-        lx, ly, radius = self.light
-        return (x - lx) ** 2 + (y - ly) ** 2 <= radius ** 2
+        return any((x - lx) ** 2 + (y - ly) ** 2 <= radius ** 2 for lx, ly, radius in self.lights)
 
     def exposed(self, obj):
-        lx, ly, radius = self.light
         right = obj.x + obj.width
+        lights = self.lights
         for y in range(int(obj.y), int(obj.y + obj.height)):
-            remaining = radius ** 2 - (y + 0.5 - ly) ** 2
-            if remaining < 0:
-                continue
-            span = sqrt(remaining)
-            left = max(obj.x, ceil(lx - span - 0.5))
-            end = min(right, floor(lx + span - 0.5) + 1)
-            if left < end:
-                yield Solid(left, y, end - left, 1)
+            for light in lights:
+                if span := light_span(light, y):
+                    left, end = max(obj.x, span[0]), min(right, span[1])
+                    if left < end:
+                        yield Solid(left, y, end - left, 1)
 
     def collision(self):
         return CollisionWorld(strip for body in self.terrain for strip in self.exposed(body))
@@ -91,6 +108,7 @@ class LanternRoom:
     def step(self, dt, direction, jump=False, interact=False):
         if self.complete:
             return
+        self.elapsed += dt
         if direction:
             self.facing = direction
         if interact and (target := self.interaction()):

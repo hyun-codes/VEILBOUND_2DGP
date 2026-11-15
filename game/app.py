@@ -12,10 +12,12 @@ from game.timing import FixedStepper
 
 
 STAGE_1 = Path(__file__).resolve().parents[1] / "maps/stage_01/stage1_lantern_room.tmj"
+STAGE_2 = STAGE_1.parent.parent / "stage_02/stage2_rail_light.tmj"
+STAGES = {1: STAGE_1, 2: STAGE_2}
 WIDTH, HEIGHT = 800, 600
 
 
-def run(room, frames, screenshot):
+def run(room, frames, screenshot, next_room=None):
     backend = Pico2DBackend()
     view = LanternView(room, WIDTH, HEIGHT)
     stepper = FixedStepper()
@@ -24,9 +26,15 @@ def run(room, frames, screenshot):
     paused = False
 
     def step(dt):
+        nonlocal room, view, next_room
         direction = int(bool(keys & {"d", "right"})) - int(bool(keys & {"a", "left"}))
         room.step(dt, direction, "space" in pending, "e" in pending)
         pending.clear()
+        if room.complete and next_room:
+            room = LanternRoom(load_map(next_room))
+            view = LanternView(room, WIDTH, HEIGHT)
+            next_room = None
+            keys.clear()
 
     try:
         backend.open(WIDTH, HEIGHT)
@@ -69,7 +77,7 @@ def run(room, frames, screenshot):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="VEILBOUND - lantern puzzle")
-    parser.add_argument("--stage", type=int, choices=[1], default=1)
+    parser.add_argument("--stage", type=int, choices=STAGES, default=1)
     parser.add_argument("--check-map", action="store_true")
     parser.add_argument("--frames", type=int)
     parser.add_argument("--screenshot", type=Path)
@@ -79,11 +87,11 @@ def main(argv=None):
     if args.screenshot and (args.frames is None or args.screenshot.suffix.lower() != ".bmp"):
         parser.error("--screenshot requires --frames and a .bmp output path")
     try:
-        room = LanternRoom(load_map(STAGE_1))
+        room = LanternRoom(load_map(STAGES[args.stage]))
         if args.check_map:
             print(f"Map OK: {room.data.width}x{room.data.height}, {len(room.platforms)} light platforms")
         else:
-            run(room, args.frames, args.screenshot)
+            run(room, args.frames, args.screenshot, STAGES.get(args.stage + 1))
         return 0
     except (MapFormatError, OSError, RuntimeError, ValueError, KeyError, TypeError) as exc:
         parser.exit(1, f"VEILBOUND could not start: {exc}\n")

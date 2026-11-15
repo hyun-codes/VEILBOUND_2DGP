@@ -1,8 +1,10 @@
 """Lantern room sprites and the light overlay, drawn at integer scale."""
 
+from math import hypot
 from pathlib import Path
 
 from game.camera import Camera
+from game.lantern_room import light_span
 
 
 ASSETS = Path(__file__).resolve().parents[1] / "assets"
@@ -24,10 +26,28 @@ def draw_darkness(backend, camera, x, y, radius):
     backend.image(DARKNESS_MASK, (0, 0, MASK_SIZE, MASK_SIZE), lit_area)
 
 
+def draw_combined_darkness(backend, camera, lights):
+    for fraction, alpha in ((1, 255), (0.87, 117), (0.68, 62), (0.42, 26)):
+        for row in range(camera.world_height):
+            spans = sorted(span for light in lights if (span := light_span(light, row, fraction)))
+            cursor = 0
+            for left, right in spans + [(camera.world_width, camera.world_width)]:
+                edge = min(camera.world_width, left)
+                if edge > cursor:
+                    backend.overlay(camera.screen_rect(cursor, row, edge - cursor, 1), (0, 0, 0, alpha))
+                cursor = max(cursor, right)
+
+
 class LanternView:
     def __init__(self, room, width, height):
         self.room = room
         self.camera = Camera(room.data.width, room.data.height, width, height, scale=3)
+        self.rail_marks = []
+        if room.rail:
+            for (ax, ay), (bx, by) in zip(room.rail.points, room.rail.points[1:]):
+                count = max(1, round(hypot(ax - bx, ay - by) / 4))
+                self.rail_marks.extend((round(ax + (bx - ax) * i / count),
+                                        round(ay + (by - ay) * i / count)) for i in range(count))
 
     def draw(self, backend):
         room = self.room
@@ -46,10 +66,18 @@ class LanternView:
 
         backend.begin(room.data.background)
         sprite("environments/stage_01/pump_hall.png", (0, 0, 264, 200), 0, 0, room.data.width, room.data.height)
+        for rx, ry in self.rail_marks:
+            rect(rx, ry, 2, 1, (67, 59, 67))
+        if room.rail:
+            for rx, ry in room.rail.points:
+                rect(rx - 1, ry - 1, 3, 3, (97, 84, 81), False)
         for ground in room.ground:
             ledge("tiles/stone_ledge.png", ground, 16)
         for p in room.platforms:
             ledge("tiles/lantern_ledge.png", p, 5)
+        for part in room.data.sprites:
+            backend.image(part.image, part.source,
+                          self.camera.screen_rect(part.x, part.y, part.width, part.height))
         for prop in room.props:
             if prop.kind == "Wall":
                 ledge("tiles/stone_ledge.png", prop, 16)
@@ -58,7 +86,9 @@ class LanternView:
                 rect(prop.x, prop.y, prop.width, prop.height, (196, 151, 102), False)
         for index, key in enumerate(room.keys):
             if index not in room.collected:
-                rect(key.x, key.y, key.width, key.height, (228, 174, 97), False)
+                rect(key.x, key.y, key.width - 2, 3, (228, 174, 97), False)
+                rect(key.x + key.width - 3, key.y + 2, 1, key.height - 2, (228, 174, 97))
+                rect(key.x + key.width - 2, key.y + key.height - 1, 2, 1, (228, 174, 97))
 
         door = room.exit
         sprite("props/exit_door.png", (13 if room.complete else 0, 0, 13, 24),
@@ -67,7 +97,13 @@ class LanternView:
             sprite("props/lantern_socket.png", (0, 0, 10, 7), socket.x - 5, socket.y - 7, 10, 7)
 
         lx, ly, radius = room.light
-        draw_darkness(backend, self.camera, lx, ly, radius)
+        if room.rail:
+            draw_combined_darkness(backend, self.camera, room.lights)
+            rx, ry, _ = room.lights[1]
+            rect(rx - 4, ry - 3, 8, 5, (105, 91, 77))
+            rect(rx - 2, ry - 2, 4, 3, (239, 199, 132))
+        else:
+            draw_darkness(backend, self.camera, lx, ly, radius)
 
         x, y = round(room.x), round(room.y)
         if not room.grounded:

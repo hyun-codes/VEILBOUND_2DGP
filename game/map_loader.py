@@ -101,6 +101,7 @@ def load_map(path):
     if min(tw, th, root["width"], root["height"]) <= 0:
         raise MapFormatError("Map dimensions must be positive")
     images, tiles, sprites, objects, solids = {}, {}, [], [], []
+    tile_shapes = {}
     collision_tops = {}
     visual_roles = {}
 
@@ -157,6 +158,8 @@ def load_map(path):
                 raise MapFormatError(f"Invalid collisionTop for GID {gid}")
             collision_tops[gid] = inset
             visual_roles[gid] = definitions.get(local, {}).get("visualRole", "prop")
+        for item in ts.get("tiles", []):
+            tile_shapes[reference["firstgid"] + item["id"]] = item.get("objectgroup", {}).get("objects", [])
 
     def tile(gid):
         if gid & 0xF0000000:
@@ -229,6 +232,17 @@ def load_map(path):
                                               active_world, alpha * obj.get("opacity", 1), color,
                                               visual_role=visual_roles[obj["gid"]], lamp_state=state,
                                               object_name=obj.get("name", "")))
+                        if is_solid:
+                            if (w, h) != rect[2:]:
+                                raise MapFormatError("Solid tile objects must use native size")
+                            shapes = tile_shapes.get(obj["gid"])
+                            if not shapes:
+                                raise MapFormatError("Solid tile object needs a tileset collision shape")
+                            for shape in shapes:
+                                if any(k in shape for k in ("ellipse", "polygon", "polyline")) or shape.get("rotation", 0):
+                                    raise MapFormatError("Solid tile shapes must be rectangles")
+                                solids.append(Solid(ox + shape["x"], oy - h + shape["y"],
+                                                    shape["width"], shape["height"], active_world))
                     else:
                         if any(k in obj for k in ("ellipse", "polygon", "polyline", "text", "template")):
                             raise MapFormatError("Only point/rectangle game objects are supported")

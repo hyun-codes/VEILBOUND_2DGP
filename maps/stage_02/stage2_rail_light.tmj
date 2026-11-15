@@ -1,0 +1,259 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 33,
+  "height": 25,
+  "tilewidth": 8,
+  "tileheight": 8,
+  "backgroundcolor": "#10111b",
+  "nextlayerid": 3,
+  "nextobjectid": 20,
+  "properties": [
+    {
+      "name": "railRadius",
+      "type": "int",
+      "value": 36
+    },
+    {
+      "name": "railSpeed",
+      "type": "int",
+      "value": 27
+    },
+    {
+      "name": "railPause",
+      "type": "float",
+      "value": 1.25
+    }
+  ],
+  "tilesets": [
+    {
+      "firstgid": 1,
+      "source": "../tilesets/stage2_machinery.tsj"
+    }
+  ],
+  "layers": [
+    {
+      "id": 1,
+      "type": "objectgroup",
+      "name": "Puzzle",
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 1,
+          "name": "PlayerStart",
+          "type": "Spawn",
+          "x": 25,
+          "y": 106,
+          "width": 0,
+          "height": 0,
+          "point": true
+        },
+        {
+          "id": 2,
+          "name": "Exit",
+          "type": "Exit",
+          "x": 24,
+          "y": 109,
+          "width": 13,
+          "height": 24
+        },
+        {
+          "id": 3,
+          "name": "Upper gallery",
+          "type": "Ground",
+          "x": 3,
+          "y": 106,
+          "width": 87,
+          "height": 6
+        },
+        {
+          "id": 4,
+          "name": "Hatch",
+          "type": "LightPlatform",
+          "x": 90,
+          "y": 106,
+          "width": 174,
+          "height": 5
+        },
+        {
+          "id": 5,
+          "name": "Lower gallery",
+          "type": "Ground",
+          "x": 22,
+          "y": 158,
+          "width": 138,
+          "height": 15
+        },
+        {
+          "id": 6,
+          "name": "Exit landing",
+          "type": "LightPlatform",
+          "x": 13,
+          "y": 133,
+          "width": 38,
+          "height": 5
+        },
+        {
+          "id": 7,
+          "name": "Entry lamp",
+          "type": "Socket",
+          "x": 40,
+          "y": 106,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "initial",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "name": "Hatch observation",
+          "type": "Socket",
+          "x": 79,
+          "y": 106,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 29
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "name": "Vault key",
+          "type": "Key",
+          "x": 147,
+          "y": 151,
+          "width": 6,
+          "height": 7
+        },
+        {
+          "id": 10,
+          "name": "Rail 1",
+          "type": "RailPoint",
+          "x": 82,
+          "y": 96,
+          "width": 0,
+          "height": 0,
+          "point": true
+        },
+        {
+          "id": 11,
+          "name": "Rail 2",
+          "type": "RailPoint",
+          "x": 130,
+          "y": 99,
+          "width": 0,
+          "height": 0,
+          "point": true
+        },
+        {
+          "id": 12,
+          "name": "Rail 3",
+          "type": "RailPoint",
+          "x": 130,
+          "y": 154,
+          "width": 0,
+          "height": 0,
+          "point": true
+        },
+        {
+          "id": 13,
+          "name": "Rail 4",
+          "type": "RailPoint",
+          "x": 146,
+          "y": 150,
+          "width": 0,
+          "height": 0,
+          "point": true
+        },
+        {
+          "id": 14,
+          "name": "Rail 5",
+          "type": "RailPoint",
+          "x": 86,
+          "y": 151,
+          "width": 0,
+          "height": 0,
+          "point": true
+        },
+        {
+          "id": 15,
+          "name": "Rail 6",
+          "type": "RailPoint",
+          "x": 47,
+          "y": 138,
+          "width": 0,
+          "height": 0,
+          "point": true
+        },
+        {
+          "id": 16,
+          "name": "Rail 7",
+          "type": "RailPoint",
+          "x": 32,
+          "y": 126,
+          "width": 0,
+          "height": 0,
+          "point": true
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "objectgroup",
+      "name": "Machinery",
+      "visible": true,
+      "opacity": 1,
+      "properties": [
+        {
+          "name": "solid",
+          "type": "bool",
+          "value": true
+        }
+      ],
+      "objects": [
+        {
+          "id": 17,
+          "gid": 3,
+          "name": "Descending vane",
+          "x": 39,
+          "y": 153,
+          "width": 55,
+          "height": 22
+        },
+        {
+          "id": 18,
+          "gid": 1,
+          "name": "Vault conduit",
+          "x": 115,
+          "y": 178,
+          "width": 45,
+          "height": 24
+        },
+        {
+          "id": 19,
+          "gid": 2,
+          "name": "Broken gear buttress",
+          "x": 2,
+          "y": 171,
+          "width": 37,
+          "height": 30
+        }
+      ]
+    }
+  ]
+}

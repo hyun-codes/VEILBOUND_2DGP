@@ -9,4 +9,4 @@
 
 `python main.py --check-map`으로 편집 결과를 검사한다.
 
-Stage 2 [발판 배치 초안](stage_02/platform_samples.tmj)은 낮은 배관에서 오른쪽으로 이동해 기어를 오른 뒤, 위쪽에서 왼쪽으로 돌아가는 형태다. [기계 부품 타일셋](tilesets/stage2_machinery.tsj)의 Tile Collision Editor에서 불투명 픽셀을 따라 만든 충돌 윤곽도 볼 수 있다. 이 맵은 Tiled 편집용이며 게임의 Stage 2 연결과 탐조등 퍼즐 배치는 후속 작업이다.
+[Stage 2 왕복 탐조등](stage_02/stage2_rail_light.tmj)은 오른쪽 덮개를 지나 아래층 열쇠를 얻고, 왼쪽의 터빈 날개로 올라와 출구에 닿는 방이다. 광원은 `RailPoint`를 Tiled 오브젝트 순서대로 왕복한다. `railRadius`, `railSpeed`, `railPause`는 각각 반지름, 초당 이동 픽셀, 지점 체류 시간(초)이다. 받침대에서 `radius`를 지정하면 휴대등을 꽂았을 때의 범위를 정할 수 있다. Machinery 레이어의 타일은 [기계 부품 타일셋](tilesets/stage2_machinery.tsj)에 정의된 충돌 윤곽을 사용한다. [발판 샘플](stage_02/platform_samples.tmj)은 Tiled에서 모양을 비교할 때 쓴다.
