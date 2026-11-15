@@ -20,7 +20,7 @@ def draw_darkness(backend, camera, x, y, radius):
     for bounds in ((0, 0, screen_w, bottom), (0, top, screen_w, screen_h - top),
                    (0, bottom, left, top - bottom), (right, bottom, screen_w - right, top - bottom)):
         if bounds[2] and bounds[3]:
-            backend.overlay(bounds, (0, 0, 0, 249))
+            backend.overlay(bounds, (0, 0, 0, 255))
     backend.image(DARKNESS_MASK, (0, 0, MASK_SIZE, MASK_SIZE), lit_area)
 
 
@@ -49,9 +49,16 @@ class LanternView:
         for ground in room.ground:
             ledge("tiles/stone_ledge.png", ground, 16)
         for p in room.platforms:
-            if room.lit(p):
-                ledge("tiles/lantern_ledge.png", p, 5)
-                rect(p.x + p.width / 2 - 1, p.y, 2, 2, (255, 218, 143))
+            ledge("tiles/lantern_ledge.png", p, 5)
+        for prop in room.props:
+            if prop.kind == "Wall":
+                ledge("tiles/stone_ledge.png", prop, 16)
+            else:
+                rect(prop.x, prop.y, prop.width, prop.height, (121, 88, 61))
+                rect(prop.x, prop.y, prop.width, prop.height, (196, 151, 102), False)
+        for index, key in enumerate(room.keys):
+            if index not in room.collected:
+                rect(key.x, key.y, key.width, key.height, (228, 174, 97), False)
 
         door = room.exit
         sprite("props/exit_door.png", (13 if room.complete else 0, 0, 13, 24),

@@ -1,6 +1,6 @@
-"""A docked lantern lights entire platforms whose centers are within reach."""
+"""Light determines the visible surfaces and the collision geometry."""
 
-from math import hypot, isfinite
+from math import ceil, floor, isfinite, sqrt
 
 from game.collision import CollisionWorld, Solid
 from game.map_loader import MapFormatError
@@ -19,19 +19,24 @@ class LanternRoom:
         self.ground = tuple(Solid(o.x, o.y, o.width, o.height) for o in data.objects if o.kind == "Ground")
         self.platforms = tuple(Solid(o.x, o.y, o.width, o.height)
                                for o in data.objects if o.kind == "LightPlatform")
+        self.props = tuple(o for o in data.objects if o.kind in ("Wall", "Box"))
+        self.keys = tuple(o for o in data.objects if o.kind == "Key")
+        self.terrain = self.ground + self.platforms + tuple(
+            Solid(o.x, o.y, o.width, o.height) for o in self.props)
         self.sockets = tuple(o for o in data.objects if o.kind == "Socket")
         initial = [o for o in self.sockets if o.properties.get("initial") is True]
         if len(initial) != 1 or not self.ground or not self.platforms:
             raise MapFormatError("A lantern room needs ground, light platforms and exactly one starting socket")
-        for obj in (*self.ground, *self.platforms, self.exit):
+        for obj in (*self.terrain, *self.keys, self.exit):
             if not (0 <= obj.x < obj.x + obj.width <= data.width
-                    and 0 <= obj.y < obj.y + obj.height <= data.height):
-                raise MapFormatError("Room rectangle must have positive size and fit inside the map")
+                    and 0 <= obj.y < obj.y + obj.height <= data.height
+                    and all(float(value).is_integer() for value in (obj.x, obj.y, obj.width, obj.height))):
+                raise MapFormatError("Room rectangles need whole-pixel coordinates and positive size inside the map")
         ground = CollisionWorld(self.ground)
         for obj in (*self.sockets, self.start):
             if not (isfinite(obj.x) and self.WIDTH / 2 <= obj.x <= data.width - self.WIDTH / 2
                     and ground.supported(obj.x, obj.y, self.WIDTH)):
-                raise MapFormatError("Starts and sockets must be on permanent ground")
+                raise MapFormatError("Starts and sockets must be on a Ground surface")
         self.initial_socket = initial[0]
         self.reset()
 
@@ -43,6 +48,7 @@ class LanternRoom:
         self.grounded = True
         self.complete = False
         self.socket = self.initial_socket
+        self.collected = set()
 
     @property
     def light(self):
@@ -51,11 +57,29 @@ class LanternRoom:
         radius = self.START_RADIUS if self.socket is self.initial_socket else self.RADIUS
         return self.socket.x, self.socket.y - 10, radius
 
-    def lit(self, platform):
-        if self.socket is None:
-            return False
-        x, y, radius = self.light
-        return hypot(platform.x + platform.width / 2 - x, platform.y - y) <= radius
+    def illuminated(self, x, y):
+        lx, ly, radius = self.light
+        return (x - lx) ** 2 + (y - ly) ** 2 <= radius ** 2
+
+    def exposed(self, obj):
+        lx, ly, radius = self.light
+        right = obj.x + obj.width
+        for y in range(int(obj.y), int(obj.y + obj.height)):
+            remaining = radius ** 2 - (y + 0.5 - ly) ** 2
+            if remaining < 0:
+                continue
+            span = sqrt(remaining)
+            left = max(obj.x, ceil(lx - span - 0.5))
+            end = min(right, floor(lx + span - 0.5) + 1)
+            if left < end:
+                yield Solid(left, y, end - left, 1)
+
+    def collision(self):
+        return CollisionWorld(strip for body in self.terrain for strip in self.exposed(body))
+
+    def _touches(self, obj):
+        return (self.x + self.WIDTH / 2 > obj.x and self.x - self.WIDTH / 2 < obj.x + obj.width
+                and self.y > obj.y and self.y - self.HEIGHT < obj.y + obj.height)
 
     def interaction(self):
         if not self.grounded or self.complete:
@@ -71,7 +95,7 @@ class LanternRoom:
             self.facing = direction
         if interact and (target := self.interaction()):
             self.socket = None if self.socket else target
-        collision = CollisionWorld(self.ground + tuple(p for p in self.platforms if self.lit(p)))
+        collision = self.collision()
         if jump and self.grounded and collision.supported(self.x, self.y, self.WIDTH):
             self.vy = -238.0
         self.vy = min(350.0, self.vy + 960.0 * dt)
@@ -86,5 +110,10 @@ class LanternRoom:
         if self.y - self.HEIGHT > self.data.height:
             self.reset()
             return
-        self.complete = (landed and self.exit.x <= self.x <= self.exit.x + self.exit.width
-                         and self.exit.y <= self.y <= self.exit.y + self.exit.height)
+        for index, key in enumerate(self.keys):
+            if index not in self.collected and any(self._touches(part) for part in self.exposed(key)):
+                self.collected.add(index)
+        self.complete = (landed and len(self.collected) == len(self.keys)
+                         and self.exit.x <= self.x <= self.exit.x + self.exit.width
+                         and self.exit.y <= self.y <= self.exit.y + self.exit.height
+                         and self.illuminated(self.x, self.y))
