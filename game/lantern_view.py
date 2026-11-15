@@ -1,8 +1,12 @@
-"""Primitive art for the lantern room, drawn at integer scale."""
+"""Lantern room sprites and the light overlay, drawn at integer scale."""
 
 from math import isqrt
+from pathlib import Path
 
 from game.camera import Camera
+
+
+ASSETS = Path(__file__).resolve().parents[1] / "assets"
 
 
 class LanternView:
@@ -16,34 +20,38 @@ class LanternView:
         def rect(x, y, w, h, color, filled=True):
             backend.rectangle(self.camera.screen_rect(x, y, w, h), color, filled)
 
+        def sprite(path, source, x, y, width, height, flip=False):
+            backend.image(ASSETS / path, source, self.camera.screen_rect(x, y, width, height), flip)
+
+        def ledge(path, platform, tile_height):
+            for offset in range(0, round(platform.width), 16):
+                width = min(16, round(platform.width) - offset)
+                sprite(path, (0, 0, width, tile_height), platform.x + offset, platform.y,
+                       width, platform.height)
+
         backend.begin(room.data.background)
-        for i in range(11):
-            x = 10 + 25 * i
-            top = 25 + (i * 37) % 67
-            rect(x, top, 9, 174 - top, (23, 24, 36))
-            rect(x + 8, top + 17, 13, 3, (23, 24, 36))
-        rect(0, 174, room.data.width, 26, (10, 10, 16))
+        sprite("environments/stage_01/pump_hall.png", (0, 0, 264, 200), 0, 0, room.data.width, room.data.height)
         if room.socket:
             lx, ly = room.socket.x, room.socket.y - 10
-            for radius, color in ((room.RADIUS, (30, 27, 36)), (63, (44, 35, 39)), (31, (59, 44, 43))):
+            for radius, alpha in ((room.RADIUS, 23), (63, 30), (31, 42)):
                 for dy in range(-radius, radius, 3):
                     span = isqrt(radius * radius - dy * dy)
-                    rect(lx - span, ly + dy, 2 * span, 3, color)
+                    region = self.camera.screen_rect(lx - span, ly + dy, 2 * span, 3)
+                    backend.overlay(region, (171, 107, 57, alpha))
 
         for ground in room.ground:
-            rect(ground.x, ground.y, ground.width, ground.height, (45, 43, 55))
-            rect(ground.x, ground.y, ground.width, 2, (136, 122, 121))
-            for x in range(int(ground.x) + 8, int(ground.x + ground.width), 16):
-                rect(x, ground.y + 4, 1, ground.height - 4, (26, 25, 36))
+            ledge("tiles/stone_ledge.png", ground, 16)
         for p in room.platforms:
             lit = room.lit(p)
-            rect(p.x, p.y, p.width, p.height, (163, 115, 72) if lit else (86, 78, 94), lit)
+            if lit:
+                ledge("tiles/lantern_ledge.png", p, 5)
+            else:
+                rect(p.x, p.y, p.width, p.height, (86, 78, 94), False)
             rect(p.x + p.width / 2 - 1, p.y, 2, 2, (255, 218, 143) if lit else (117, 104, 123))
 
         door = room.exit
-        rect(door.x, door.y, door.width, door.height, (177, 142, 98) if room.complete else (122, 107, 118), room.complete)
-        rect(door.x + 3, door.y + 5, door.width - 6, door.height - 5, (42, 39, 48))
-        rect(door.x + 9, door.y + 14, 1, 2, (255, 218, 143))
+        sprite("props/exit_door.png", (13 if room.complete else 0, 0, 13, 24),
+               door.x, door.y, door.width, door.height)
         for socket in room.sockets:
             rect(socket.x - 4, socket.y - 3, 8, 3, (126, 100, 89))
             rect(socket.x - 2, socket.y - 5, 4, 2, (91, 68, 70))

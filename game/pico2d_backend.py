@@ -16,6 +16,7 @@ class Pico2DBackend:
         from pico2d import pico2d as native
         import sdl2
         self.pico, self.native, self.sdl = pico2d, native, sdl2
+        self.images = {}
         self.opened = False
 
     def open(self, width, height):
@@ -29,6 +30,7 @@ class Pico2DBackend:
         self.sdl.SDL_SetRenderDrawBlendMode(self.native.renderer, self.sdl.SDL_BLENDMODE_BLEND)
 
     def close(self):
+        self.images.clear()
         if self.opened:
             self.pico.close_canvas()
             self.opened = False
@@ -65,6 +67,27 @@ class Pico2DBackend:
     def rectangle(self, rect, color, filled=False):
         x, y, width, height = rect
         self.pico.draw_rectangle(x, y, x + width, y + height, *color, filled=filled)
+
+    def overlay(self, rect, color):
+        x, y, width, height = rect
+        window_height = self.pico.get_canvas_height()
+        area = self.sdl.SDL_Rect(x, window_height - y - height, width, height)
+        self.sdl.SDL_SetRenderDrawColor(self.native.renderer, *color)
+        self.sdl.SDL_RenderFillRect(self.native.renderer, ctypes.byref(area))
+
+    def image(self, path, source, destination, flip=False):
+        image = self.images.get(path)
+        if image is None:
+            image = self.pico.load_image(str(path))
+            self.sdl.SDL_SetTextureScaleMode(image.texture, self.sdl.SDL_ScaleModeNearest)
+            self.images[path] = image
+        x, y, width, height = source
+        y = image.h - y - height
+        dx, dy, dw, dh = destination
+        if flip:
+            image.clip_composite_draw(x, y, width, height, 0, "h", dx + dw / 2, dy + dh / 2, dw, dh)
+        else:
+            image.clip_draw_to_origin(x, y, width, height, dx, dy, dw, dh)
 
     def present(self):
         self.pico.update_canvas()
