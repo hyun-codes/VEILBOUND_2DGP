@@ -18,12 +18,15 @@ class LanternRoomTest(unittest.TestCase):
 
     def test_lantern_placement_and_lit_platform_route(self):
         room = self.room
+        self.assertEqual(room.light, (48, 132, room.START_RADIUS))
         self.assertEqual([room.lit(p) for p in room.platforms], [False, False])
         self.move(20, 1)
         self.press(interact=True)
         self.assertIsNone(room.socket)
         self.move(45, 1)
+        self.assertEqual(room.light, (room.x + 6, room.y - 7, room.CARRY_RADIUS))
         self.press(interact=True)
+        self.assertEqual(room.light, (100, 132, room.RADIUS))
         self.assertEqual([room.lit(p) for p in room.platforms], [True, False])
         self.press(interact=True)
         self.move(30, 1)

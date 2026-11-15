@@ -1,12 +1,27 @@
 """Lantern room sprites and the light overlay, drawn at integer scale."""
 
-from math import isqrt
 from pathlib import Path
 
 from game.camera import Camera
 
 
 ASSETS = Path(__file__).resolve().parents[1] / "assets"
+DARKNESS_MASK = ASSETS / "environments/stage_01/lantern_darkness.png"
+MASK_SIZE = 221
+
+
+def draw_darkness(backend, camera, x, y, radius):
+    lit_area = camera.screen_rect(x - radius, y - radius, 2 * radius, 2 * radius)
+    left, bottom, width, height = lit_area
+    right, top = left + width, bottom + height
+    screen_w, screen_h = camera.width, camera.height
+    left, right = (max(0, min(screen_w, edge)) for edge in (left, right))
+    bottom, top = (max(0, min(screen_h, edge)) for edge in (bottom, top))
+    for bounds in ((0, 0, screen_w, bottom), (0, top, screen_w, screen_h - top),
+                   (0, bottom, left, top - bottom), (right, bottom, screen_w - right, top - bottom)):
+        if bounds[2] and bounds[3]:
+            backend.overlay(bounds, (0, 0, 0, 249))
+    backend.image(DARKNESS_MASK, (0, 0, MASK_SIZE, MASK_SIZE), lit_area)
 
 
 class LanternView:
@@ -31,29 +46,21 @@ class LanternView:
 
         backend.begin(room.data.background)
         sprite("environments/stage_01/pump_hall.png", (0, 0, 264, 200), 0, 0, room.data.width, room.data.height)
-        if room.socket:
-            lx, ly = room.socket.x, room.socket.y - 10
-            for radius, alpha in ((room.RADIUS, 23), (63, 30), (31, 42)):
-                for dy in range(-radius, radius, 3):
-                    span = isqrt(radius * radius - dy * dy)
-                    region = self.camera.screen_rect(lx - span, ly + dy, 2 * span, 3)
-                    backend.overlay(region, (171, 107, 57, alpha))
-
         for ground in room.ground:
             ledge("tiles/stone_ledge.png", ground, 16)
         for p in room.platforms:
-            lit = room.lit(p)
-            if lit:
+            if room.lit(p):
                 ledge("tiles/lantern_ledge.png", p, 5)
-            else:
-                rect(p.x, p.y, p.width, p.height, (86, 78, 94), False)
-            rect(p.x + p.width / 2 - 1, p.y, 2, 2, (255, 218, 143) if lit else (117, 104, 123))
+                rect(p.x + p.width / 2 - 1, p.y, 2, 2, (255, 218, 143))
 
         door = room.exit
         sprite("props/exit_door.png", (13 if room.complete else 0, 0, 13, 24),
                door.x, door.y, door.width, door.height)
         for socket in room.sockets:
             sprite("props/lantern_socket.png", (0, 0, 10, 7), socket.x - 5, socket.y - 7, 10, 7)
+
+        lx, ly, radius = room.light
+        draw_darkness(backend, self.camera, lx, ly, radius)
 
         x, y = round(room.x), round(room.y)
         if not room.grounded:
@@ -65,8 +72,6 @@ class LanternView:
         sprite("characters/player/lantern_keeper.png", (frame * 16, 0, 16, 18),
                x - 8, y - 16, 16, 18, flip=room.facing < 0)
 
-        lx = room.socket.x if room.socket else x + 6 * room.facing
-        ly = room.socket.y - 10 if room.socket else room.y - 7
         sprite("props/lantern.png", (0, 0, 7, 9), lx - 3, ly - 5, 7, 9)
         if target := room.interaction():
             sx, sy = target.x - 2, target.y - 22

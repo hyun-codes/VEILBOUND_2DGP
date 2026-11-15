@@ -8,6 +8,8 @@ from game.map_loader import MapFormatError
 
 class LanternRoom:
     RADIUS = 110
+    CARRY_RADIUS = 46
+    START_RADIUS = 39
     WIDTH, HEIGHT = 6, 13
 
     def __init__(self, data):
@@ -42,11 +44,18 @@ class LanternRoom:
         self.complete = False
         self.socket = self.initial_socket
 
+    @property
+    def light(self):
+        if self.socket is None:
+            return self.x + 6 * self.facing, self.y - 7, self.CARRY_RADIUS
+        radius = self.START_RADIUS if self.socket is self.initial_socket else self.RADIUS
+        return self.socket.x, self.socket.y - 10, radius
+
     def lit(self, platform):
         if self.socket is None:
             return False
-        return hypot(platform.x + platform.width / 2 - self.socket.x,
-                     platform.y - (self.socket.y - 10)) <= self.RADIUS
+        x, y, radius = self.light
+        return hypot(platform.x + platform.width / 2 - x, platform.y - y) <= radius
 
     def interaction(self):
         if not self.grounded or self.complete:
