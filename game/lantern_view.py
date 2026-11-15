@@ -105,9 +105,8 @@ class LanternView:
                 rect(prop.x, prop.y, prop.width, prop.height, (196, 151, 102), False)
         for index, key in enumerate(room.keys):
             if index not in room.collected:
-                rect(key.x, key.y, key.width - 2, 3, (228, 174, 97), False)
-                rect(key.x + key.width - 3, key.y + 2, 1, key.height - 2, (228, 174, 97))
-                rect(key.x + key.width - 2, key.y + key.height - 1, 2, 1, (228, 174, 97))
+                sprite("props/brass_key.png", (0, 0, 14, 10),
+                       key.x + key.width / 2 - 7, key.y + key.height - 10, 14, 10)
 
         door = room.exit
         sprite("props/exit_door.png", (13 if room.complete else 0, 0, 13, 24),
