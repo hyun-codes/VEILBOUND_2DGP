@@ -37,6 +37,7 @@ class LanternRoom:
         self.x, self.y = self.start.x, self.start.y
         self.vy = 0.0
         self.walk_time = 0.0
+        self.facing = 1
         self.grounded = True
         self.complete = False
         self.socket = self.initial_socket
@@ -57,6 +58,8 @@ class LanternRoom:
     def step(self, dt, direction, jump=False, interact=False):
         if self.complete:
             return
+        if direction:
+            self.facing = direction
         if interact and (target := self.interaction()):
             self.socket = None if self.socket else target
         collision = CollisionWorld(self.ground + tuple(p for p in self.platforms if self.lit(p)))

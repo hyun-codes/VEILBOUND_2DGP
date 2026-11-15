@@ -53,18 +53,21 @@ class LanternView:
         sprite("props/exit_door.png", (13 if room.complete else 0, 0, 13, 24),
                door.x, door.y, door.width, door.height)
         for socket in room.sockets:
-            rect(socket.x - 4, socket.y - 3, 8, 3, (126, 100, 89))
-            rect(socket.x - 2, socket.y - 5, 4, 2, (91, 68, 70))
+            sprite("props/lantern_socket.png", (0, 0, 10, 7), socket.x - 5, socket.y - 7, 10, 7)
+
         x, y = round(room.x), round(room.y)
-        rect(x - 3, y - 13, 6, 5, (201, 184, 169))
-        rect(x - 3, y - 8, 6, 6, (119, 108, 130))
-        stride = int(room.walk_time * 12) % 2
-        rect(x - 2 - stride, y - 3, 2, 3, (173, 157, 154))
-        rect(x + 1, y - 3, 2, 3 - stride, (173, 157, 154))
-        lx = room.socket.x if room.socket else room.x + 5
+        if not room.grounded:
+            frame = 5 if room.vy < 0 else 6
+        elif room.walk_time:
+            frame = 1 + int(room.walk_time * 12) % 4
+        else:
+            frame = 0
+        sprite("characters/player/lantern_keeper.png", (frame * 16, 0, 16, 18),
+               x - 8, y - 16, 16, 18, flip=room.facing < 0)
+
+        lx = room.socket.x if room.socket else x + 6 * room.facing
         ly = room.socket.y - 10 if room.socket else room.y - 7
-        rect(lx - 2, ly - 3, 4, 6, (222, 149, 75))
-        rect(lx - 1, ly - 2, 2, 4, (255, 230, 166))
+        sprite("props/lantern.png", (0, 0, 7, 9), lx - 3, ly - 5, 7, 9)
         if target := room.interaction():
             sx, sy = target.x - 2, target.y - 22
             rect(sx - 2, sy - 2, 8, 9, (20, 19, 29))
