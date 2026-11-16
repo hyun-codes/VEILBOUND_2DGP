@@ -66,6 +66,42 @@ class LanternRoomTest(unittest.TestCase):
         self.assertEqual(self.room.y, self.room.start.y)
         self.assertTrue(self.room.grounded)
 
+    def test_lantern_can_be_left_between_sockets_and_picked_up_again(self):
+        room = self.room
+        self.move(20, 1)
+        self.press(interact=True)
+        self.move(22, 1)
+        placed_at = room.x, room.y
+        self.assertIsNone(room.interaction())
+        self.press(interact=True)
+        self.assertFalse(room.carrying_lantern)
+        self.move(14, 1)
+        self.assertAlmostEqual(room.light[0], placed_at[0])
+        self.assertAlmostEqual(room.light[1], placed_at[1] - 4)
+        self.press(interact=True)
+        self.assertIsNotNone(room.loose_lantern)
+        self.move(14, -1)
+        self.press(interact=True)
+        self.assertTrue(room.carrying_lantern)
+        self.assertIsNone(room.loose_lantern)
+
+    def test_releasing_lantern_in_midair_lands_it_on_the_ground(self):
+        room = self.room
+        self.move(20, 1)
+        self.press(interact=True)
+        self.move(22, 1)
+        self.press(jump=True)
+        self.move(9)
+        self.assertFalse(room.grounded)
+        self.press(interact=True)
+        released_at = room.loose_lantern.y
+        self.move(40)
+        self.assertLess(released_at, room.start.y)
+        self.assertEqual(room.loose_lantern.y, room.start.y)
+        self.assertEqual(room.lantern_vy, 0)
+        self.press(interact=True)
+        self.assertTrue(room.carrying_lantern)
+
     def test_walls_boxes_and_keys_need_light(self):
         data = self.room.data
         objects = (

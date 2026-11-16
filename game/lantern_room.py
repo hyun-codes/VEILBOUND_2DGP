@@ -1,9 +1,10 @@
 """Light determines the visible surfaces and the collision geometry."""
 
+from dataclasses import replace
 from math import ceil, floor, isfinite, sqrt
 
 from game.collision import CollisionWorld, Solid
-from game.map_loader import MapFormatError
+from game.map_loader import MapFormatError, MapObject
 from game.rail_light import RailLight
 
 
@@ -22,6 +23,7 @@ class LanternRoom:
     PROJECTOR_TURN = 0.60
     CHUTE_TRAVEL = 0.70
     WIDTH, HEIGHT = 6, 13
+    LANTERN_WIDTH, LANTERN_HEIGHT = 5, 9
 
     def __init__(self, data):
         self.data = data
@@ -114,9 +116,17 @@ class LanternRoom:
         self.aim_indices = dict.fromkeys(self.aims, 0)
         self.turning = {}
         self.in_transit = None
+        self.loose_lantern = None
+        self.lantern_vy = 0.0
+
+    @property
+    def carrying_lantern(self):
+        return self.socket is None and self.loose_lantern is None and self.in_transit is None
 
     @property
     def light(self):
+        if self.loose_lantern:
+            return self.loose_lantern.x, self.loose_lantern.y - 4, self.CARRY_RADIUS
         if self.in_transit:
             chute, target, started = self.in_transit
             progress = min(1.0, (self.elapsed - started) / self.CHUTE_TRAVEL)
@@ -186,15 +196,44 @@ class LanternRoom:
                 and all(self.receiver_lit(receiver) for receiver in self.receivers))
 
     def interaction(self):
-        if not self.grounded or self.complete:
+        if self.complete:
             return None
-        sockets = () if self.in_transit else (self.socket,) if self.socket else self.sockets
+        if self.loose_lantern and (abs(self.x - self.loose_lantern.x) <= 9
+                                   and abs(self.y - self.loose_lantern.y) <= 9):
+            return self.loose_lantern
+        if not self.grounded:
+            return None
+        sockets = self.sockets if self.carrying_lantern else (self.socket,) if self.socket else ()
         chutes = tuple(o for o in self.chutes
-                       if not self.in_transit and (self.socket is None or self.socket is self.chute_targets[o.name]))
+                       if self.carrying_lantern or self.socket is self.chute_targets[o.name])
         candidates = self.projectors + self.switches + chutes + tuple(
             o for o in sockets if not self.socket_locked(o))
         return min((o for o in candidates if abs(self.x - o.x) <= 9 and abs(self.y - o.y) <= 2),
                    key=lambda o: abs(self.x - o.x), default=None)
+
+    def interact(self):
+        target = self.interaction()
+        if target is None:
+            if self.carrying_lantern:
+                self.loose_lantern = MapObject("Lantern", "LooseLantern", self.x, self.y, 0, 0, {})
+                self.lantern_vy = 0.0
+        elif target.kind == "LooseLantern":
+            self.loose_lantern = None
+            self.lantern_vy = 0.0
+        elif target.kind in ("Projector", "ProjectorSwitch"):
+            name = target.name if target.kind == "Projector" else target.properties["projector"]
+            next_index = (self.aim_indices[name] + 1) % len(self.aims[name])
+            index = self.selected_focus.get(target.name, next_index)
+            if index != self.aim_indices[name]:
+                self.turning[name] = self.projected_light(name), self.elapsed
+                self.aim_indices[name] = index
+        elif target.kind == "Chute":
+            if self.carrying_lantern:
+                self.in_transit = target, self.chute_targets[target.name], self.elapsed
+            else:
+                self.socket = None
+        else:
+            self.socket = None if self.socket else target
 
     def step(self, dt, direction, jump=False, interact=False):
         if self.complete:
@@ -205,21 +244,21 @@ class LanternRoom:
             self.in_transit = None
         if direction:
             self.facing = direction
-        if interact and (target := self.interaction()):
-            if target.kind in ("Projector", "ProjectorSwitch"):
-                name = target.name if target.kind == "Projector" else target.properties["projector"]
-                index = self.selected_focus.get(target.name, (self.aim_indices[name] + 1) % len(self.aims[name]))
-                if index != self.aim_indices[name]:
-                    self.turning[name] = self.projected_light(name), self.elapsed
-                    self.aim_indices[name] = index
-            elif target.kind == "Chute":
-                if self.socket is None:
-                    self.in_transit = target, self.chute_targets[target.name], self.elapsed
-                else:
-                    self.socket = None
-            else:
-                self.socket = None if self.socket else target
+        if interact:
+            self.interact()
         collision = self.collision()
+        if lamp := self.loose_lantern:
+            self.lantern_vy = min(350.0, self.lantern_vy + 960.0 * dt)
+            _, feet, _, landed, _ = collision.move(lamp.x, lamp.y, self.LANTERN_WIDTH,
+                                                    self.LANTERN_HEIGHT, 0, self.lantern_vy * dt)
+            if landed:
+                self.lantern_vy = 0.0
+            if feet - self.LANTERN_HEIGHT > self.data.height:
+                self.reset()
+                return
+            if feet != lamp.y:
+                self.loose_lantern = replace(lamp, y=feet)
+                collision = self.collision()
         if jump and self.grounded and collision.supported(self.x, self.y, self.WIDTH):
             self.vy = -238.0
         self.vy = min(350.0, self.vy + 960.0 * dt)
