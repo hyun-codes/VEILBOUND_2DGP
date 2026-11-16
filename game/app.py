@@ -5,7 +5,7 @@ from pathlib import Path
 from time import perf_counter, sleep
 
 from game.lantern_room import LanternRoom
-from game.lantern_view import LanternView
+from game.lantern_view import ASSETS, LanternView
 from game.map_loader import MapFormatError, load_map
 from game.pico2d_backend import Pico2DBackend
 from game.timing import FixedStepper
@@ -20,6 +20,26 @@ STAGE_5 = STAGE_1.parent.parent / "stage_05/stage5_beacon_vault.tmj"
 STAGE_6 = STAGE_1.parent.parent / "stage_06/stage6_flooded_reservoir.tmj"
 STAGES = {1: STAGE_1, 2: STAGE_2, 3: STAGE_3, 4: STAGE_4, 5: STAGE_5, 6: STAGE_6}
 WIDTH, HEIGHT = 800, 600
+FADE_OUT = 0.28
+BLACKOUT = 0.14
+FADE_IN = 0.30
+
+
+def draw_stage_transition(backend, elapsed):
+    black_time = elapsed - FADE_OUT
+    if black_time < 0:
+        fade = elapsed / FADE_OUT
+    elif black_time < BLACKOUT:
+        fade = 1.0
+    else:
+        fade = max(0.0, 1 - (black_time - BLACKOUT) / FADE_IN)
+    bounds = (0, 0, WIDTH, HEIGHT)
+    backend.overlay(bounds, (0, 0, 0, round(255 * fade * fade * (3 - 2 * fade))))
+    if 0 <= black_time < BLACKOUT:
+        backend.image(ASSETS / "props/light_orb.png", (0, 0, 7, 7),
+                      (WIDTH // 2 - 10, HEIGHT // 2 - 10, 21, 21))
+        glow = min(1.0, black_time / 0.04, (BLACKOUT - black_time) / 0.04)
+        backend.overlay(bounds, (0, 0, 0, round(255 * (1 - glow))))
 
 
 def run(room, frames, screenshot, next_room=None):
@@ -30,16 +50,25 @@ def run(room, frames, screenshot, next_room=None):
     keys = set()
     pending = set()
     paused = False
+    transition = None
 
     def step(dt):
-        nonlocal room, view, next_room
+        nonlocal room, view, next_room, transition
+        if transition is not None:
+            previous = transition
+            transition += dt
+            if previous < FADE_OUT <= transition:
+                room = LanternRoom(load_map(STAGES[next_room]))
+                view = LanternView(room, WIDTH, HEIGHT)
+                next_room = next_room + 1 if next_room + 1 in STAGES else None
+            if transition >= FADE_OUT + BLACKOUT + FADE_IN:
+                transition = None
+            return
         direction = int(bool(keys & {"d", "right"})) - int(bool(keys & {"a", "left"}))
         room.step(dt, direction, "space" in pending, "e" in pending)
         pending.clear()
         if room.complete and next_room is not None:
-            room = LanternRoom(load_map(STAGES[next_room]))
-            view = LanternView(room, WIDTH, HEIGHT)
-            next_room = next_room + 1 if next_room + 1 in STAGES else None
+            transition = 0.0
             keys.clear()
 
     try:
@@ -73,6 +102,8 @@ def run(room, frames, screenshot, next_room=None):
                     continue
                 if event.kind == "key_down" and event.key == "escape":
                     return
+                if transition is not None:
+                    continue
                 if event.kind == "key_up":
                     keys.discard(event.key)
                 elif event.kind == "key_down" and not paused and event.key not in keys:
@@ -91,6 +122,8 @@ def run(room, frames, screenshot, next_room=None):
                 if not paused:
                     stepper.advance(elapsed, step)
                 view.draw(backend)
+                if transition is not None:
+                    draw_stage_transition(backend, transition)
             count += 1
             if screenshot and count == frames:
                 backend.save_screenshot(screenshot, WIDTH, HEIGHT)
