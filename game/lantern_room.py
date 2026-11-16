@@ -22,6 +22,7 @@ class LanternRoom:
     START_RADIUS = 39
     PROJECTOR_TURN = 0.60
     CHUTE_TRAVEL = 0.70
+    FLOOD_TRAVEL = 0.65
     WIDTH, HEIGHT = 6, 13
     CHEST_HEIGHT = 7
     LANTERN_WIDTH, LANTERN_HEIGHT = 5, 9
@@ -39,13 +40,14 @@ class LanternRoom:
             raise MapFormatError("A room supports one movable crate")
         self.crate_start = crates[0] if crates else None
         self.keys = tuple(o for o in data.objects if o.kind == "Key")
+        self.floods = tuple(o for o in data.objects if o.kind == "Flood")
         self.terrain = self.ground + self.platforms + tuple(
             Solid(o.x, o.y, o.width, o.height) for o in self.props) + data.solids
         self.sockets = tuple(o for o in data.objects if o.kind == "Socket")
         initial = [o for o in self.sockets if o.properties.get("initial") is True]
         if len(initial) != 1 or not self.ground or not (self.platforms or data.solids):
             raise MapFormatError("A lantern room needs ground, light platforms and exactly one starting socket")
-        for obj in (*self.terrain, *self.keys, *crates, self.exit):
+        for obj in (*self.terrain, *self.keys, *crates, *self.floods, self.exit):
             if not (0 <= obj.x < obj.x + obj.width <= data.width
                     and 0 <= obj.y < obj.y + obj.height <= data.height
                     and all(float(value).is_integer() for value in (obj.x, obj.y, obj.width, obj.height))):
@@ -61,6 +63,17 @@ class LanternRoom:
             radius = socket.properties.get("radius", self.RADIUS)
             if type(radius) not in (int, float) or not isfinite(radius) or radius <= 0:
                 raise MapFormatError("Socket radius must be positive")
+        self.valves = tuple(o for o in data.objects if o.kind == "DrainValve")
+        self.valve_links = {}
+        for valve in self.valves:
+            socket = data.object_named(valve.properties.get("socket"))
+            flood = data.object_named(valve.properties.get("flood"))
+            if socket not in self.sockets or flood not in self.floods or not terrain.supported(
+                    valve.x, valve.y, self.WIDTH):
+                raise MapFormatError("A drain valve needs a floor, socket and flood")
+            self.valve_links[valve.name] = socket, flood
+        if len(self.valve_links) != len(self.valves):
+            raise MapFormatError("Drain valves need unique names")
         self.initial_socket = initial[0]
         points = [obj for obj in data.objects if obj.kind == "RailPoint"]
         self.rail = RailLight(data, points) if points else None
@@ -143,6 +156,9 @@ class LanternRoom:
         self.lantern_vy = 0.0
         self.crate = self.crate_start
         self.crate_vy = 0.0
+        self.drained = None
+        self.flood_from = {}
+        self.drain_started = 0.0
 
     @property
     def carrying_lantern(self):
@@ -196,6 +212,12 @@ class LanternRoom:
 
     def illuminated(self, x, y):
         return any((x - lx) ** 2 + (y - ly) ** 2 <= radius ** 2 for lx, ly, radius in self.lights)
+
+    def water_depth(self, flood):
+        start = self.flood_from.get(flood.name, flood.height)
+        target = 0 if flood == self.drained else flood.height
+        progress = min(1.0, (self.elapsed - self.drain_started) / self.FLOOD_TRAVEL)
+        return start + (target - start) * progress
 
     def exposed(self, obj):
         right = obj.x + obj.width
@@ -261,7 +283,8 @@ class LanternRoom:
                        if self.carrying_lantern or self.socket is self.chute_targets[o.name])
         switches = tuple(s for s in self.switches
                          if s.name not in self.switch_relays or self.relay_lit(s))
-        candidates = self.projectors + switches + chutes + tuple(
+        valves = tuple(v for v in self.valves if self.valve_links[v.name][0] is self.socket)
+        candidates = self.projectors + switches + chutes + valves + tuple(
             o for o in sockets if not self.socket_locked(o))
         candidates += tuple(beacon for name, (beacon, _) in self.beacons.items()
                             if name not in self.lit_beacons
@@ -280,6 +303,12 @@ class LanternRoom:
             self.lantern_vy = 0.0
         elif target.kind == "Beacon":
             self.lit_beacons.add(target.name)
+        elif target.kind == "DrainValve":
+            _, flood = self.valve_links[target.name]
+            if flood != self.drained:
+                self.flood_from = {o.name: self.water_depth(o) for o in self.floods}
+                self.drain_started = self.elapsed
+                self.drained = flood
         elif target.kind in ("Projector", "ProjectorSwitch"):
             name = target.name if target.kind == "Projector" else target.properties["projector"]
             next_index = (self.aim_indices[name] + 1) % len(self.aims[name])
@@ -335,7 +364,10 @@ class LanternRoom:
         if landed or ceiling:
             self.vy = 0.0
         self.walk_time = self.walk_time + dt if landed and self.x != previous_x else 0.0
-        if self.y - self.HEIGHT > self.data.height:
+        if self.y - self.HEIGHT > self.data.height or any(
+                flood.x <= self.x < flood.x + flood.width
+                and flood.y + flood.height - self.water_depth(flood) < self.y < flood.y + flood.height
+                for flood in self.floods):
             self.reset()
             return
         for index, key in enumerate(self.keys):

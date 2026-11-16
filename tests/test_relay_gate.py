@@ -12,7 +12,7 @@ class RelayGateTest(unittest.TestCase):
                 self.solve_with_orb_at(drop_x)
 
     def solve_with_orb_at(self, drop_x):
-        room = LanternRoom(load_map(STAGE_6))
+        room = LanternRoom(load_map(STAGE_6.with_name("stage6_relay_gate.tmj")))
         relay_switch, = room.switches
 
         def go(x, *, jump=False):

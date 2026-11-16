@@ -82,7 +82,10 @@ class LanternView:
         backend.begin(room.data.background)
         sprite("environments/stage_01/pump_hall.png", (0, 0, 264, 200), 0, 0, room.data.width, room.data.height)
         for part in room.data.sprites:
-            if part.visual_role == "hoist_chain":
+            if part.visual_role == "backdrop":
+                backend.image(part.image, part.source,
+                              self.camera.screen_rect(part.x, part.y, part.width, part.height))
+            elif part.visual_role == "hoist_chain":
                 sx, sy, sw, sh = part.source
                 frame = int(room.rail.distance_at(room.elapsed) / CHAIN_FRAME_TRAVEL) % CHAIN_FRAMES
                 backend.image(part.image, (sx + frame * sw, sy, sw, sh),
@@ -92,7 +95,7 @@ class LanternView:
         for p in room.platforms:
             ledge("tiles/lantern_ledge.png", p, 5)
         for part in room.data.sprites:
-            if part.visual_role != "hoist_chain":
+            if part.visual_role not in ("hoist_chain", "backdrop"):
                 backend.image(part.image, part.source,
                               self.camera.screen_rect(part.x, part.y, part.width, part.height))
         for prop in room.props:
@@ -121,6 +124,13 @@ class LanternView:
             sprite("props/light_orb.png", (7, 0, 7, 9), fixture.x - 3, fixture.y - 4, 7, 9)
         for chute in room.chutes:
             sprite("props/lantern_chute.png", (0, 0, 14, 15), chute.x - 7, chute.y - 15, 14, 15)
+        for valve in room.valves:
+            socket, flood = room.valve_links[valve.name]
+            frame = 12 if room.socket is socket else 0
+            if room.drained == flood:
+                frame = 24
+            sprite("props/drain_valve.png", (frame, 0, 12, 14),
+                   valve.x - 6, valve.y - 14, 12, 14)
         for switch in room.switches:
             sprite("props/projector_stand.png", (0, 0, 15, 16), switch.x - 7, switch.y - 16, 15, 16)
             if relay := room.switch_relays.get(switch.name):
@@ -135,6 +145,22 @@ class LanternView:
                    beacon.x - 5, beacon.y - 14, 11, 14)
             sprite("props/vault_beacon.png", (frame + 4, 4, 3, 3),
                    door.x - 2 + i % 3 * 6, door.y - 9 + i // 3 * 4, 3, 3)
+
+        for flood in room.floods:
+            depth = round(room.water_depth(flood))
+            if not depth:
+                continue
+            surface = flood.y + flood.height - depth
+            ripple = int(room.elapsed * 5) % 2 * 16
+            rim = min(3, depth)
+            for offset in range(0, int(flood.width), 16):
+                width = min(16, int(flood.width) - offset)
+                x = flood.x + offset
+                sprite("environments/stage_06/reservoir_water.png", (ripple, 0, width, rim),
+                       x, surface, width, rim)
+                if depth > rim:
+                    sprite("environments/stage_06/reservoir_water.png", (ripple, 3, width, 5),
+                           x, surface + rim, width, depth - rim)
 
         lx, ly, radius = room.light
         if len(room.lights) > 1:

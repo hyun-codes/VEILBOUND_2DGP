@@ -16,7 +16,7 @@ STAGE_2 = STAGE_1.parent.parent / "stage_02/stage2_rail_light.tmj"
 STAGE_3 = STAGE_1.parent.parent / "stage_03/stage3_crossed_lenses.tmj"
 STAGE_4 = STAGE_1.parent.parent / "stage_04/stage4_counterweight.tmj"
 STAGE_5 = STAGE_1.parent.parent / "stage_05/stage5_beacon_vault.tmj"
-STAGE_6 = STAGE_1.parent.parent / "stage_06/stage6_relay_gate.tmj"
+STAGE_6 = STAGE_1.parent.parent / "stage_06/stage6_flooded_reservoir.tmj"
 STAGES = {1: STAGE_1, 2: STAGE_2, 3: STAGE_3, 4: STAGE_4, 5: STAGE_5, 6: STAGE_6}
 WIDTH, HEIGHT = 800, 600
 

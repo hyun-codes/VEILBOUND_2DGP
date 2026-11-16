@@ -18,3 +18,5 @@ Stage 3의 투광기는 `props/projector_stand.png`와 회전하는 구리·은�
 `props/brass_key.png`는 Stage 2와 Stage 3에서 사용하는 14×10 황동 열쇠다. 열쇠 오브젝트의 가운데와 바닥을 기준으로 놓이며 방의 조명에 따라 드러난다.
 
 `props/cargo_crate.png`는 Stage 4의 16×16 운반 상자다. 금속 모서리와 대각 보강대로 일반 발판과 구분한다.
+
+Stage 6의 배경은 `environments/stage_06/reservoir_hall.png`, 투입관과 배수 배관은 같은 폴더의 `pump_fittings.png`에 있다. 물은 `reservoir_water.png`의 표면 프레임 두 장을 반복하며, `props/drain_valve.png`는 밸브의 소등·전원·배수 방향 상태를 그린다.

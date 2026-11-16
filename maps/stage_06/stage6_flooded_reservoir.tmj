@@ -1,0 +1,416 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 33,
+  "height": 25,
+  "tilewidth": 8,
+  "tileheight": 8,
+  "backgroundcolor": "#0c1520",
+  "nextlayerid": 6,
+  "nextobjectid": 26,
+  "layers": [
+    {
+      "id": 5,
+      "name": "Reservoir hall",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/stage_06/reservoir_hall.png",
+      "imagewidth": 264,
+      "imageheight": 200,
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Pump fittings",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/stage_06/pump_fittings.png",
+      "imagewidth": 264,
+      "imageheight": 200
+    },
+    {
+      "id": 1,
+      "name": "Masonry",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 1,
+          "name": "Inlet gallery",
+          "type": "Ground",
+          "x": 16,
+          "y": 101,
+          "width": 88,
+          "height": 8
+        },
+        {
+          "id": 2,
+          "name": "Reservoir service floor",
+          "type": "Ground",
+          "x": 57,
+          "y": 160,
+          "width": 204,
+          "height": 13
+        },
+        {
+          "id": 3,
+          "name": "Inlet bulkhead",
+          "type": "Wall",
+          "x": 106,
+          "y": 72,
+          "width": 7,
+          "height": 68
+        },
+        {
+          "id": 4,
+          "name": "Outlet lowest step",
+          "type": "LightPlatform",
+          "x": 228,
+          "y": 141,
+          "width": 15,
+          "height": 5
+        },
+        {
+          "id": 5,
+          "name": "Outlet return step",
+          "type": "LightPlatform",
+          "x": 207,
+          "y": 122,
+          "width": 14,
+          "height": 5
+        },
+        {
+          "id": 6,
+          "name": "Outlet gantry",
+          "type": "LightPlatform",
+          "x": 237,
+          "y": 103,
+          "width": 25,
+          "height": 7
+        },
+        {
+          "id": 21,
+          "name": "West filter floor",
+          "type": "Ground",
+          "x": 10,
+          "y": 160,
+          "width": 33,
+          "height": 13
+        },
+        {
+          "id": 22,
+          "name": "West filter grate",
+          "type": "Wall",
+          "x": 48,
+          "y": 112,
+          "width": 7,
+          "height": 54
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Flood basins",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 7,
+          "name": "West basin",
+          "type": "Flood",
+          "x": 0,
+          "y": 145,
+          "width": 85,
+          "height": 35
+        },
+        {
+          "id": 8,
+          "name": "East basin",
+          "type": "Flood",
+          "x": 177,
+          "y": 145,
+          "width": 87,
+          "height": 35
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Machinery and goals",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 9,
+          "name": "PlayerStart",
+          "type": "Spawn",
+          "x": 25,
+          "y": 101,
+          "width": 0,
+          "height": 0,
+          "point": true
+        },
+        {
+          "id": 10,
+          "name": "Inlet cradle",
+          "type": "Socket",
+          "x": 40,
+          "y": 101,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "initial",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 29
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "name": "Reservoir inlet",
+          "type": "Chute",
+          "x": 72,
+          "y": 101,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Pump cradle"
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "name": "Inlet pilot",
+          "type": "FixedLight",
+          "x": 88,
+          "y": 94,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 16
+            }
+          ]
+        },
+        {
+          "id": 13,
+          "name": "Pump cradle",
+          "type": "Socket",
+          "x": 130,
+          "y": 160,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 29
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "name": "West handwheel",
+          "type": "DrainValve",
+          "x": 109,
+          "y": 160,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Pump cradle"
+            },
+            {
+              "name": "flood",
+              "type": "string",
+              "value": "West basin"
+            }
+          ]
+        },
+        {
+          "id": 15,
+          "name": "East handwheel",
+          "type": "DrainValve",
+          "x": 151,
+          "y": 160,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Pump cradle"
+            },
+            {
+              "name": "flood",
+              "type": "string",
+              "value": "East basin"
+            }
+          ]
+        },
+        {
+          "id": 16,
+          "name": "West key",
+          "type": "Key",
+          "x": 28,
+          "y": 153,
+          "width": 7,
+          "height": 7
+        },
+        {
+          "id": 17,
+          "name": "East key",
+          "type": "Key",
+          "x": 216,
+          "y": 153,
+          "width": 7,
+          "height": 7
+        },
+        {
+          "id": 18,
+          "name": "Outlet pilot",
+          "type": "FixedLight",
+          "x": 245,
+          "y": 93,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "id": 19,
+          "name": "Outlet cradle",
+          "type": "Socket",
+          "x": 253,
+          "y": 103,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 28
+            }
+          ]
+        },
+        {
+          "id": 20,
+          "name": "Exit",
+          "type": "Exit",
+          "x": 238,
+          "y": 79,
+          "width": 13,
+          "height": 24,
+          "properties": [
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Outlet cradle"
+            }
+          ]
+        },
+        {
+          "id": 23,
+          "name": "West filter pilot",
+          "type": "FixedLight",
+          "x": 27,
+          "y": 154,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 17
+            }
+          ]
+        },
+        {
+          "id": 24,
+          "name": "West rim pilot",
+          "type": "FixedLight",
+          "x": 85,
+          "y": 141,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 13
+            }
+          ]
+        },
+        {
+          "id": 25,
+          "name": "East rim pilot",
+          "type": "FixedLight",
+          "x": 176,
+          "y": 141,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 13
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
