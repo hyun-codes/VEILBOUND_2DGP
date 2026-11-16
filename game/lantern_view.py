@@ -1,6 +1,6 @@
 """Lantern room sprites and the light overlay, drawn at integer scale."""
 
-from math import atan2, ceil, floor, hypot
+from math import atan2, ceil, floor, hypot, sin, tau
 from pathlib import Path
 
 from game.camera import Camera
@@ -90,17 +90,22 @@ class LanternView:
             if part.visual_role == "backdrop":
                 backend.image(part.image, part.source,
                               self.camera.screen_rect(part.x, part.y, part.width, part.height))
-            elif part.visual_role == "hoist_chain":
+            elif part.visual_role in ("hoist_chain", "hoist_gears"):
                 sx, sy, sw, sh = part.source
-                frame = int(room.rail.distance_at(room.elapsed) / CHAIN_FRAME_TRAVEL) % CHAIN_FRAMES
-                backend.image(part.image, (sx + frame * sw, sy, sw, sh),
-                              self.camera.screen_rect(part.x, part.y, part.width, part.height))
+                distance = room.rail.distance_at(room.elapsed)
+                frame = int(distance / CHAIN_FRAME_TRAVEL) % CHAIN_FRAMES
+                x, y, w, h = self.camera.screen_rect(part.x, part.y, part.width, part.height)
+                if part.visual_role == "hoist_chain":
+                    recent = room.rail.distance_at(max(0.0, room.elapsed - 0.12))
+                    tension = min(1.0, abs(distance - recent) / 2.5)
+                    y += round(2 * sin(tau * distance / 21) * tension)
+                backend.image(part.image, (sx + frame * sw, sy, sw, sh), (x, y, w, h))
         for ground in room.ground:
             ledge("tiles/stone_ledge.png", ground, 16)
         for p in room.platforms:
             ledge("tiles/lantern_ledge.png", p, 5)
         for part in room.data.sprites:
-            if part.visual_role not in ("hoist_chain", "backdrop"):
+            if part.visual_role not in ("hoist_chain", "hoist_gears", "backdrop"):
                 backend.image(part.image, part.source,
                               self.camera.screen_rect(part.x, part.y, part.width, part.height))
         for prop in room.props:

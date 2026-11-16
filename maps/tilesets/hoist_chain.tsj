@@ -4,14 +4,14 @@
   "name": "Hoist chain frames",
   "tilewidth": 131,
   "tileheight": 75,
-  "tilecount": 8,
+  "tilecount": 16,
   "columns": 8,
   "spacing": 0,
   "margin": 0,
   "objectalignment": "bottomleft",
   "image": "../../assets/environments/stage_02/hoist_chain.png",
   "imagewidth": 1048,
-  "imageheight": 75,
+  "imageheight": 150,
   "tiles": [
     {
       "id": 0,
@@ -20,6 +20,16 @@
           "name": "visualRole",
           "type": "string",
           "value": "hoist_chain"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "hoist_gears"
         }
       ]
     }

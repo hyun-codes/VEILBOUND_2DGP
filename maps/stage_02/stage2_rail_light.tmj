@@ -10,7 +10,7 @@
   "tileheight": 8,
   "backgroundcolor": "#10111b",
   "nextlayerid": 4,
-  "nextobjectid": 21,
+  "nextobjectid": 22,
   "properties": [
     {
       "name": "railRadius",
@@ -52,6 +52,15 @@
           "id": 20,
           "name": "Hoist chain",
           "gid": 4,
+          "x": 24,
+          "y": 163,
+          "width": 131,
+          "height": 75
+        },
+        {
+          "id": 21,
+          "name": "Hoist sprockets",
+          "gid": 12,
           "x": 24,
           "y": 163,
           "width": 131,

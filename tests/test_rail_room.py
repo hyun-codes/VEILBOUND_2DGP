@@ -68,17 +68,24 @@ class RailRoomTest(unittest.TestCase):
         view = LanternView(self.room, 800, 600)
         rail = self.room.rail
 
-        def chain_frame(elapsed):
+        def hoist_frames(elapsed):
             self.room.elapsed = elapsed
             backend = Mock()
             view.draw(backend)
-            source, = (call.args[1] for call in backend.image.call_args_list
-                       if call.args[0].name == "hoist_chain.png")
-            return source
+            links, gears = (call.args[1:3] for call in backend.image.call_args_list
+                            if call.args[0].name == "hoist_chain.png")
+            return links, gears
 
-        self.assertEqual(chain_frame(0), chain_frame(rail.pause / 2))
-        first = chain_frame(rail.pause + 0.10)
-        second = chain_frame(rail.pause + 0.20)
+        parked = hoist_frames(0)
+        self.assertEqual(parked, hoist_frames(rail.pause / 2))
+        first = hoist_frames(rail.pause + 0.10)
+        second = hoist_frames(rail.pause + 0.20)
         self.assertNotEqual(first, second)
-        self.assertEqual(second, chain_frame(rail.period - 0.20))
-        self.assertEqual(first, chain_frame(rail.period - 0.10))
+        self.assertEqual(second[0][0], hoist_frames(rail.period - 0.20)[0][0])
+        self.assertEqual(first[0][0], hoist_frames(rail.period - 0.10)[0][0])
+        self.assertNotEqual(second[0][1][1], parked[0][1][1])
+        self.assertLessEqual(abs(second[0][1][1] - parked[0][1][1]), 2)
+        self.assertEqual(second[1][1], parked[1][1])
+        first_stop = rail.pause + rail.legs[0][-1]
+        self.assertEqual(hoist_frames(first_stop + 0.25)[0][1], parked[0][1])
+        self.assertEqual(view.camera.render_offset, (0, 0))

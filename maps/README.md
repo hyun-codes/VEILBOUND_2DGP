@@ -11,7 +11,7 @@
 
 [Stage 2 왕복 탐조등](stage_02/stage2_rail_light.tmj)은 오른쪽 덮개를 지나 아래층 열쇠를 얻고, 왼쪽의 터빈 날개로 올라와 출구에 닿는 방이다. 광원은 `RailPoint`를 Tiled 오브젝트 순서대로 왕복한다. `railRadius`, `railSpeed`, `railPause`는 각각 반지름, 초당 이동 픽셀, 지점 체류 시간(초)이다. 받침대에서 `radius`를 지정하면 휴대등을 꽂았을 때의 범위를 정할 수 있다. Machinery 레이어의 타일은 [기계 부품 타일셋](tilesets/stage2_machinery.tsj)에 정의된 충돌 윤곽을 사용한다. [발판 샘플](stage_02/platform_samples.tmj)은 Tiled에서 모양을 비교할 때 쓴다.
 
-`Hoist chain` 레이어는 [사슬 타일셋](tilesets/hoist_chain.tsj)의 첫 프레임을 Tiled에서 보여준다. 게임에서는 운반대가 이동한 거리에 맞춰 사슬과 톱니의 여덟 프레임을 발판 뒤에 그린다. `RailPoint`를 옮길 때는 사슬 시트와 레이어 위치를 새 경로에 맞춘다.
+`Hoist chain` 레이어는 [사슬 타일셋](tilesets/hoist_chain.tsj)의 고리와 톱니 첫 프레임을 각각 표시한다. 게임에서는 운반대의 이동 거리에 맞춰 발판 뒤에 두 애니메이션을 그리고, 고리 쪽에만 작은 세로 흔들림을 적용한다. `RailPoint`를 옮길 때는 두 타일 오브젝트를 새 경로에 맞춘다.
 
 [Stage 3 교차 렌즈](stage_03/stage3_crossed_lenses.tmj)는 중앙 조작대에서 두 갈래 열쇠 경로와 위쪽 출구를 비추는 방이다. `Projector` 옆에서 E를 누를 때마다 같은 이름을 `projector` 속성에 적은 `Focus` 지점을 맵 순서대로 바꾼다. 렌즈와 빛은 약 0.6초에 걸쳐 돌아가며, 지형 충돌도 움직이는 빛을 따라 바뀐다. 각 목표점의 `radius`는 비출 범위다. `Receiver`는 투광기 빛을 받으면 켜지며, 출구는 두 열쇠와 모든 수광부가 필요하다. `fixed=true`가 붙은 시작 등불은 중앙 조작대를 비춘다.
 [Stage 4 화물 승강로](stage_04/stage4_counterweight.tmj)는 위층 상자를 아래층에 내려보낸 뒤 오른쪽 출구 턱까지 옮기는 방이다. `PushCrate` 사각형은 빛이 닿으면 밟을 수 있고, 플레이어가 양손을 비우고 밀면 움직인다. 등불을 상자 위에 놓으면 상자와 함께 이동한다. [등불 투입구](stage_04/stage4_lantern_chute.tmj)는 이전 배치의 검증용으로 보존한다.
