@@ -23,6 +23,7 @@ class LanternRoom:
     PROJECTOR_TURN = 0.60
     CHUTE_TRAVEL = 0.70
     FLOOD_TRAVEL = 0.65
+    DEATH_DURATION = 0.48
     WIDTH, HEIGHT = 6, 13
     CHEST_HEIGHT = 7
     LANTERN_WIDTH, LANTERN_HEIGHT = 5, 9
@@ -145,6 +146,7 @@ class LanternRoom:
         self.facing = 1
         self.grounded = True
         self.complete = False
+        self.death_elapsed = None
         self.socket = self.initial_socket
         self.collected = set()
         self.lit_beacons = set()
@@ -174,7 +176,10 @@ class LanternRoom:
             return (chute.x + (target.x - chute.x) * progress,
                     chute.y - 10 + (target.y - chute.y) * progress ** 2, self.CARRY_RADIUS)
         if self.socket is None:
-            return self.x, self.y - self.CHEST_HEIGHT, self.CARRY_RADIUS
+            radius = self.CARRY_RADIUS
+            if self.death_elapsed is not None:
+                radius = max(3, radius * (1 - self.death_elapsed / self.DEATH_DURATION))
+            return self.x, self.y - self.CHEST_HEIGHT, radius
         radius = self.socket.properties.get(
             "radius", self.START_RADIUS if self.socket is self.initial_socket else self.RADIUS)
         return self.socket.x, self.socket.y - 10, radius
@@ -271,7 +276,7 @@ class LanternRoom:
                 and all(self.receiver_lit(receiver) for receiver in self.receivers))
 
     def interaction(self):
-        if self.complete:
+        if self.complete or self.death_elapsed is not None:
             return None
         if self.loose_lantern and (abs(self.x - self.loose_lantern.x) <= 9
                                    and abs(self.y - self.loose_lantern.y) <= 9):
@@ -327,6 +332,11 @@ class LanternRoom:
     def step(self, dt, direction, jump=False, interact=False):
         if self.complete:
             return
+        if self.death_elapsed is not None:
+            self.death_elapsed += dt
+            if self.death_elapsed >= self.DEATH_DURATION:
+                self.reset()
+            return
         self.elapsed += dt
         if self.in_transit and self.elapsed - self.in_transit[2] >= self.CHUTE_TRAVEL:
             self.socket = self.in_transit[1]
@@ -364,11 +374,12 @@ class LanternRoom:
         if landed or ceiling:
             self.vy = 0.0
         self.walk_time = self.walk_time + dt if landed and self.x != previous_x else 0.0
-        if self.y - self.HEIGHT > self.data.height or any(
+        if (not landed and self.y >= self.data.height) or any(
                 flood.x <= self.x < flood.x + flood.width
                 and flood.y + flood.height - self.water_depth(flood) < self.y < flood.y + flood.height
                 for flood in self.floods):
-            self.reset()
+            self.y = min(self.y, self.data.height - 1)
+            self.death_elapsed = 0.0
             return
         for index, key in enumerate(self.keys):
             if index not in self.collected and any(self._touches(part) for part in self.exposed(key)):

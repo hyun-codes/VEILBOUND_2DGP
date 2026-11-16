@@ -98,6 +98,14 @@ class FloodedReservoirTest(unittest.TestCase):
         self.go(151)
         self.assertIsNone(self.room.interaction())
         self.act(24, direction=1)
+        self.assertIsNotNone(self.room.death_elapsed)
+        fallen_at = self.room.x, self.room.y
+        radius = self.room.light[2]
+        self.act(12, direction=-1, jump=True, interact=True)
+        self.assertEqual((self.room.x, self.room.y), fallen_at)
+        self.assertTrue(self.room.carrying_lantern)
+        self.assertLess(self.room.light[2], radius)
+        self.act(30)
         self.assertIs(self.room.socket, self.room.initial_socket)
         self.assertEqual(self.room.y, self.room.start.y)
         self.assertEqual(self.room.water_depth(self.east), self.east.height)

@@ -181,18 +181,23 @@ class LanternView:
             sprite("props/chain_carriage.png", (0, 0, 13, 13), round(rx) - 6, round(ry) - 6, 13, 13)
 
         x, y = round(room.x), round(room.y)
-        if not room.grounded:
-            frame = 5 if room.vy < 0 else 6
-        elif room.walk_time:
-            frame = 1 + int(room.walk_time * 12) % 4
+        if room.death_elapsed is not None:
+            frame = min(5, int(6 * room.death_elapsed / room.DEATH_DURATION))
+            sheet = "characters/player/shadow_child_death.png"
         else:
-            frame = 0
-        sprite("characters/player/shadow_child.png", (frame * 21, 0, 21, 22),
-               x - 10, y - 20, 21, 22, flip=room.facing < 0)
+            sheet = "characters/player/shadow_child.png"
+            if not room.grounded:
+                frame = 5 if room.vy < 0 else 6
+            elif room.walk_time:
+                frame = 1 + int(room.walk_time * 12) % 4
+            else:
+                frame = 0
+        sprite(sheet, (frame * 21, 0, 21, 22), x - 10, y - 20, 21, 22, flip=room.facing < 0)
 
         if room.carrying_lantern:
-            sprite("props/light_orb.png", (16, 2, 3, 3),
-                   round(lx) - 1, round(ly) - 1, 3, 3)
+            if room.death_elapsed is None:
+                sprite("props/light_orb.png", (16, 2, 3, 3),
+                       round(lx) - 1, round(ly) - 1, 3, 3)
         else:
             sprite("props/light_orb.png", (0, 0, 7, 7), round(lx) - 3, round(ly) - 3, 7, 7)
         if target := room.interaction():

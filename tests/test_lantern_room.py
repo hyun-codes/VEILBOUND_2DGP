@@ -54,7 +54,15 @@ class LanternRoomTest(unittest.TestCase):
         self.move(61, 1)
         self.assertFalse(self.room.grounded)
         self.assertGreater(self.room.y, self.room.start.y)
-        self.move(55)
+        for _ in range(30):
+            if self.room.death_elapsed is not None:
+                break
+            self.move(1)
+        self.assertIsNotNone(self.room.death_elapsed)
+        self.assertLess(self.room.y, self.room.data.height)
+        self.assertIsNone(self.room.interaction())
+        self.move(30)
+        self.assertIsNone(self.room.death_elapsed)
         self.assertEqual((self.room.x, self.room.y), (self.room.start.x, self.room.start.y))
         self.assertIs(self.room.socket, self.room.initial_socket)
 
