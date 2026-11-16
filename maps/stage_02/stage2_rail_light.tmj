@@ -9,7 +9,7 @@
   "tilewidth": 8,
   "tileheight": 8,
   "backgroundcolor": "#10111b",
-  "nextlayerid": 3,
+  "nextlayerid": 4,
   "nextobjectid": 20,
   "properties": [
     {
@@ -35,6 +35,27 @@
     }
   ],
   "layers": [
+    {
+      "id": 3,
+      "name": "Hoist chain",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 24,
+      "offsety": 88,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/stage_02/hoist_chain.png",
+      "imagewidth": 131,
+      "imageheight": 75,
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "underlay"
+        }
+      ]
+    },
     {
       "id": 1,
       "type": "objectgroup",

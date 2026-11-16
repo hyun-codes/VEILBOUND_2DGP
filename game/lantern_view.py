@@ -61,12 +61,6 @@ class LanternView:
     def __init__(self, room, width, height):
         self.room = room
         self.camera = Camera(room.data.width, room.data.height, width, height, scale=3)
-        self.rail_marks = []
-        if room.rail:
-            for (ax, ay), (bx, by) in zip(room.rail.points, room.rail.points[1:]):
-                count = max(1, round(hypot(ax - bx, ay - by) / 4))
-                self.rail_marks.extend((round(ax + (bx - ax) * i / count),
-                                        round(ay + (by - ay) * i / count)) for i in range(count))
 
     def draw(self, backend):
         room = self.room
@@ -85,18 +79,18 @@ class LanternView:
 
         backend.begin(room.data.background)
         sprite("environments/stage_01/pump_hall.png", (0, 0, 264, 200), 0, 0, room.data.width, room.data.height)
-        for rx, ry in self.rail_marks:
-            rect(rx, ry, 2, 1, (67, 59, 67))
-        if room.rail:
-            for rx, ry in room.rail.points:
-                rect(rx - 1, ry - 1, 3, 3, (97, 84, 81), False)
+        for part in room.data.sprites:
+            if part.visual_role == "underlay":
+                backend.image(part.image, part.source,
+                              self.camera.screen_rect(part.x, part.y, part.width, part.height))
         for ground in room.ground:
             ledge("tiles/stone_ledge.png", ground, 16)
         for p in room.platforms:
             ledge("tiles/lantern_ledge.png", p, 5)
         for part in room.data.sprites:
-            backend.image(part.image, part.source,
-                          self.camera.screen_rect(part.x, part.y, part.width, part.height))
+            if part.visual_role != "underlay":
+                backend.image(part.image, part.source,
+                              self.camera.screen_rect(part.x, part.y, part.width, part.height))
         for prop in room.props:
             if prop.kind == "Wall":
                 ledge("tiles/stone_ledge.png", prop, 16)
@@ -154,8 +148,7 @@ class LanternView:
             sprite(head, (0, 0, 18, 12), x - 9, y - 19, 18, 12, angle=angle)
         if room.rail:
             rx, ry, _ = room.lights[1]
-            rect(rx - 4, ry - 3, 8, 5, (105, 91, 77))
-            rect(rx - 2, ry - 2, 4, 3, (239, 199, 132))
+            sprite("props/chain_carriage.png", (0, 0, 13, 13), round(rx) - 6, round(ry) - 6, 13, 13)
 
         x, y = round(room.x), round(room.y)
         if not room.grounded:
