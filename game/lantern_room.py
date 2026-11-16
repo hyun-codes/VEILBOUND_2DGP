@@ -24,6 +24,7 @@ class LanternRoom:
     CHUTE_TRAVEL = 0.70
     FLOOD_TRAVEL = 0.65
     DEATH_DURATION = 0.48
+    RESPAWN_DURATION = 0.18
     WIDTH, HEIGHT = 6, 13
     CHEST_HEIGHT = 7
     LANTERN_WIDTH, LANTERN_HEIGHT = 5, 9
@@ -147,6 +148,7 @@ class LanternRoom:
         self.grounded = True
         self.complete = False
         self.death_elapsed = None
+        self.respawn_elapsed = None
         self.socket = self.initial_socket
         self.collected = set()
         self.lit_beacons = set()
@@ -276,7 +278,7 @@ class LanternRoom:
                 and all(self.receiver_lit(receiver) for receiver in self.receivers))
 
     def interaction(self):
-        if self.complete or self.death_elapsed is not None:
+        if self.complete or self.death_elapsed is not None or self.respawn_elapsed is not None:
             return None
         if self.loose_lantern and (abs(self.x - self.loose_lantern.x) <= 9
                                    and abs(self.y - self.loose_lantern.y) <= 9):
@@ -336,6 +338,12 @@ class LanternRoom:
             self.death_elapsed += dt
             if self.death_elapsed >= self.DEATH_DURATION:
                 self.reset()
+                self.respawn_elapsed = 0.0
+            return
+        if self.respawn_elapsed is not None:
+            self.respawn_elapsed += dt
+            if self.respawn_elapsed >= self.RESPAWN_DURATION:
+                self.respawn_elapsed = None
             return
         self.elapsed += dt
         if self.in_transit and self.elapsed - self.in_transit[2] >= self.CHUTE_TRAVEL:

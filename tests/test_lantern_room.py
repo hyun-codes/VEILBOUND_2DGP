@@ -63,8 +63,14 @@ class LanternRoomTest(unittest.TestCase):
         self.assertIsNone(self.room.interaction())
         self.move(30)
         self.assertIsNone(self.room.death_elapsed)
+        self.assertIsNotNone(self.room.respawn_elapsed)
+        self.move(7, -1)
         self.assertEqual((self.room.x, self.room.y), (self.room.start.x, self.room.start.y))
         self.assertIs(self.room.socket, self.room.initial_socket)
+        self.move(11)
+        self.assertIsNone(self.room.respawn_elapsed)
+        self.move(1, 1)
+        self.assertGreater(self.room.x, self.room.start.x)
 
     def test_carried_light_makes_the_floor_under_the_player_solid(self):
         self.move(20, 1)

@@ -10,6 +10,7 @@ Stage 1 전용 배경과 공용으로 쓸 수 있는 지형·소품 PNG를 직�
 - `props/exit_door.png`는 13×24 셀 두 개에 일반 문과 도착 후 문을 담았다.
 - `characters/player/shadow_child.png`는 21×22 셀 일곱 개에 대기, 걷기 네 장, 상승, 낙하를 담았다. 모든 셀의 발과 가슴 중심은 각각 (10, 20), (10, 13)이다.
 - `characters/player/shadow_child_death.png`는 같은 발 기준점을 사용하는 21×22 셀 여섯 장에 그림자가 무너져 흩어지는 모션을 담았다.
+- `props/death_shock.png`는 사망 지점에서 퍼지는 잔광을 29×29 셀 다섯 장에 담았다.
 - `props/light_orb.png`는 바닥·받침대에 놓인 구슬, 고정 조명, 가슴에 끼운 광원을 담았다. `props/lantern_socket.png`(10×7)는 구슬 받침대에 재사용한다.
 
 Stage 2의 발판은 `tiles/stage_02/`의 기계 부품 세 종류를 사용한다. 구부러진 배관은 완만한 계단, 깨진 기어는 가파른 층계, 터빈 날개는 기울어진 착지면으로 그렸다. Tiled에서 볼 수 있는 발판 배치와 충돌 윤곽은 [맵 편집 안내](../maps/README.md)에 있다.

@@ -12,6 +12,7 @@ class Camera:
         self.world_width, self.world_height = world_width, world_height
         self.width, self.height, self.scale = width, height, int(scale)
         self.x = self.y = 0.0
+        self.render_offset = (0, 0)
         self.look_ahead = 0.0
         self.set_position(0, 0)
 
@@ -58,4 +59,5 @@ class Camera:
         top = round(y * self.scale) - round(self.y * self.scale)
         right = round((x + width) * self.scale) - round(self.x * self.scale)
         bottom = round((y + height) * self.scale) - round(self.y * self.scale)
-        return left, self.height - bottom, right - left, bottom - top
+        dx, dy = self.render_offset
+        return left + dx, self.height - bottom + dy, right - left, bottom - top

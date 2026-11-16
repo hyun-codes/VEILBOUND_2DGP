@@ -12,6 +12,9 @@ DARKNESS_MASK = ASSETS / "environments/stage_01/lantern_darkness.png"
 MASK_SIZE = 221
 CHAIN_FRAMES = 8
 CHAIN_FRAME_TRAVEL = 1.5
+DEATH_KICK = ((4, -1), (-3, 1), (2, -1), (-1, 0))
+SHOCK_DURATION = 0.18
+DEATH_FADE_START = 0.30
 
 
 def draw_darkness(backend, camera, x, y, radius):
@@ -66,6 +69,9 @@ class LanternView:
 
     def draw(self, backend):
         room = self.room
+        death = room.death_elapsed
+        kick = int(death * 32) if death is not None else len(DEATH_KICK)
+        self.camera.render_offset = DEATH_KICK[kick] if kick < len(DEATH_KICK) else (0, 0)
 
         def rect(x, y, w, h, color, filled=True):
             backend.rectangle(self.camera.screen_rect(x, y, w, h), color, filled)
@@ -208,3 +214,14 @@ class LanternView:
             rect(sx, sy, 1, 5, (255, 221, 170))
             for offset in (0, 2, 4):
                 rect(sx, sy + offset, 3, 1, (255, 221, 170))
+
+        if death is not None and death < SHOCK_DURATION:
+            frame = int(5 * death / SHOCK_DURATION)
+            sprite("props/death_shock.png", (frame * 29, 0, 29, 29),
+                   x - 14, y - room.CHEST_HEIGHT - 14, 29, 29)
+        if death is not None and death >= DEATH_FADE_START:
+            fade = (death - DEATH_FADE_START) / (room.DEATH_DURATION - DEATH_FADE_START)
+            backend.overlay((0, 0, self.camera.width, self.camera.height), (0, 0, 0, round(255 * fade)))
+        elif room.respawn_elapsed is not None:
+            fade = 1 - room.respawn_elapsed / room.RESPAWN_DURATION
+            backend.overlay((0, 0, self.camera.width, self.camera.height), (0, 0, 0, round(255 * fade)))
