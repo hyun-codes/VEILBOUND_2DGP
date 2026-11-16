@@ -26,12 +26,17 @@ class BeaconVaultTest(unittest.TestCase):
         self.act(35)
         self.assertEqual(self.room.y, y)
 
-    def light_east(self):
-        self.go(112)
+    def enter_cistern(self, lamp_x):
+        self.go(lamp_x)
         self.act(interact=True)
+        self.assertIsNotNone(self.room.loose_lantern)
+        self.assertFalse(self.room.collision().supported(172, 142, self.room.WIDTH))
         self.go(179)
         self.act(35)
         self.assertEqual(self.room.y, 178)
+
+    def light_east(self):
+        self.enter_cistern(112)
         self.act(interact=True)
         self.go(194)
         self.jump_to(204, 160)
@@ -88,3 +93,13 @@ class BeaconVaultTest(unittest.TestCase):
         self.room.reset()
         self.assertFalse(self.room.lit_beacons)
         self.assertIs(self.room.socket, self.room.initial_socket)
+
+    def test_east_hatch_allows_more_than_one_lantern_position(self):
+        for lamp_x in (110, 119):
+            with self.subTest(lamp_x=lamp_x):
+                self.room.reset()
+                self.go(104)
+                self.act(interact=True)
+                self.go(158)
+                self.assertTrue(self.room.collision().supported(172, 142, self.room.WIDTH))
+                self.enter_cistern(lamp_x)

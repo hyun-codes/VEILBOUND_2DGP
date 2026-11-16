@@ -9,7 +9,7 @@
   "tilewidth": 8,
   "tileheight": 8,
   "backgroundcolor": "#10111b",
-  "nextlayerid": 3,
+  "nextlayerid": 4,
   "nextobjectid": 29,
   "layers": [
     {
@@ -27,7 +27,7 @@
           "type": "Ground",
           "x": 96,
           "y": 146,
-          "width": 64,
+          "width": 69,
           "height": 8
         },
         {
@@ -88,9 +88,9 @@
           "id": 10,
           "name": "East hatch",
           "type": "LightPlatform",
-          "x": 160,
+          "x": 166,
           "y": 142,
-          "width": 25,
+          "width": 19,
           "height": 5
         },
         {
@@ -373,8 +373,8 @@
           "id": 28,
           "name": "Balcony pilot flame",
           "type": "FixedLight",
-          "x": 147,
-          "y": 141,
+          "x": 151,
+          "y": 139,
           "width": 0,
           "height": 0,
           "point": true,
@@ -382,11 +382,25 @@
             {
               "name": "radius",
               "type": "int",
-              "value": 12
+              "value": 15
             }
           ]
         }
       ]
+    },
+    {
+      "id": 3,
+      "name": "Sluice fittings",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 78,
+      "offsety": 104,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/stage_05/sluice_fittings.png",
+      "imagewidth": 151,
+      "imageheight": 84
     }
   ]
 }
