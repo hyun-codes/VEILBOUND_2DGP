@@ -103,6 +103,8 @@ class LanternView:
             else:
                 rect(prop.x, prop.y, prop.width, prop.height, (121, 88, 61))
                 rect(prop.x, prop.y, prop.width, prop.height, (196, 151, 102), False)
+        if crate := room.crate:
+            sprite("props/cargo_crate.png", (0, 0, 16, 16), crate.x, crate.y, crate.width, crate.height)
         for index, key in enumerate(room.keys):
             if index not in room.collected:
                 sprite("props/brass_key.png", (0, 0, 14, 10),

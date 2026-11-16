@@ -7,7 +7,7 @@ from game.map_loader import load_map
 
 class LanternChuteTest(unittest.TestCase):
     def setUp(self):
-        self.room = LanternRoom(load_map(STAGE_4))
+        self.room = LanternRoom(load_map(STAGE_4.with_name("stage4_lantern_chute.tmj")))
 
     def act(self, frames=1, direction=0, *, jump=False, interact=False):
         for i in range(frames):

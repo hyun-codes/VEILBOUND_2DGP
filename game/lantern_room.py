@@ -33,6 +33,10 @@ class LanternRoom:
         self.platforms = tuple(Solid(o.x, o.y, o.width, o.height)
                                for o in data.objects if o.kind == "LightPlatform")
         self.props = tuple(o for o in data.objects if o.kind in ("Wall", "Box"))
+        crates = tuple(o for o in data.objects if o.kind == "PushCrate")
+        if len(crates) > 1:
+            raise MapFormatError("A room supports one movable crate")
+        self.crate_start = crates[0] if crates else None
         self.keys = tuple(o for o in data.objects if o.kind == "Key")
         self.terrain = self.ground + self.platforms + tuple(
             Solid(o.x, o.y, o.width, o.height) for o in self.props) + data.solids
@@ -40,7 +44,7 @@ class LanternRoom:
         initial = [o for o in self.sockets if o.properties.get("initial") is True]
         if len(initial) != 1 or not self.ground or not (self.platforms or data.solids):
             raise MapFormatError("A lantern room needs ground, light platforms and exactly one starting socket")
-        for obj in (*self.terrain, *self.keys, self.exit):
+        for obj in (*self.terrain, *self.keys, *crates, self.exit):
             if not (0 <= obj.x < obj.x + obj.width <= data.width
                     and 0 <= obj.y < obj.y + obj.height <= data.height
                     and all(float(value).is_integer() for value in (obj.x, obj.y, obj.width, obj.height))):
@@ -118,6 +122,8 @@ class LanternRoom:
         self.in_transit = None
         self.loose_lantern = None
         self.lantern_vy = 0.0
+        self.crate = self.crate_start
+        self.crate_vy = 0.0
 
     @property
     def carrying_lantern(self):
@@ -175,8 +181,28 @@ class LanternRoom:
                     if left < end:
                         yield Solid(left, y, end - left, 1)
 
-    def collision(self):
-        return CollisionWorld(strip for body in self.terrain for strip in self.exposed(body))
+    def collision(self, *, include_crate=True):
+        bodies = self.terrain + ((self.crate,) if include_crate and self.crate else ())
+        return CollisionWorld(strip for body in bodies for strip in self.exposed(body))
+
+    def move_crate(self, dt, direction, jumping):
+        crate = self.crate
+        center, feet = crate.x + crate.width / 2, crate.y + crate.height
+        world = self.collision(include_crate=False)
+        edge = crate.x if direction > 0 else crate.x + crate.width
+        touching = abs(self.x + direction * self.WIDTH / 2 - edge) < 1e-6
+        dx = 0
+        if (direction and self.grounded and not jumping and not self.carrying_lantern and touching
+                and abs(self.y - feet) < 6 and self.illuminated(edge, self.y - 5)):
+            dx = direction * 38 * dt
+        self.crate_vy = min(350, self.crate_vy + 960 * dt)
+        x, y, _, landed, _ = world.move(center, feet, crate.width, crate.height, dx, self.crate_vy * dt)
+        if landed:
+            self.crate_vy = 0.0
+        self.crate = replace(crate, x=x - crate.width / 2, y=y - crate.height)
+        lamp = self.loose_lantern
+        if lamp and crate.x <= lamp.x <= crate.x + crate.width and abs(lamp.y - crate.y) < 1e-6:
+            self.loose_lantern = replace(lamp, x=lamp.x + x - center, y=lamp.y + y - feet)
 
     def _touches(self, obj):
         return (self.x + self.WIDTH / 2 > obj.x and self.x - self.WIDTH / 2 < obj.x + obj.width
@@ -246,6 +272,11 @@ class LanternRoom:
             self.facing = direction
         if interact:
             self.interact()
+        if self.crate:
+            self.move_crate(dt, direction, jump)
+            if self.crate.y > self.data.height:
+                self.reset()
+                return
         collision = self.collision()
         if lamp := self.loose_lantern:
             self.lantern_vy = min(350.0, self.lantern_vy + 960.0 * dt)

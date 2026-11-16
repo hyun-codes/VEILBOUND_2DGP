@@ -14,3 +14,5 @@ Stage 2의 발판은 `tiles/stage_02/`의 기계 부품 세 종류를 사용한�
 Stage 3의 투광기는 `props/projector_stand.png`와 회전하는 구리·은색 렌즈 헤드로 구성한다. `props/lens_receiver.png`의 두 셀은 벽에 붙은 수광부의 소등·점등 상태다.
 
 `props/brass_key.png`는 Stage 2와 Stage 3에서 사용하는 14×10 황동 열쇠다. 열쇠 오브젝트의 가운데와 바닥을 기준으로 놓이며 방의 조명에 따라 드러난다.
+
+`props/cargo_crate.png`는 Stage 4의 16×16 운반 상자다. 금속 모서리와 대각 보강대로 일반 발판과 구분한다.
