@@ -10,7 +10,7 @@
   "tileheight": 8,
   "backgroundcolor": "#10111b",
   "nextlayerid": 2,
-  "nextobjectid": 20,
+  "nextobjectid": 21,
   "layers": [
     {
       "id": 1,
@@ -36,7 +36,14 @@
           "x": 39,
           "y": 82,
           "width": 13,
-          "height": 24
+          "height": 24,
+          "properties": [
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Exit lamp"
+            }
+          ]
         },
         {
           "id": 3,
@@ -84,7 +91,7 @@
           "point": true,
           "properties": [
             {
-              "name": "fixed",
+              "name": "releaseInLight",
               "type": "bool",
               "value": true
             },
@@ -230,7 +237,7 @@
             {
               "name": "radius",
               "type": "int",
-              "value": 70
+              "value": 57
             }
           ]
         },
@@ -287,6 +294,23 @@
           "y": 106,
           "width": 31,
           "height": 4
+        },
+        {
+          "id": 20,
+          "name": "Exit lamp",
+          "type": "Socket",
+          "x": 56,
+          "y": 106,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 30
+            }
+          ]
         }
       ]
     }

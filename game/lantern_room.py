@@ -44,10 +44,12 @@ class LanternRoom:
                     and all(float(value).is_integer() for value in (obj.x, obj.y, obj.width, obj.height))):
                 raise MapFormatError("Room rectangles need whole-pixel coordinates and positive size inside the map")
         ground = CollisionWorld(self.ground)
+        terrain = CollisionWorld(self.terrain)
         for obj in (*self.sockets, self.start):
+            surface = ground if obj is self.start else terrain
             if not (isfinite(obj.x) and self.WIDTH / 2 <= obj.x <= data.width - self.WIDTH / 2
-                    and ground.supported(obj.x, obj.y, self.WIDTH)):
-                raise MapFormatError("Starts and sockets must be on a Ground surface")
+                    and surface.supported(obj.x, obj.y, self.WIDTH)):
+                raise MapFormatError("The start needs ground and sockets need a supporting surface")
         for socket in self.sockets:
             radius = socket.properties.get("radius", self.RADIUS)
             if type(radius) not in (int, float) or not isfinite(radius) or radius <= 0:
@@ -69,6 +71,10 @@ class LanternRoom:
                     raise MapFormatError("Focus radius must be positive")
             self.aims[projector.name] = targets
         self.receivers = tuple(o for o in data.objects if o.kind == "Receiver")
+        required_socket = self.exit.properties.get("socket")
+        self.exit_socket = data.object_named(required_socket) if required_socket else None
+        if self.exit_socket is not None and self.exit_socket not in self.sockets:
+            raise MapFormatError("Exit socket must refer to a socket")
         self.switches = tuple(o for o in data.objects if o.kind == "ProjectorSwitch")
         if any(o.properties.get("projector") not in self.aims for o in self.switches):
             raise MapFormatError("A projector switch must name an existing projector")
@@ -90,8 +96,8 @@ class LanternRoom:
         self.chute_targets = {}
         for chute in self.chutes:
             target = data.object_named(chute.properties.get("socket"))
-            if target not in self.sockets or not target.properties.get("fixed") or target.y <= chute.y:
-                raise MapFormatError("A chute must lead to a fixed socket below it")
+            if target not in self.sockets or target.y <= chute.y:
+                raise MapFormatError("A chute must lead to a socket below it")
             self.chute_targets[chute.name] = target
         self.reset()
 
@@ -166,6 +172,19 @@ class LanternRoom:
         return (self.x + self.WIDTH / 2 > obj.x and self.x - self.WIDTH / 2 < obj.x + obj.width
                 and self.y > obj.y and self.y - self.HEIGHT < obj.y + obj.height)
 
+    def socket_locked(self, socket):
+        if socket.properties.get("fixed"):
+            return True
+        if socket is self.socket and socket.properties.get("releaseInLight"):
+            return not self.receiver_lit(socket)
+        return False
+
+    @property
+    def exit_ready(self):
+        return (len(self.collected) == len(self.keys)
+                and (self.exit_socket is None or self.socket is self.exit_socket)
+                and all(self.receiver_lit(receiver) for receiver in self.receivers))
+
     def interaction(self):
         if not self.grounded or self.complete:
             return None
@@ -173,7 +192,7 @@ class LanternRoom:
         chutes = tuple(o for o in self.chutes
                        if not self.in_transit and (self.socket is None or self.socket is self.chute_targets[o.name]))
         candidates = self.projectors + self.switches + chutes + tuple(
-            o for o in sockets if not o.properties.get("fixed"))
+            o for o in sockets if not self.socket_locked(o))
         return min((o for o in candidates if abs(self.x - o.x) <= 9 and abs(self.y - o.y) <= 2),
                    key=lambda o: abs(self.x - o.x), default=None)
 
@@ -218,8 +237,7 @@ class LanternRoom:
         for index, key in enumerate(self.keys):
             if index not in self.collected and any(self._touches(part) for part in self.exposed(key)):
                 self.collected.add(index)
-        self.complete = (landed and len(self.collected) == len(self.keys)
-                         and all(self.receiver_lit(receiver) for receiver in self.receivers)
+        self.complete = (landed and self.exit_ready
                          and self.exit.x <= self.x <= self.exit.x + self.exit.width
                          and self.exit.y <= self.y <= self.exit.y + self.exit.height
                          and self.illuminated(self.x, self.y))

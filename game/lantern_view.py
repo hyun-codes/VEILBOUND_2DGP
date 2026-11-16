@@ -109,10 +109,14 @@ class LanternView:
                        key.x + key.width / 2 - 7, key.y + key.height - 10, 14, 10)
 
         door = room.exit
-        sprite("props/exit_door.png", (13 if room.complete else 0, 0, 13, 24),
+        door_open = room.complete or (room.exit_socket is not None and room.exit_ready)
+        sprite("props/exit_door.png", (13 if door_open else 0, 0, 13, 24),
                door.x, door.y, door.width, door.height)
         for socket in room.sockets:
             sprite("props/lantern_socket.png", (0, 0, 10, 7), socket.x - 5, socket.y - 7, 10, 7)
+            if socket.properties.get("releaseInLight"):
+                open_cell = 9 if room.receiver_lit(socket) else 0
+                sprite("props/lens_receiver.png", (open_cell, 0, 9, 11), socket.x + 6, socket.y - 11, 9, 11)
         for fixture in room.fixtures:
             sprite("props/lantern.png", (0, 0, 7, 9), fixture.x - 3, fixture.y - 5, 7, 9)
         for chute in room.chutes:
