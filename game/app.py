@@ -1,4 +1,4 @@
-"""VEILBOUND의 첫 등불 퍼즐 실행과 입력 처리."""
+"""VEILBOUND의 타이틀, 플레이 화면과 입력 처리."""
 
 import argparse
 from pathlib import Path
@@ -9,6 +9,7 @@ from game.lantern_view import LanternView
 from game.map_loader import MapFormatError, load_map
 from game.pico2d_backend import Pico2DBackend
 from game.timing import FixedStepper
+from game.title_screen import TitleScreen
 
 
 STAGE_1 = Path(__file__).resolve().parents[1] / "maps/stage_01/stage1_lantern_room.tmj"
@@ -23,7 +24,8 @@ WIDTH, HEIGHT = 800, 600
 
 def run(room, frames, screenshot, next_room=None):
     backend = Pico2DBackend()
-    view = LanternView(room, WIDTH, HEIGHT)
+    title = TitleScreen() if room is None else None
+    view = LanternView(room, WIDTH, HEIGHT) if room is not None else None
     stepper = FixedStepper()
     keys = set()
     pending = set()
@@ -47,7 +49,7 @@ def run(room, frames, screenshot, next_room=None):
             now = perf_counter()
             elapsed, previous = now - previous, now
             for event in backend.poll_events():
-                if event.kind == "quit" or (event.kind == "key_down" and event.key == "escape"):
+                if event.kind == "quit":
                     return
                 if event.kind in ("focus_lost", "focus_gained"):
                     paused = event.kind == "focus_lost"
@@ -55,7 +57,23 @@ def run(room, frames, screenshot, next_room=None):
                     pending.clear()
                     stepper.reset()
                     elapsed = 0.0
-                elif event.kind == "key_up":
+                    continue
+                if title is not None:
+                    if not paused:
+                        action = title.handle(event)
+                        if action == "quit":
+                            return
+                        if action == "play":
+                            room = LanternRoom(load_map(STAGE_1))
+                            view = LanternView(room, WIDTH, HEIGHT)
+                            next_room = 2
+                            title = None
+                            elapsed = 0.0
+                            break
+                    continue
+                if event.kind == "key_down" and event.key == "escape":
+                    return
+                if event.kind == "key_up":
                     keys.discard(event.key)
                 elif event.kind == "key_down" and not paused and event.key not in keys:
                     keys.add(event.key)
@@ -67,9 +85,12 @@ def run(room, frames, screenshot, next_room=None):
                         elapsed = 0.0
                     elif event.key in ("space", "e"):
                         pending.add(event.key)
-            if not paused:
-                stepper.advance(elapsed, step)
-            view.draw(backend)
+            if title is not None:
+                title.draw(backend, 0.0 if paused else elapsed)
+            else:
+                if not paused:
+                    stepper.advance(elapsed, step)
+                view.draw(backend)
             count += 1
             if screenshot and count == frames:
                 backend.save_screenshot(screenshot, WIDTH, HEIGHT)
@@ -81,7 +102,7 @@ def run(room, frames, screenshot, next_room=None):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="VEILBOUND - lantern puzzle")
-    parser.add_argument("--stage", type=int, choices=STAGES, default=1)
+    parser.add_argument("--stage", type=int, choices=STAGES)
     parser.add_argument("--check-map", action="store_true")
     parser.add_argument("--frames", type=int)
     parser.add_argument("--screenshot", type=Path)
@@ -91,10 +112,13 @@ def main(argv=None):
     if args.screenshot and (args.frames is None or args.screenshot.suffix.lower() != ".bmp"):
         parser.error("--screenshot requires --frames and a .bmp output path")
     try:
-        room = LanternRoom(load_map(STAGES[args.stage]))
         if args.check_map:
+            room = LanternRoom(load_map(STAGES[args.stage or 1]))
             print(f"Map OK: {room.data.width}x{room.data.height}, {len(room.platforms)} light platforms")
+        elif args.stage is None:
+            run(None, args.frames, args.screenshot)
         else:
+            room = LanternRoom(load_map(STAGES[args.stage]))
             run(room, args.frames, args.screenshot, args.stage + 1 if args.stage + 1 in STAGES else None)
         return 0
     except (MapFormatError, OSError, RuntimeError, ValueError, KeyError, TypeError) as exc:

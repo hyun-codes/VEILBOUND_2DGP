@@ -8,6 +8,8 @@ import ctypes
 class InputEvent:
     kind: str
     key: str = ""
+    x: int = 0
+    y: int = 0
 
 
 class Pico2DBackend:
@@ -17,6 +19,8 @@ class Pico2DBackend:
         import sdl2
         self.pico, self.native, self.sdl = pico2d, native, sdl2
         self.images = {}
+        self.fonts = {}
+        self.labels = {}
         self.opened = False
 
     def open(self, width, height):
@@ -31,6 +35,10 @@ class Pico2DBackend:
 
     def close(self):
         self.images.clear()
+        self.labels.clear()
+        for font in self.fonts.values():
+            self.native.TTF_CloseFont(font.font)
+        self.fonts.clear()
         if self.opened:
             self.pico.close_canvas()
             self.opened = False
@@ -39,6 +47,8 @@ class Pico2DBackend:
         sdl = self.sdl
         key_names = {sdl.SDLK_ESCAPE: "escape", sdl.SDLK_LEFT: "left",
                      sdl.SDLK_RIGHT: "right",
+                     sdl.SDLK_UP: "up", sdl.SDLK_DOWN: "down", sdl.SDLK_RETURN: "enter",
+                     sdl.SDLK_KP_ENTER: "enter", sdl.SDLK_w: "w", sdl.SDLK_s: "s",
                      sdl.SDLK_r: "r",
                      sdl.SDLK_SPACE: "space", sdl.SDLK_a: "a", sdl.SDLK_d: "d",
                      sdl.SDLK_e: "e"}
@@ -54,6 +64,10 @@ class Pico2DBackend:
                     result.append(InputEvent("focus_gained"))
                 elif event.window.event == sdl.SDL_WINDOWEVENT_CLOSE:
                     result.append(InputEvent("quit"))
+            elif event.type == sdl.SDL_MOUSEMOTION:
+                result.append(InputEvent("hover", x=event.motion.x, y=self.pico.get_canvas_height() - event.motion.y - 1))
+            elif event.type == sdl.SDL_MOUSEBUTTONDOWN and event.button.button == sdl.SDL_BUTTON_LEFT:
+                result.append(InputEvent("click", x=event.button.x, y=self.pico.get_canvas_height() - event.button.y - 1))
             elif event.type in (sdl.SDL_KEYDOWN, sdl.SDL_KEYUP) and not event.key.repeat:
                 key = key_names.get(event.key.keysym.sym)
                 if key:
@@ -92,6 +106,28 @@ class Pico2DBackend:
 
     def present(self):
         self.pico.update_canvas()
+
+    def text(self, path, size, value, x, y, color):
+        key = path, size, value, color
+        label = self.labels.get(key)
+        if label is None:
+            font_key = path, size
+            if font_key not in self.fonts:
+                self.fonts[font_key] = self.pico.load_font(str(path), size)
+            font = self.fonts[font_key]
+            surface = self.native.TTF_RenderUTF8_Blended(
+                font.font, value.encode("utf-8"), self.sdl.SDL_Color(*color, 255))
+            if not surface:
+                raise RuntimeError(f"Could not rasterize menu text: {value}")
+            try:
+                texture = self.sdl.SDL_CreateTextureFromSurface(self.native.renderer, surface)
+            finally:
+                self.sdl.SDL_FreeSurface(surface)
+            if not texture:
+                raise RuntimeError(f"Could not load menu label: {value}")
+            label = self.native.Image(texture)
+            self.labels[key] = label
+        label.draw(x, y)
 
     def save_screenshot(self, path, width, height):
         """점검용: present 전에 실제 SDL back buffer를 BMP로 저장한다."""

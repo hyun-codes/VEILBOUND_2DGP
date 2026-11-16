@@ -1,5 +1,7 @@
 # 에셋
 
+타이틀 저수조 배경은 `ui/title_reservoir.png`에 있다. 타이틀에서 사용하는 [Cinzel 라이선스](ui/fonts/Cinzel-OFL.txt)는 글꼴과 함께 넣었다.
+
 Stage 1 전용 배경과 공용으로 쓸 수 있는 지형·소품 PNG를 직접 제작했다. 좌표와 충돌은 Tiled의 방 데이터가 결정한다.
 
 - `environments/stage_01/pump_hall.png`는 방 크기에 맞춘 264×200 배경이다.
