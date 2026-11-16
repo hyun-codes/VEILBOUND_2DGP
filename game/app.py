@@ -14,7 +14,8 @@ from game.timing import FixedStepper
 STAGE_1 = Path(__file__).resolve().parents[1] / "maps/stage_01/stage1_lantern_room.tmj"
 STAGE_2 = STAGE_1.parent.parent / "stage_02/stage2_rail_light.tmj"
 STAGE_3 = STAGE_1.parent.parent / "stage_03/stage3_crossed_lenses.tmj"
-STAGES = {1: STAGE_1, 2: STAGE_2, 3: STAGE_3}
+STAGE_4 = STAGE_1.parent.parent / "stage_04/stage4_lantern_chute.tmj"
+STAGES = {1: STAGE_1, 2: STAGE_2, 3: STAGE_3, 4: STAGE_4}
 WIDTH, HEIGHT = 800, 600
 
 

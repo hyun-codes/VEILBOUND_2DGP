@@ -113,12 +113,18 @@ class LanternView:
                door.x, door.y, door.width, door.height)
         for socket in room.sockets:
             sprite("props/lantern_socket.png", (0, 0, 10, 7), socket.x - 5, socket.y - 7, 10, 7)
+        for fixture in room.fixtures:
+            sprite("props/lantern.png", (0, 0, 7, 9), fixture.x - 3, fixture.y - 5, 7, 9)
+        for chute in room.chutes:
+            sprite("props/lantern_chute.png", (0, 0, 14, 15), chute.x - 7, chute.y - 15, 14, 15)
+        for switch in room.switches:
+            sprite("props/projector_stand.png", (0, 0, 15, 16), switch.x - 7, switch.y - 16, 15, 16)
         for receiver in room.receivers:
             sprite("props/lens_receiver.png", (9 if room.receiver_lit(receiver) else 0, 0, 9, 11),
                    receiver.x - 4, receiver.y - 5, 9, 11)
 
         lx, ly, radius = room.light
-        if room.rail or room.projectors:
+        if len(room.lights) > 1:
             draw_combined_darkness(backend, self.camera, room.lights)
         else:
             draw_darkness(backend, self.camera, lx, ly, radius)

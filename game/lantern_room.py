@@ -20,6 +20,7 @@ class LanternRoom:
     CARRY_RADIUS = 46
     START_RADIUS = 39
     PROJECTOR_TURN = 0.60
+    CHUTE_TRAVEL = 0.70
     WIDTH, HEIGHT = 6, 13
 
     def __init__(self, data):
@@ -68,6 +69,30 @@ class LanternRoom:
                     raise MapFormatError("Focus radius must be positive")
             self.aims[projector.name] = targets
         self.receivers = tuple(o for o in data.objects if o.kind == "Receiver")
+        self.switches = tuple(o for o in data.objects if o.kind == "ProjectorSwitch")
+        if any(o.properties.get("projector") not in self.aims for o in self.switches):
+            raise MapFormatError("A projector switch must name an existing projector")
+        self.selected_focus = {}
+        for control in self.projectors + self.switches:
+            if focus := control.properties.get("selectFocus"):
+                targets = self.aims[control.properties.get("projector", control.name)]
+                indices = [i for i, o in enumerate(targets) if o.name == focus]
+                if len(indices) != 1:
+                    raise MapFormatError("A control must name one of its projector's focus points")
+                self.selected_focus[control.name] = indices[0]
+        self.fixtures = tuple(o for o in data.objects if o.kind == "FixedLight")
+        self.fixed_lights = tuple((o.x, o.y, o.properties.get("radius", 0)) for o in self.fixtures)
+        if any(type(r) not in (int, float) or not isfinite(r) or r <= 0
+               or not (0 <= x < data.width and 0 <= y < data.height)
+               for x, y, r in self.fixed_lights):
+            raise MapFormatError("A fixed light needs an in-bounds position and positive radius")
+        self.chutes = tuple(o for o in data.objects if o.kind == "Chute")
+        self.chute_targets = {}
+        for chute in self.chutes:
+            target = data.object_named(chute.properties.get("socket"))
+            if target not in self.sockets or not target.properties.get("fixed") or target.y <= chute.y:
+                raise MapFormatError("A chute must lead to a fixed socket below it")
+            self.chute_targets[chute.name] = target
         self.reset()
 
     def reset(self):
@@ -82,9 +107,15 @@ class LanternRoom:
         self.elapsed = 0.0
         self.aim_indices = dict.fromkeys(self.aims, 0)
         self.turning = {}
+        self.in_transit = None
 
     @property
     def light(self):
+        if self.in_transit:
+            chute, target, started = self.in_transit
+            progress = min(1.0, (self.elapsed - started) / self.CHUTE_TRAVEL)
+            return (chute.x + (target.x - chute.x) * progress,
+                    chute.y - 10 + (target.y - chute.y) * progress ** 2, self.CARRY_RADIUS)
         if self.socket is None:
             return self.x + 6 * self.facing, self.y - 7, self.CARRY_RADIUS
         radius = self.socket.properties.get(
@@ -94,7 +125,7 @@ class LanternRoom:
     @property
     def lights(self):
         bases = (self.light, self.rail.at(self.elapsed)) if self.rail else (self.light,)
-        return bases + self.projected_lights
+        return bases + self.fixed_lights + self.projected_lights
 
     @property
     def projected_lights(self):
@@ -138,8 +169,11 @@ class LanternRoom:
     def interaction(self):
         if not self.grounded or self.complete:
             return None
-        sockets = (self.socket,) if self.socket else self.sockets
-        candidates = self.projectors + tuple(o for o in sockets if not o.properties.get("fixed"))
+        sockets = () if self.in_transit else (self.socket,) if self.socket else self.sockets
+        chutes = tuple(o for o in self.chutes
+                       if not self.in_transit and (self.socket is None or self.socket is self.chute_targets[o.name]))
+        candidates = self.projectors + self.switches + chutes + tuple(
+            o for o in sockets if not o.properties.get("fixed"))
         return min((o for o in candidates if abs(self.x - o.x) <= 9 and abs(self.y - o.y) <= 2),
                    key=lambda o: abs(self.x - o.x), default=None)
 
@@ -147,13 +181,23 @@ class LanternRoom:
         if self.complete:
             return
         self.elapsed += dt
+        if self.in_transit and self.elapsed - self.in_transit[2] >= self.CHUTE_TRAVEL:
+            self.socket = self.in_transit[1]
+            self.in_transit = None
         if direction:
             self.facing = direction
         if interact and (target := self.interaction()):
-            if target.kind == "Projector":
-                name = target.name
-                self.turning[name] = self.projected_light(name), self.elapsed
-                self.aim_indices[name] = (self.aim_indices[name] + 1) % len(self.aims[name])
+            if target.kind in ("Projector", "ProjectorSwitch"):
+                name = target.name if target.kind == "Projector" else target.properties["projector"]
+                index = self.selected_focus.get(target.name, (self.aim_indices[name] + 1) % len(self.aims[name]))
+                if index != self.aim_indices[name]:
+                    self.turning[name] = self.projected_light(name), self.elapsed
+                    self.aim_indices[name] = index
+            elif target.kind == "Chute":
+                if self.socket is None:
+                    self.in_transit = target, self.chute_targets[target.name], self.elapsed
+                else:
+                    self.socket = None
             else:
                 self.socket = None if self.socket else target
         collision = self.collision()

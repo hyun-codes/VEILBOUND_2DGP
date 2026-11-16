@@ -1,0 +1,294 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 33,
+  "height": 25,
+  "tilewidth": 8,
+  "tileheight": 8,
+  "backgroundcolor": "#10111b",
+  "nextlayerid": 2,
+  "nextobjectid": 20,
+  "layers": [
+    {
+      "id": 1,
+      "type": "objectgroup",
+      "name": "Lantern chute",
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 1,
+          "name": "PlayerStart",
+          "type": "Spawn",
+          "x": 107,
+          "y": 80,
+          "width": 0,
+          "height": 0,
+          "point": true
+        },
+        {
+          "id": 2,
+          "name": "Exit",
+          "type": "Exit",
+          "x": 39,
+          "y": 82,
+          "width": 13,
+          "height": 24
+        },
+        {
+          "id": 3,
+          "name": "Upper gallery",
+          "type": "Ground",
+          "x": 0,
+          "y": 80,
+          "width": 194,
+          "height": 6
+        },
+        {
+          "id": 4,
+          "name": "Lower gallery",
+          "type": "Ground",
+          "x": 42,
+          "y": 151,
+          "width": 164,
+          "height": 12
+        },
+        {
+          "id": 5,
+          "name": "Hand lamp",
+          "type": "Socket",
+          "x": 122,
+          "y": 80,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "initial",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "name": "Lower cradle",
+          "type": "Socket",
+          "x": 148,
+          "y": 151,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "fixed",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 55
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "name": "Pilot lamp",
+          "type": "FixedLight",
+          "x": 132,
+          "y": 73,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 49
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "name": "Shaft lamp",
+          "type": "Chute",
+          "x": 148,
+          "y": 80,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Lower cradle"
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "name": "Guide projector",
+          "type": "Projector",
+          "x": 101,
+          "y": 80,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "selectFocus",
+              "type": "string",
+              "value": "Descending gallery"
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "name": "Lower return lever",
+          "type": "ProjectorSwitch",
+          "x": 168,
+          "y": 151,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Guide projector"
+            },
+            {
+              "name": "selectFocus",
+              "type": "string",
+              "value": "Return stair"
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "name": "Shutter illumination",
+          "type": "Focus",
+          "x": 185,
+          "y": 56,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Guide projector"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 48
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "name": "Descending gallery",
+          "type": "Focus",
+          "x": 190,
+          "y": 107,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Guide projector"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 31
+            }
+          ]
+        },
+        {
+          "id": 13,
+          "name": "Return stair",
+          "type": "Focus",
+          "x": 105,
+          "y": 131,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Guide projector"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 70
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "name": "Hanging shutter",
+          "type": "Wall",
+          "x": 182,
+          "y": 24,
+          "width": 6,
+          "height": 51
+        },
+        {
+          "id": 15,
+          "name": "Vault key",
+          "type": "Key",
+          "x": 185,
+          "y": 144,
+          "width": 6,
+          "height": 7
+        },
+        {
+          "id": 16,
+          "name": "Return landing",
+          "type": "LightPlatform",
+          "x": 109,
+          "y": 139,
+          "width": 22,
+          "height": 4
+        },
+        {
+          "id": 17,
+          "name": "Return middle",
+          "type": "LightPlatform",
+          "x": 83,
+          "y": 127,
+          "width": 24,
+          "height": 4
+        },
+        {
+          "id": 18,
+          "name": "Return upper",
+          "type": "LightPlatform",
+          "x": 60,
+          "y": 115,
+          "width": 22,
+          "height": 4
+        },
+        {
+          "id": 19,
+          "name": "Exit ledge",
+          "type": "LightPlatform",
+          "x": 30,
+          "y": 106,
+          "width": 31,
+          "height": 4
+        }
+      ]
+    }
+  ]
+}
