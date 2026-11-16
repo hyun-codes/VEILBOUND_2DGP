@@ -111,7 +111,7 @@ class LanternView:
                        key.x + key.width / 2 - 7, key.y + key.height - 10, 14, 10)
 
         door = room.exit
-        door_open = room.complete or (room.exit_socket is not None and room.exit_ready)
+        door_open = room.complete or (bool(room.exit_socket or room.beacons) and room.exit_ready)
         sprite("props/exit_door.png", (13 if door_open else 0, 0, 13, 24),
                door.x, door.y, door.width, door.height)
         for socket in room.sockets:
@@ -128,6 +128,12 @@ class LanternView:
         for receiver in room.receivers:
             sprite("props/lens_receiver.png", (9 if room.receiver_lit(receiver) else 0, 0, 9, 11),
                    receiver.x - 4, receiver.y - 5, 9, 11)
+        for i, (name, (beacon, _)) in enumerate(room.beacons.items()):
+            frame = 11 if name in room.lit_beacons else 0
+            sprite("props/vault_beacon.png", (frame, 0, 11, 14),
+                   beacon.x - 5, beacon.y - 14, 11, 14)
+            sprite("props/vault_beacon.png", (frame + 4, 4, 3, 3),
+                   door.x - 2 + i % 3 * 6, door.y - 9 + i // 3 * 4, 3, 3)
 
         lx, ly, radius = room.light
         if len(room.lights) > 1:

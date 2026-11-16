@@ -13,3 +13,5 @@
 
 [Stage 3 교차 렌즈](stage_03/stage3_crossed_lenses.tmj)는 중앙 조작대에서 두 갈래 열쇠 경로와 위쪽 출구를 비추는 방이다. `Projector` 옆에서 E를 누를 때마다 같은 이름을 `projector` 속성에 적은 `Focus` 지점을 맵 순서대로 바꾼다. 렌즈와 빛은 약 0.6초에 걸쳐 돌아가며, 지형 충돌도 움직이는 빛을 따라 바뀐다. 각 목표점의 `radius`는 비출 범위다. `Receiver`는 투광기 빛을 받으면 켜지며, 출구는 두 열쇠와 모든 수광부가 필요하다. `fixed=true`가 붙은 시작 등불은 중앙 조작대를 비춘다.
 [Stage 4 화물 승강로](stage_04/stage4_counterweight.tmj)는 위층 상자를 아래층에 내려보낸 뒤 오른쪽 출구 턱까지 옮기는 방이다. `PushCrate` 사각형은 빛이 닿으면 밟을 수 있고, 플레이어가 양손을 비우고 밀면 움직인다. 등불을 상자 위에 놓으면 상자와 함께 이동한다. [등불 투입구](stage_04/stage4_lantern_chute.tmj)는 이전 배치의 검증용으로 보존한다.
+
+[Stage 5 점등실](stage_05/stage5_beacon_vault.tmj)은 왼쪽 계단과 오른쪽 수조를 돌며 등잔 여섯 개를 켜는 방이다. `Beacon`은 발판 위의 고유 이름을 가진 점 오브젝트다. 다른 광원이 심지(점 좌표에서 8픽셀 위)를 비추고 가까이서 E를 누르면 `radius` 범위를 비춘다. 출구 위 표시 순서는 Tiled 오브젝트 순서를 따르며 재시작하면 등잔도 초기화된다. 점등을 유지해 출구를 여는 발상은 [Closure 에필로그 공략](https://gamefaqs.gamespot.com/ps3/643242-closure/faqs/67183)을 참고했다.

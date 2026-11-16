@@ -105,6 +105,16 @@ class LanternRoom:
             if target not in self.sockets or target.y <= chute.y:
                 raise MapFormatError("A chute must lead to a socket below it")
             self.chute_targets[chute.name] = target
+        beacons = tuple(o for o in data.objects if o.kind == "Beacon")
+        self.beacons = {o.name: (o, o.properties.get("radius")) for o in beacons}
+        if len(self.beacons) != len(beacons) or "" in self.beacons:
+            raise MapFormatError("Beacons need unique names")
+        for beacon, radius in self.beacons.values():
+            if not (type(radius) in (int, float) and isfinite(radius) and radius > 0
+                    and self.WIDTH / 2 <= beacon.x <= data.width - self.WIDTH / 2
+                    and 8 <= beacon.y <= data.height
+                    and terrain.supported(beacon.x, beacon.y, self.WIDTH)):
+                raise MapFormatError("A beacon needs a supporting surface and positive radius")
         self.reset()
 
     def reset(self):
@@ -116,6 +126,7 @@ class LanternRoom:
         self.complete = False
         self.socket = self.initial_socket
         self.collected = set()
+        self.lit_beacons = set()
         self.elapsed = 0.0
         self.aim_indices = dict.fromkeys(self.aims, 0)
         self.turning = {}
@@ -147,7 +158,9 @@ class LanternRoom:
     @property
     def lights(self):
         bases = (self.light, self.rail.at(self.elapsed)) if self.rail else (self.light,)
-        return bases + self.fixed_lights + self.projected_lights
+        return bases + self.fixed_lights + self.projected_lights + tuple(
+            (beacon.x, beacon.y - 8, radius)
+            for name, (beacon, radius) in self.beacons.items() if name in self.lit_beacons)
 
     @property
     def projected_lights(self):
@@ -218,6 +231,7 @@ class LanternRoom:
     @property
     def exit_ready(self):
         return (len(self.collected) == len(self.keys)
+                and len(self.lit_beacons) == len(self.beacons)
                 and (self.exit_socket is None or self.socket is self.exit_socket)
                 and all(self.receiver_lit(receiver) for receiver in self.receivers))
 
@@ -234,6 +248,9 @@ class LanternRoom:
                        if self.carrying_lantern or self.socket is self.chute_targets[o.name])
         candidates = self.projectors + self.switches + chutes + tuple(
             o for o in sockets if not self.socket_locked(o))
+        candidates += tuple(beacon for name, (beacon, _) in self.beacons.items()
+                            if name not in self.lit_beacons
+                            and self.illuminated(beacon.x, beacon.y - 8))
         return min((o for o in candidates if abs(self.x - o.x) <= 9 and abs(self.y - o.y) <= 2),
                    key=lambda o: abs(self.x - o.x), default=None)
 
@@ -246,6 +263,8 @@ class LanternRoom:
         elif target.kind == "LooseLantern":
             self.loose_lantern = None
             self.lantern_vy = 0.0
+        elif target.kind == "Beacon":
+            self.lit_beacons.add(target.name)
         elif target.kind in ("Projector", "ProjectorSwitch"):
             name = target.name if target.kind == "Projector" else target.properties["projector"]
             next_index = (self.aim_indices[name] + 1) % len(self.aims[name])
