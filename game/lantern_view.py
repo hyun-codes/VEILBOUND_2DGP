@@ -13,8 +13,7 @@ MASK_SIZE = 221
 CHAIN_FRAMES = 8
 CHAIN_FRAME_TRAVEL = 1.5
 DEATH_KICK = ((4, -1), (-3, 1), (2, -1), (-1, 0))
-SHOCK_DURATION = 0.18
-DEATH_FADE_START = 0.30
+DEATH_FADE_START = 0.36
 
 
 def draw_darkness(backend, camera, x, y, radius):
@@ -189,9 +188,9 @@ class LanternView:
         x, y = round(room.x), round(room.y)
         if room.death_elapsed is not None:
             frame = min(5, int(6 * room.death_elapsed / room.DEATH_DURATION))
-            sheet = "characters/player/shadow_child_death.png"
+            sheet = "characters/player/raincoat_child_death.png"
         else:
-            sheet = "characters/player/shadow_child.png"
+            sheet = "characters/player/raincoat_child.png"
             if not room.grounded:
                 frame = 5 if room.vy < 0 else 6
             elif room.walk_time:
@@ -215,10 +214,6 @@ class LanternView:
             for offset in (0, 2, 4):
                 rect(sx, sy + offset, 3, 1, (255, 221, 170))
 
-        if death is not None and death < SHOCK_DURATION:
-            frame = int(5 * death / SHOCK_DURATION)
-            sprite("props/death_shock.png", (frame * 29, 0, 29, 29),
-                   x - 14, y - room.CHEST_HEIGHT - 14, 29, 29)
         if death is not None and death >= DEATH_FADE_START:
             fade = (death - DEATH_FADE_START) / (room.DEATH_DURATION - DEATH_FADE_START)
             backend.overlay((0, 0, self.camera.width, self.camera.height), (0, 0, 0, round(255 * fade)))
