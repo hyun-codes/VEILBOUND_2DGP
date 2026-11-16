@@ -7,6 +7,11 @@ from game.map_loader import load_map
 
 class RelayGateTest(unittest.TestCase):
     def test_crosses_dark_wall_and_returns_to_power_exit(self):
+        for drop_x in (55, 63):
+            with self.subTest(drop_x=drop_x):
+                self.solve_with_orb_at(drop_x)
+
+    def solve_with_orb_at(self, drop_x):
         room = LanternRoom(load_map(STAGE_6))
         relay_switch, = room.switches
 
@@ -29,8 +34,19 @@ class RelayGateTest(unittest.TestCase):
         go(36)
         settle(interact=True)
         self.assertFalse(wall_blocks())
-        go(70)
-        self.assertTrue(room.receiver_lit(room.switch_relays[relay_switch.name]))
+        self.assertFalse(room.collision().supported(70, 150, room.WIDTH))
+        go(24)
+        settle(interact=True)
+        self.assertTrue(room.carrying_lantern)
+        go(100)
+        self.assertTrue(wall_blocks())
+        go(drop_x)
+        settle(interact=True)
+        self.assertIsNotNone(room.loose_lantern)
+        self.assertTrue(room.collision().supported(70, 150, room.WIDTH))
+        self.assertFalse(wall_blocks())
+        go(74)
+        self.assertFalse(room.receiver_lit(room.switch_relays[relay_switch.name]))
         self.assertIsNone(room.interaction())
         settle(interact=True)
         self.assertFalse(room.exit_ready)
@@ -44,7 +60,7 @@ class RelayGateTest(unittest.TestCase):
         go(128)
         go(101, jump=True)
         settle()
-        go(70)
+        go(74)
         self.assertEqual(room.interaction(), relay_switch)
         settle(interact=True)
         self.assertIsNone(room.interaction())

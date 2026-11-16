@@ -119,23 +119,6 @@
           ]
         },
         {
-          "id": 9,
-          "name": "West oil lamp",
-          "type": "FixedLight",
-          "x": 55,
-          "y": 141,
-          "width": 0,
-          "height": 0,
-          "point": true,
-          "properties": [
-            {
-              "name": "radius",
-              "type": "int",
-              "value": 38
-            }
-          ]
-        },
-        {
           "id": 10,
           "name": "East oil lamp",
           "type": "FixedLight",
@@ -205,8 +188,8 @@
           "id": 14,
           "name": "Crossing aim",
           "type": "Focus",
-          "x": 88,
-          "y": 144,
+          "x": 103,
+          "y": 149,
           "width": 0,
           "height": 0,
           "point": true,
@@ -219,7 +202,7 @@
             {
               "name": "radius",
               "type": "int",
-              "value": 23
+              "value": 8
             }
           ]
         },

@@ -20,4 +20,4 @@
 
 5스테이지의 `Sluice fittings` 이미지 레이어는 왼쪽 칸막이의 철제 테두리, 오른쪽 덮개와 하부 수조의 배관을 그린다. 덮개 위치를 바꿀 때는 이미지와 `East hatch` 충돌 사각형을 함께 맞춘다.
 
-[Stage 6 연동 수문](stage_06/stage6_relay_gate.tmj)은 투광기로 칸막이의 통과 구간을 만들고 건너편 조명을 되돌려 왼쪽 수광부를 켜는 방이다. `ProjectorSwitch`의 `relay`는 `Relay` 점 오브젝트의 이름이다. 스위치에 연결된 투광기가 수광부를 비출 때만 E 입력을 받는다. 출구의 `Receiver`는 출구 앞 조명 전환을 확인한다. 왕복하며 조명의 역할을 바꾸는 구조는 [Closure 연옥 4-2 영상](https://www.youtube.com/watch?v=S4ZaDFn8dgI)을 참고했다.
+[Stage 6 연동 수문](stage_06/stage6_relay_gate.tmj)은 왼쪽 통로에 광원 구슬을 내려놓아 왕복할 바닥을 유지하고, 칸막이가 어두울 때 건너는 방이다. `ProjectorSwitch`의 `relay`는 `Relay` 점 오브젝트의 이름이다. 스위치에 연결된 투광기가 수광부를 비출 때만 E 입력을 받는다. 출구의 `Receiver`는 출구 앞 조명 전환을 확인한다. 구슬을 남겨 두고 양쪽 조명을 조정하는 구조는 [Closure 연옥 4-2 영상](https://www.youtube.com/watch?v=S4ZaDFn8dgI&t=3s)을 참고했다.
