@@ -11,7 +11,7 @@ Stage 1 전용 배경과 공용으로 쓸 수 있는 지형·소품 PNG를 직�
 
 Stage 2의 발판은 `tiles/stage_02/`의 기계 부품 세 종류를 사용한다. 구부러진 배관은 완만한 계단, 깨진 기어는 가파른 층계, 터빈 날개는 기울어진 착지면으로 그렸다. Tiled에서 볼 수 있는 발판 배치와 충돌 윤곽은 [맵 편집 안내](../maps/README.md)에 있다.
 
-Stage 2의 사슬과 톱니는 `environments/stage_02/hoist_chain.png`에 그려져 있다. `props/chain_carriage.png`는 사슬을 따라 움직이는 13×13 광원 운반대다.
+Stage 2의 `environments/stage_02/hoist_chain.png`는 사슬과 톱니의 131×75 프레임 여덟 개를 담는다. 애니메이션은 운반대와 함께 멈추고 방향을 바꾼다. `props/chain_carriage.png`는 사슬을 따라 움직이는 13×13 광원 운반대다.
 
 Stage 3의 투광기는 `props/projector_stand.png`와 회전하는 구리·은색 렌즈 헤드로 구성한다. `props/lens_receiver.png`의 두 셀은 벽에 붙은 수광부의 소등·점등 상태다.
 

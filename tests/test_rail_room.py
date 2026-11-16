@@ -1,7 +1,9 @@
 import unittest
+from unittest.mock import Mock
 
 from game.app import STAGE_2
 from game.lantern_room import LanternRoom
+from game.lantern_view import LanternView
 from game.map_loader import load_map
 
 
@@ -61,3 +63,22 @@ class RailRoomTest(unittest.TestCase):
         self.act(round(self.room.rail.period * 60) + 1)
         self.assertEqual((self.room.x, self.room.y), origin)
         self.assertTrue(self.room.grounded)
+
+    def test_chain_animation_follows_carriage_motion_and_pause(self):
+        view = LanternView(self.room, 800, 600)
+        rail = self.room.rail
+
+        def chain_frame(elapsed):
+            self.room.elapsed = elapsed
+            backend = Mock()
+            view.draw(backend)
+            source, = (call.args[1] for call in backend.image.call_args_list
+                       if call.args[0].name == "hoist_chain.png")
+            return source
+
+        self.assertEqual(chain_frame(0), chain_frame(rail.pause / 2))
+        first = chain_frame(rail.pause + 0.10)
+        second = chain_frame(rail.pause + 0.20)
+        self.assertNotEqual(first, second)
+        self.assertEqual(second, chain_frame(rail.period - 0.20))
+        self.assertEqual(first, chain_frame(rail.period - 0.10))

@@ -10,6 +10,8 @@ from game.lantern_room import light_span
 ASSETS = Path(__file__).resolve().parents[1] / "assets"
 DARKNESS_MASK = ASSETS / "environments/stage_01/lantern_darkness.png"
 MASK_SIZE = 221
+CHAIN_FRAMES = 8
+CHAIN_FRAME_TRAVEL = 1.5
 
 
 def draw_darkness(backend, camera, x, y, radius):
@@ -80,15 +82,17 @@ class LanternView:
         backend.begin(room.data.background)
         sprite("environments/stage_01/pump_hall.png", (0, 0, 264, 200), 0, 0, room.data.width, room.data.height)
         for part in room.data.sprites:
-            if part.visual_role == "underlay":
-                backend.image(part.image, part.source,
+            if part.visual_role == "hoist_chain":
+                sx, sy, sw, sh = part.source
+                frame = int(room.rail.distance_at(room.elapsed) / CHAIN_FRAME_TRAVEL) % CHAIN_FRAMES
+                backend.image(part.image, (sx + frame * sw, sy, sw, sh),
                               self.camera.screen_rect(part.x, part.y, part.width, part.height))
         for ground in room.ground:
             ledge("tiles/stone_ledge.png", ground, 16)
         for p in room.platforms:
             ledge("tiles/lantern_ledge.png", p, 5)
         for part in room.data.sprites:
-            if part.visual_role != "underlay":
+            if part.visual_role != "hoist_chain":
                 backend.image(part.image, part.source,
                               self.camera.screen_rect(part.x, part.y, part.width, part.height))
         for prop in room.props:

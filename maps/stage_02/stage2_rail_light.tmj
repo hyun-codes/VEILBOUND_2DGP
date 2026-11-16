@@ -10,7 +10,7 @@
   "tileheight": 8,
   "backgroundcolor": "#10111b",
   "nextlayerid": 4,
-  "nextobjectid": 20,
+  "nextobjectid": 21,
   "properties": [
     {
       "name": "railRadius",
@@ -32,27 +32,30 @@
     {
       "firstgid": 1,
       "source": "../tilesets/stage2_machinery.tsj"
+    },
+    {
+      "firstgid": 4,
+      "source": "../tilesets/hoist_chain.tsj"
     }
   ],
   "layers": [
     {
       "id": 3,
       "name": "Hoist chain",
-      "type": "imagelayer",
+      "type": "objectgroup",
       "x": 0,
       "y": 0,
-      "offsetx": 24,
-      "offsety": 88,
       "visible": true,
       "opacity": 1,
-      "image": "../../assets/environments/stage_02/hoist_chain.png",
-      "imagewidth": 131,
-      "imageheight": 75,
-      "properties": [
+      "objects": [
         {
-          "name": "visualRole",
-          "type": "string",
-          "value": "underlay"
+          "id": 20,
+          "name": "Hoist chain",
+          "gid": 4,
+          "x": 24,
+          "y": 163,
+          "width": 131,
+          "height": 75
         }
       ]
     },

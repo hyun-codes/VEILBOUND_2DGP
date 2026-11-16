@@ -1,0 +1,27 @@
+{
+  "type": "tileset",
+  "version": "1.10",
+  "name": "Hoist chain frames",
+  "tilewidth": 131,
+  "tileheight": 75,
+  "tilecount": 8,
+  "columns": 8,
+  "spacing": 0,
+  "margin": 0,
+  "objectalignment": "bottomleft",
+  "image": "../../assets/environments/stage_02/hoist_chain.png",
+  "imagewidth": 1048,
+  "imageheight": 75,
+  "tiles": [
+    {
+      "id": 0,
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "hoist_chain"
+        }
+      ]
+    }
+  ]
+}
