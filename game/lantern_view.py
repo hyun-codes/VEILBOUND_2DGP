@@ -120,7 +120,7 @@ class LanternView:
                 open_cell = 9 if room.receiver_lit(socket) else 0
                 sprite("props/lens_receiver.png", (open_cell, 0, 9, 11), socket.x + 6, socket.y - 11, 9, 11)
         for fixture in room.fixtures:
-            sprite("props/lantern.png", (0, 0, 7, 9), fixture.x - 3, fixture.y - 5, 7, 9)
+            sprite("props/light_orb.png", (7, 0, 7, 9), fixture.x - 3, fixture.y - 4, 7, 9)
         for chute in room.chutes:
             sprite("props/lantern_chute.png", (0, 0, 14, 15), chute.x - 7, chute.y - 15, 14, 15)
         for switch in room.switches:
@@ -164,10 +164,14 @@ class LanternView:
             frame = 1 + int(room.walk_time * 12) % 4
         else:
             frame = 0
-        sprite("characters/player/lantern_keeper.png", (frame * 16, 0, 16, 18),
-               x - 8, y - 16, 16, 18, flip=room.facing < 0)
+        sprite("characters/player/shadow_child.png", (frame * 21, 0, 21, 22),
+               x - 10, y - 20, 21, 22, flip=room.facing < 0)
 
-        sprite("props/lantern.png", (0, 0, 7, 9), lx - 3, ly - 5, 7, 9)
+        if room.carrying_lantern:
+            sprite("props/light_orb.png", (16, 2, 3, 3),
+                   round(lx) - 1, round(ly) - 1, 3, 3)
+        else:
+            sprite("props/light_orb.png", (0, 0, 7, 7), round(lx) - 3, round(ly) - 3, 7, 7)
         if target := room.interaction():
             sx, sy = target.x - 2, target.y - 22
             if relay := room.switch_relays.get(target.name):

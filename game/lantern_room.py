@@ -23,6 +23,7 @@ class LanternRoom:
     PROJECTOR_TURN = 0.60
     CHUTE_TRAVEL = 0.70
     WIDTH, HEIGHT = 6, 13
+    CHEST_HEIGHT = 7
     LANTERN_WIDTH, LANTERN_HEIGHT = 5, 9
 
     def __init__(self, data):
@@ -157,7 +158,7 @@ class LanternRoom:
             return (chute.x + (target.x - chute.x) * progress,
                     chute.y - 10 + (target.y - chute.y) * progress ** 2, self.CARRY_RADIUS)
         if self.socket is None:
-            return self.x + 6 * self.facing, self.y - 7, self.CARRY_RADIUS
+            return self.x, self.y - self.CHEST_HEIGHT, self.CARRY_RADIUS
         radius = self.socket.properties.get(
             "radius", self.START_RADIUS if self.socket is self.initial_socket else self.RADIUS)
         return self.socket.x, self.socket.y - 10, radius

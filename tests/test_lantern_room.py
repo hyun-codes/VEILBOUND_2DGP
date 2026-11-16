@@ -28,7 +28,7 @@ class LanternRoomTest(unittest.TestCase):
         self.press(interact=True)
         self.assertIsNone(room.socket)
         self.move(45, 1)
-        self.assertEqual(room.light, (room.x + 6, room.y - 7, room.CARRY_RADIUS))
+        self.assertEqual(room.light, (room.x, room.y - room.CHEST_HEIGHT, room.CARRY_RADIUS))
         self.press(interact=True)
         self.assertEqual(room.light, (100, 132, room.RADIUS))
         self.assertEqual(self.lit_platforms(), [True, True])
@@ -65,6 +65,17 @@ class LanternRoomTest(unittest.TestCase):
         self.assertGreater(self.room.x, 130)
         self.assertEqual(self.room.y, self.room.start.y)
         self.assertTrue(self.room.grounded)
+
+    def test_orb_stays_at_the_chest_when_turning_and_jumping(self):
+        room = self.room
+        self.move(20, 1)
+        self.press(interact=True)
+        for direction in (-1, 1):
+            self.press(direction=direction)
+            self.assertEqual(room.light[:2], (room.x, room.y - room.CHEST_HEIGHT))
+        self.press(jump=True)
+        self.assertFalse(room.grounded)
+        self.assertEqual(room.light[:2], (room.x, room.y - room.CHEST_HEIGHT))
 
     def test_lantern_can_be_left_between_sockets_and_picked_up_again(self):
         room = self.room
