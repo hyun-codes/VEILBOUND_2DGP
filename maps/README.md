@@ -17,3 +17,5 @@
 [Stage 5 점등실](stage_05/stage5_beacon_vault.tmj)은 왼쪽 계단과 오른쪽 수조를 돌며 등잔 여섯 개를 켜는 방이다. `Beacon`은 발판 위의 고유 이름을 가진 점 오브젝트다. 다른 광원이 심지(점 좌표에서 8픽셀 위)를 비추고 가까이서 E를 누르면 `radius` 범위를 비춘다. 출구 위 표시 순서는 Tiled 오브젝트 순서를 따르며 재시작하면 등잔도 초기화된다. 점등을 유지해 출구를 여는 발상은 [Closure 에필로그 공략](https://gamefaqs.gamespot.com/ps3/643242-closure/faqs/67183)을 참고했다.
 
 5스테이지의 `Sluice fittings` 이미지 레이어는 왼쪽 칸막이의 철제 테두리, 오른쪽 덮개와 하부 수조의 배관을 그린다. 덮개 위치를 바꿀 때는 이미지와 `East hatch` 충돌 사각형을 함께 맞춘다.
+
+[Stage 6 연동 수문](stage_06/stage6_relay_gate.tmj)은 투광기로 칸막이의 통과 구간을 만들고 건너편 조명을 되돌려 왼쪽 수광부를 켜는 방이다. `ProjectorSwitch`의 `relay`는 `Relay` 점 오브젝트의 이름이다. 스위치에 연결된 투광기가 수광부를 비출 때만 E 입력을 받는다. 출구의 `Receiver`는 출구 앞 조명 전환을 확인한다. 왕복하며 조명의 역할을 바꾸는 구조는 [Closure 연옥 4-2 영상](https://www.youtube.com/watch?v=S4ZaDFn8dgI)을 참고했다.

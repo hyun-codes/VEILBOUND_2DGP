@@ -84,6 +84,13 @@ class LanternRoom:
         self.switches = tuple(o for o in data.objects if o.kind == "ProjectorSwitch")
         if any(o.properties.get("projector") not in self.aims for o in self.switches):
             raise MapFormatError("A projector switch must name an existing projector")
+        self.switch_relays = {}
+        for switch in self.switches:
+            if "relay" in switch.properties:
+                relay = data.object_named(switch.properties["relay"])
+                if relay.kind != "Relay" or not (0 <= relay.x < data.width and 0 <= relay.y < data.height):
+                    raise MapFormatError("A projector switch relay must be an in-bounds Relay")
+                self.switch_relays[switch.name] = relay
         self.selected_focus = {}
         for control in self.projectors + self.switches:
             if focus := control.properties.get("selectFocus"):
@@ -177,9 +184,14 @@ class LanternRoom:
         ease = t * t * (3 - 2 * t)
         return tuple(a + (b - a) * ease for a, b in zip(origin, destination))
 
-    def receiver_lit(self, receiver):
+    def receiver_lit(self, receiver, *, projector=None):
+        lights = self.projected_lights if projector is None else (self.projected_light(projector),)
         return any((receiver.x - x) ** 2 + (receiver.y - y) ** 2 <= radius ** 2
-                   for x, y, radius in self.projected_lights)
+                   for x, y, radius in lights)
+
+    def relay_lit(self, switch):
+        return self.receiver_lit(self.switch_relays[switch.name],
+                                 projector=switch.properties["projector"])
 
     def illuminated(self, x, y):
         return any((x - lx) ** 2 + (y - ly) ** 2 <= radius ** 2 for lx, ly, radius in self.lights)
@@ -246,7 +258,9 @@ class LanternRoom:
         sockets = self.sockets if self.carrying_lantern else (self.socket,) if self.socket else ()
         chutes = tuple(o for o in self.chutes
                        if self.carrying_lantern or self.socket is self.chute_targets[o.name])
-        candidates = self.projectors + self.switches + chutes + tuple(
+        switches = tuple(s for s in self.switches
+                         if s.name not in self.switch_relays or self.relay_lit(s))
+        candidates = self.projectors + switches + chutes + tuple(
             o for o in sockets if not self.socket_locked(o))
         candidates += tuple(beacon for name, (beacon, _) in self.beacons.items()
                             if name not in self.lit_beacons

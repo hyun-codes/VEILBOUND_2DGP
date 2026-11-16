@@ -111,7 +111,7 @@ class LanternView:
                        key.x + key.width / 2 - 7, key.y + key.height - 10, 14, 10)
 
         door = room.exit
-        door_open = room.complete or (bool(room.exit_socket or room.beacons) and room.exit_ready)
+        door_open = room.complete or (bool(room.exit_socket or room.beacons or room.switch_relays) and room.exit_ready)
         sprite("props/exit_door.png", (13 if door_open else 0, 0, 13, 24),
                door.x, door.y, door.width, door.height)
         for socket in room.sockets:
@@ -125,6 +125,9 @@ class LanternView:
             sprite("props/lantern_chute.png", (0, 0, 14, 15), chute.x - 7, chute.y - 15, 14, 15)
         for switch in room.switches:
             sprite("props/projector_stand.png", (0, 0, 15, 16), switch.x - 7, switch.y - 16, 15, 16)
+            if relay := room.switch_relays.get(switch.name):
+                sprite("props/lens_receiver.png", (9 if room.relay_lit(switch) else 0, 0, 9, 11),
+                       relay.x - 4, relay.y - 5, 9, 11)
         for receiver in room.receivers:
             sprite("props/lens_receiver.png", (9 if room.receiver_lit(receiver) else 0, 0, 9, 11),
                    receiver.x - 4, receiver.y - 5, 9, 11)
@@ -167,6 +170,8 @@ class LanternView:
         sprite("props/lantern.png", (0, 0, 7, 9), lx - 3, ly - 5, 7, 9)
         if target := room.interaction():
             sx, sy = target.x - 2, target.y - 22
+            if relay := room.switch_relays.get(target.name):
+                sy = min(sy, relay.y - 15)
             rect(sx - 2, sy - 2, 8, 9, (20, 19, 29))
             rect(sx, sy, 1, 5, (255, 221, 170))
             for offset in (0, 2, 4):

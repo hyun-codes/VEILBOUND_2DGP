@@ -1,0 +1,373 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 33,
+  "height": 25,
+  "tilewidth": 8,
+  "tileheight": 8,
+  "backgroundcolor": "#10111b",
+  "nextlayerid": 4,
+  "nextobjectid": 22,
+  "layers": [
+    {
+      "id": 1,
+      "name": "Terrain",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 1,
+          "name": "West service floor",
+          "type": "Ground",
+          "x": 12,
+          "y": 150,
+          "width": 92,
+          "height": 9
+        },
+        {
+          "id": 2,
+          "name": "East service floor",
+          "type": "Ground",
+          "x": 125,
+          "y": 150,
+          "width": 72,
+          "height": 9
+        },
+        {
+          "id": 3,
+          "name": "Hanging bulkhead",
+          "type": "Wall",
+          "x": 112,
+          "y": 72,
+          "width": 7,
+          "height": 83
+        },
+        {
+          "id": 4,
+          "name": "First exit step",
+          "type": "LightPlatform",
+          "x": 198,
+          "y": 132,
+          "width": 18,
+          "height": 5
+        },
+        {
+          "id": 5,
+          "name": "Exit balcony",
+          "type": "LightPlatform",
+          "x": 225,
+          "y": 114,
+          "width": 34,
+          "height": 7
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Light controls",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 6,
+          "name": "PlayerStart",
+          "type": "Spawn",
+          "x": 45,
+          "y": 150,
+          "width": 0,
+          "height": 0,
+          "point": true
+        },
+        {
+          "id": 7,
+          "name": "Exit",
+          "type": "Exit",
+          "x": 236,
+          "y": 90,
+          "width": 13,
+          "height": 24
+        },
+        {
+          "id": 8,
+          "name": "Starting lantern",
+          "type": "Socket",
+          "x": 24,
+          "y": 150,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "initial",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 28
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "name": "West oil lamp",
+          "type": "FixedLight",
+          "x": 55,
+          "y": 141,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 38
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "name": "East oil lamp",
+          "type": "FixedLight",
+          "x": 157,
+          "y": 141,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 37
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "name": "Bulkhead marker lamp",
+          "type": "FixedLight",
+          "x": 114,
+          "y": 83,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 18
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "name": "West projector",
+          "type": "Projector",
+          "x": 36,
+          "y": 150,
+          "width": 0,
+          "height": 0,
+          "point": true
+        },
+        {
+          "id": 13,
+          "name": "Bulkhead aim",
+          "type": "Focus",
+          "x": 114,
+          "y": 125,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "West projector"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 32
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "name": "Crossing aim",
+          "type": "Focus",
+          "x": 88,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "West projector"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 23
+            }
+          ]
+        },
+        {
+          "id": 15,
+          "name": "East projector",
+          "type": "Projector",
+          "x": 170,
+          "y": 150,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "selectFocus",
+              "type": "string",
+              "value": "Relay aim"
+            }
+          ]
+        },
+        {
+          "id": 16,
+          "name": "Idle aim",
+          "type": "Focus",
+          "x": 182,
+          "y": 119,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "East projector"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 18
+            }
+          ]
+        },
+        {
+          "id": 17,
+          "name": "Relay aim",
+          "type": "Focus",
+          "x": 70,
+          "y": 130,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "East projector"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 16
+            }
+          ]
+        },
+        {
+          "id": 18,
+          "name": "Exit aim",
+          "type": "Focus",
+          "x": 231,
+          "y": 110,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "East projector"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 38
+            }
+          ]
+        },
+        {
+          "id": 19,
+          "name": "West relay lens",
+          "type": "Relay",
+          "x": 70,
+          "y": 132,
+          "width": 0,
+          "height": 0,
+          "point": true
+        },
+        {
+          "id": 20,
+          "name": "West relay switch",
+          "type": "ProjectorSwitch",
+          "x": 70,
+          "y": 150,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "East projector"
+            },
+            {
+              "name": "selectFocus",
+              "type": "string",
+              "value": "Exit aim"
+            },
+            {
+              "name": "relay",
+              "type": "string",
+              "value": "West relay lens"
+            }
+          ]
+        },
+        {
+          "id": 21,
+          "name": "Exit lens",
+          "type": "Receiver",
+          "x": 243,
+          "y": 87,
+          "width": 0,
+          "height": 0,
+          "point": true
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Relay fittings",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 31,
+      "offsety": 73,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/stage_06/relay_fittings.png",
+      "imagewidth": 223,
+      "imageheight": 85
+    }
+  ]
+}
