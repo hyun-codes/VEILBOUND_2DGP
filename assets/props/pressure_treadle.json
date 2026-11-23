@@ -1,0 +1,12 @@
+{
+  "image": "pressure_treadle.png",
+  "canvas": [32, 32],
+  "source": [3, 13, 26, 11],
+  "anchor": "pressure-plate center, floor level",
+  "pressed_offset_y": 2,
+  "generator": "PixelLab Pixflux",
+  "job_id": "19d2a21b-72bc-41e0-94b8-18c6446ac0a9",
+  "palette_reference": "projector_head_silver.png",
+  "background": "transparent",
+  "description": "Weathered iron treadle and twin mechanical supports for the pump-house setting. Native pixels, no runtime shape drawing."
+}
