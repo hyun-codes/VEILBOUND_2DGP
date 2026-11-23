@@ -1,0 +1,405 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 33,
+  "height": 25,
+  "tilewidth": 8,
+  "tileheight": 8,
+  "backgroundcolor": "#101018",
+  "layers": [
+    {
+      "id": 1,
+      "name": "Common",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/stage_06/reservoir_hall.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Terrain",
+      "type": "objectgroup",
+      "objects": [
+        {
+          "id": 1,
+          "name": "Service floor",
+          "type": "Ground",
+          "x": 8,
+          "y": 184,
+          "width": 248,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 2,
+          "name": "Bulkhead",
+          "type": "Wall",
+          "x": 130,
+          "y": 92,
+          "width": 12,
+          "height": 92,
+          "properties": []
+        },
+        {
+          "id": 3,
+          "name": "Return gallery",
+          "type": "LightPlatform",
+          "x": 8,
+          "y": 80,
+          "width": 121,
+          "height": 6,
+          "properties": []
+        },
+        {
+          "id": 4,
+          "name": "Right lower stair",
+          "type": "LightPlatform",
+          "x": 202,
+          "y": 160,
+          "width": 46,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 5,
+          "name": "Right middle stair",
+          "type": "LightPlatform",
+          "x": 176,
+          "y": 136,
+          "width": 30,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 6,
+          "name": "Right beacon stair",
+          "type": "LightPlatform",
+          "x": 154,
+          "y": 112,
+          "width": 30,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 7,
+          "name": "Bridge over bulkhead",
+          "type": "LightPlatform",
+          "x": 130,
+          "y": 88,
+          "width": 28,
+          "height": 5,
+          "properties": []
+        }
+      ],
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1
+    },
+    {
+      "id": 3,
+      "name": "Objects",
+      "type": "objectgroup",
+      "objects": [
+        {
+          "id": 8,
+          "name": "PlayerStart",
+          "type": "Spawn",
+          "x": 24,
+          "y": 184,
+          "width": 0,
+          "height": 0,
+          "properties": []
+        },
+        {
+          "id": 9,
+          "name": "Starting cradle",
+          "type": "Socket",
+          "x": 28,
+          "y": 184,
+          "width": 0,
+          "height": 0,
+          "properties": [
+            {
+              "name": "initial",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 55
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "name": "Cargo",
+          "type": "PushCrate",
+          "x": 46,
+          "y": 168,
+          "width": 16,
+          "height": 16,
+          "properties": []
+        },
+        {
+          "id": 11,
+          "name": "Weight treadle",
+          "type": "PressurePlate",
+          "x": 78,
+          "y": 184,
+          "width": 16,
+          "height": 3,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Balance lamp"
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "name": "Balance lamp",
+          "type": "Projector",
+          "x": 86,
+          "y": 184,
+          "width": 0,
+          "height": 0,
+          "properties": []
+        },
+        {
+          "id": 13,
+          "name": "Bulkhead rest",
+          "type": "Focus",
+          "x": 129,
+          "y": 125,
+          "width": 0,
+          "height": 0,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Balance lamp"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 50
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "name": "Loaded stair",
+          "type": "Focus",
+          "x": 213,
+          "y": 160,
+          "width": 0,
+          "height": 0,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Balance lamp"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 70
+            }
+          ]
+        },
+        {
+          "id": 15,
+          "name": "Return beacon",
+          "type": "Beacon",
+          "x": 180,
+          "y": 112,
+          "width": 0,
+          "height": 0,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 112
+            }
+          ]
+        },
+        {
+          "id": 16,
+          "name": "Upper gallery pilot",
+          "type": "FixedLight",
+          "x": 38,
+          "y": 67,
+          "width": 0,
+          "height": 0,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 40
+            }
+          ]
+        },
+        {
+          "id": 17,
+          "name": "East key",
+          "type": "Key",
+          "x": 233,
+          "y": 153,
+          "width": 7,
+          "height": 7,
+          "properties": []
+        },
+        {
+          "id": 18,
+          "name": "Upper west key",
+          "type": "Key",
+          "x": 32,
+          "y": 73,
+          "width": 7,
+          "height": 7,
+          "properties": []
+        },
+        {
+          "id": 19,
+          "name": "Rest receiver",
+          "type": "Receiver",
+          "x": 129,
+          "y": 105,
+          "width": 0,
+          "height": 0,
+          "properties": []
+        },
+        {
+          "id": 20,
+          "name": "Exit",
+          "type": "Exit",
+          "x": 13,
+          "y": 160,
+          "width": 13,
+          "height": 24,
+          "properties": [
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Starting cradle"
+            }
+          ]
+        },
+        {
+          "id": 21,
+          "name": "Floor pilot 30",
+          "type": "FixedLight",
+          "x": 30,
+          "y": 199,
+          "width": 0,
+          "height": 0,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 32
+            }
+          ]
+        },
+        {
+          "id": 22,
+          "name": "Floor pilot 82",
+          "type": "FixedLight",
+          "x": 82,
+          "y": 199,
+          "width": 0,
+          "height": 0,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 32
+            }
+          ]
+        },
+        {
+          "id": 23,
+          "name": "Floor pilot 134",
+          "type": "FixedLight",
+          "x": 134,
+          "y": 199,
+          "width": 0,
+          "height": 0,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 32
+            }
+          ]
+        },
+        {
+          "id": 24,
+          "name": "Floor pilot 186",
+          "type": "FixedLight",
+          "x": 186,
+          "y": 199,
+          "width": 0,
+          "height": 0,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 32
+            }
+          ]
+        },
+        {
+          "id": 25,
+          "name": "Floor pilot 238",
+          "type": "FixedLight",
+          "x": 238,
+          "y": 199,
+          "width": 0,
+          "height": 0,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 32
+            }
+          ]
+        }
+      ],
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1
+    }
+  ],
+  "nextlayerid": 4,
+  "nextobjectid": 26,
+  "properties": [
+    {
+      "name": "title",
+      "type": "string",
+      "value": "The weight of light"
+    },
+    {
+      "name": "stage",
+      "type": "int",
+      "value": 6
+    }
+  ]
+}

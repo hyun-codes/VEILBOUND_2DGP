@@ -7,7 +7,7 @@ from game.map_loader import load_map
 
 class FloodedReservoirTest(unittest.TestCase):
     def setUp(self):
-        self.room = LanternRoom(load_map(STAGE_6))
+        self.room = LanternRoom(load_map(STAGE_6.with_name('stage6_flooded_reservoir.tmj')))
         self.west, self.east = self.room.floods
 
     def act(self, frames=1, direction=0, *, jump=False, interact=False):
