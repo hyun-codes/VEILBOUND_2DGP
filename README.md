@@ -13,7 +13,7 @@ A/D 또는 좌우 방향키로 이동하고 Space로 점프한다. 광원 구슬
 
 첫 방에서 광원 구슬을 들면 근처 받침대와 바닥이 드러난다. 바닥과 발판은 빛이 닿는 부분만 밟을 수 있다. 다른 받침대에 놓으면 빛이 더 멀리 닿는다.
 
-기본 진행은 Stage 1 광원의 방, Stage 2 왕복 탐조등, Stage 3 교차 렌즈, Stage 4 화물 승강로, Stage 5 점등실, Stage 6 하중 주조실, Stage 7 역하중 회랑, Stage 8 화물 연동실, Stage 9 최종 저수조 순서다. 새 방은 `python main.py --stage 6`으로 바로 시험하며 마지막 숫자를 7, 8, 9로 바꿀 수 있다. 후반부는 무게로 투광기를 움직이는 압력판을 추가한다. [편집 파일과 설계 근거](maps/late_stage_design.md)에 상세 내용을 기록했다.
+기본 진행은 Stage 1 광원의 방, Stage 2 왕복 탐조등, Stage 3 교차 렌즈, Stage 4 화물 승강로, Stage 5 점등실, Stage 6 하중 주조실, Stage 7 역하중 회랑, Stage 8 화물 연동실, Stage 9 회전 공방 순서다. 새 방은 `python main.py --stage 6`으로 바로 시험하며 마지막 숫자를 7, 8, 9로 바꿀 수 있다. 후반부는 무게로 투광기를 움직이는 압력판을 추가한다. [편집 파일과 설계 근거](maps/late_stage_design.md)에 상세 내용을 기록했다.
 
 Stage 5에서는 빛이 닿은 등잔에 다가가 E를 누르면 점등된다.
 
@@ -23,3 +23,5 @@ Stage 4에서는 광원 구슬을 내려놓고 A/D로 상자에 붙어 걸으면
 - [Tiled 맵](maps/stage_01/stage1_lantern_room.tmj)
 - [맵 편집 안내](maps/README.md)
 - [이전 버전](https://github.com/hyun-codes/VEILBOUND_2DGP/tree/6217a1a38e8b72c7476d2d62ce08eae345344f0a)
+
+9스테이지 손잡이에서는 E로 회전 조작에 들어가고 A/D 또는 좌우 방향키로 방을 90도씩 돌린다. E를 다시 누르면 이동한다. [회전 공방 기록](maps/stage_09/README.md)을 참고한다.

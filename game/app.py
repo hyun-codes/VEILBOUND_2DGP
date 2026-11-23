@@ -20,7 +20,7 @@ STAGE_5 = STAGE_1.parent.parent / "stage_05/stage5_beacon_vault.tmj"
 STAGE_6 = STAGE_1.parent.parent / "stage_06/stage6_pressure_foundry.tmj"
 STAGE_7 = STAGE_1.parent.parent / "stage_07/stage7_reverse_foundry.tmj"
 STAGE_8 = STAGE_1.parent.parent / "stage_08/stage8_freight_interlock.tmj"
-STAGE_9 = STAGE_1.parent.parent / "stage_09/stage9_reservoir_interlock.tmj"
+STAGE_9 = STAGE_1.parent.parent / "stage_09/stage9_clockwork_chamber.tmj"
 STAGES = {1: STAGE_1, 2: STAGE_2, 3: STAGE_3, 4: STAGE_4, 5: STAGE_5,
           6: STAGE_6, 7: STAGE_7, 8: STAGE_8, 9: STAGE_9}
 WIDTH, HEIGHT = 800, 600

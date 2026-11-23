@@ -1,0 +1,419 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 33,
+  "height": 25,
+  "tilewidth": 8,
+  "tileheight": 8,
+  "backgroundcolor": "#101018",
+  "layers": [
+    {
+      "id": 1,
+      "name": "Common",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/stage_01/pump_hall.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Terrain",
+      "type": "objectgroup",
+      "objects": [
+        {
+          "id": 1,
+          "name": "Crank gallery",
+          "type": "Ground",
+          "x": 8,
+          "y": 170,
+          "width": 76,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 2,
+          "name": "Recovery floor",
+          "type": "Ground",
+          "x": 80,
+          "y": 184,
+          "width": 144,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 3,
+          "name": "Exit gallery",
+          "type": "LightPlatform",
+          "x": 224,
+          "y": 60,
+          "width": 36,
+          "height": 8,
+          "properties": []
+        },
+        {
+          "id": 9,
+          "name": "Outside lower stair",
+          "type": "LightPlatform",
+          "x": 12,
+          "y": 148,
+          "width": 22,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 10,
+          "name": "Outside middle stair",
+          "type": "LightPlatform",
+          "x": 42,
+          "y": 126,
+          "width": 22,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 11,
+          "name": "Outside upper dock",
+          "type": "LightPlatform",
+          "x": 64,
+          "y": 104,
+          "width": 20,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 12,
+          "name": "Middle shelf left",
+          "type": "RotatingPlatform",
+          "x": 128,
+          "y": 118,
+          "width": 10,
+          "height": 6,
+          "properties": []
+        },
+        {
+          "id": 13,
+          "name": "Middle shelf right",
+          "type": "RotatingPlatform",
+          "x": 148,
+          "y": 118,
+          "width": 20,
+          "height": 6,
+          "properties": []
+        },
+        {
+          "id": 14,
+          "name": "High outlet shelf",
+          "type": "RotatingPlatform",
+          "x": 172,
+          "y": 94,
+          "width": 36,
+          "height": 6,
+          "properties": []
+        },
+        {
+          "id": 15,
+          "name": "Isolated roof shelf",
+          "type": "RotatingPlatform",
+          "x": 100,
+          "y": 64,
+          "width": 32,
+          "height": 6,
+          "properties": []
+        },
+        {
+          "id": 16,
+          "name": "Low outlet shelf",
+          "type": "RotatingPlatform",
+          "x": 180,
+          "y": 144,
+          "width": 28,
+          "height": 6,
+          "properties": []
+        },
+        {
+          "id": 17,
+          "name": "Inner partition",
+          "type": "RotatingPlatform",
+          "x": 148,
+          "y": 52,
+          "width": 6,
+          "height": 42,
+          "properties": []
+        },
+        {
+          "id": 18,
+          "name": "Inner inlet step",
+          "type": "RotatingPlatform",
+          "x": 104,
+          "y": 98,
+          "width": 24,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 19,
+          "name": "Transfer rib",
+          "type": "RotatingPlatform",
+          "x": 140,
+          "y": 114,
+          "width": 6,
+          "height": 44,
+          "properties": []
+        },
+        {
+          "id": 20,
+          "name": "Outlet transfer rib",
+          "type": "RotatingPlatform",
+          "x": 128,
+          "y": 36,
+          "width": 6,
+          "height": 18,
+          "properties": []
+        }
+      ],
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1
+    },
+    {
+      "id": 3,
+      "name": "Objects",
+      "type": "objectgroup",
+      "objects": [
+        {
+          "id": 4,
+          "name": "PlayerStart",
+          "type": "Spawn",
+          "x": 22,
+          "y": 170,
+          "width": 0,
+          "height": 0,
+          "properties": []
+        },
+        {
+          "id": 5,
+          "name": "Starting cradle",
+          "type": "Socket",
+          "x": 48,
+          "y": 170,
+          "width": 0,
+          "height": 0,
+          "properties": [
+            {
+              "name": "initial",
+              "type": "bool",
+              "value": true
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 42
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "name": "Room crank",
+          "type": "RoomCrank",
+          "x": 26,
+          "y": 170,
+          "width": 0,
+          "height": 0,
+          "properties": []
+        },
+        {
+          "id": 7,
+          "name": "Crank pilot",
+          "type": "FixedLight",
+          "x": 10,
+          "y": 166,
+          "width": 0,
+          "height": 0,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 30
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "name": "Room axle",
+          "type": "RoomPivot",
+          "x": 148,
+          "y": 100,
+          "width": 0,
+          "height": 0,
+          "properties": [
+            {
+              "name": "size",
+              "type": "int",
+              "value": 128
+            },
+            {
+              "name": "frameSize",
+              "type": "int",
+              "value": 160
+            },
+            {
+              "name": "exitOrientation",
+              "type": "int",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": 21,
+          "name": "Roof key",
+          "type": "Key",
+          "x": 112,
+          "y": 55,
+          "width": 9,
+          "height": 9,
+          "properties": [
+            {
+              "name": "rotates",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 22,
+          "name": "Low key",
+          "type": "Key",
+          "x": 195,
+          "y": 137,
+          "width": 7,
+          "height": 7,
+          "properties": [
+            {
+              "name": "rotates",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 23,
+          "name": "High key",
+          "type": "Key",
+          "x": 192,
+          "y": 87,
+          "width": 7,
+          "height": 7,
+          "properties": [
+            {
+              "name": "rotates",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 24,
+          "name": "Outlet cradle",
+          "type": "Socket",
+          "x": 251,
+          "y": 60,
+          "width": 0,
+          "height": 0,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 32
+            }
+          ]
+        },
+        {
+          "id": 25,
+          "name": "Exit",
+          "type": "Exit",
+          "x": 235,
+          "y": 36,
+          "width": 13,
+          "height": 24,
+          "properties": [
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Outlet cradle"
+            }
+          ]
+        }
+      ],
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1
+    },
+    {
+      "id": 4,
+      "name": "Rotating frame art",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 68,
+      "offsety": 20,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/props/rotating_room_frame.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "rotating_frame"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Handwheel art",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 10,
+      "offsety": 117,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/props/room_handwheel.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "room_crank"
+        }
+      ]
+    }
+  ],
+  "nextlayerid": 6,
+  "nextobjectid": 26,
+  "properties": [
+    {
+      "name": "title",
+      "type": "string",
+      "value": "The room turns"
+    },
+    {
+      "name": "stage",
+      "type": "int",
+      "value": 9
+    }
+  ]
+}

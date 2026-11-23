@@ -1,0 +1,19 @@
+{
+  "generator": "PixelLab Pixflux",
+  "style_reference": "projector_head_silver.png",
+  "background": "transparent",
+  "assets": [
+    {
+      "image": "room_handwheel.png",
+      "size": [32, 32],
+      "job_id": "cc534152-6a56-48ee-8297-8bd7ca40671b",
+      "purpose": "Detached iron crank wheel, rotated around its axle"
+    },
+    {
+      "image": "rotating_room_frame.png",
+      "size": [160, 160],
+      "job_id": "34d45abc-5f5e-4d60-b68b-53eb3cc1957e",
+      "purpose": "Hollow iron chamber frame, rotated with internal platforms"
+    }
+  ]
+}

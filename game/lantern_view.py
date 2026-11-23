@@ -84,6 +84,35 @@ class LanternView:
                 sprite(path, (0, 0, width, tile_height), platform.x + offset, platform.y,
                        width, platform.height)
 
+        def draw_chamber():
+            chamber = room.chamber
+            sprite('props/rotating_room_frame.png', (0, 0, 160, 160),
+                   chamber.x - chamber.frame_size / 2, chamber.y - chamber.frame_size / 2,
+                   chamber.frame_size, chamber.frame_size, angle=-chamber.angle)
+            for part in room.rotating_platforms:
+                vertical = part.height > part.width
+                length = part.height if vertical else part.width
+                thickness = part.width if vertical else part.height
+                for offset in range(0, int(length), 16):
+                    width = min(16, int(length) - offset)
+                    x = part.x + (part.width / 2 if vertical else offset + width / 2)
+                    y = part.y + (offset + width / 2 if vertical else part.height / 2)
+                    cx, cy = chamber.animated_point(x, y, original=True)
+                    sprite('tiles/lantern_ledge.png', (0, 0, width, 5),
+                           cx - width / 2, cy - thickness / 2, width, thickness,
+                           angle=-chamber.angle - (tau / 4 if vertical else 0))
+
+        def draw_key(index, key):
+            if index in room.collected:
+                return
+            cx, cy = key.x + key.width / 2, key.y + key.height - 5
+            angle = 0
+            if room.chamber and key.properties.get('rotates'):
+                cy = key.y + key.height / 2
+                cx, cy = room.chamber.animated_point(cx, cy)
+                angle = -room.chamber.angle
+            sprite('props/brass_key.png', (0, 0, 14, 10), cx - 7, cy - 5, 14, 10, angle=angle)
+
         backend.begin(room.data.background)
         sprite("environments/stage_01/pump_hall.png", (0, 0, 264, 200), 0, 0, room.data.width, room.data.height)
         for part in room.data.sprites:
@@ -100,6 +129,8 @@ class LanternView:
                     tension = min(1.0, abs(distance - recent) / 2.5)
                     y += round(2 * sin(tau * distance / 21) * tension)
                 backend.image(part.image, (sx + frame * sw, sy, sw, sh), (x, y, w, h))
+        if room.chamber:
+            draw_chamber()
         for ground in room.ground:
             ledge("tiles/stone_ledge.png", ground, 16)
         for p in room.platforms:
@@ -109,7 +140,7 @@ class LanternView:
             sprite("props/pressure_treadle.png", (3, 13, 26, 11),
                    plate.x + plate.width / 2 - 13, plate.y - (1 if pressed else 3), 26, 11)
         for part in room.data.sprites:
-            if part.visual_role not in ("hoist_chain", "hoist_gears", "backdrop"):
+            if part.visual_role not in ("hoist_chain", "hoist_gears", "backdrop", 'rotating_frame', 'room_crank'):
                 backend.image(part.image, part.source,
                               self.camera.screen_rect(part.x, part.y, part.width, part.height))
         for prop in room.props:
@@ -121,9 +152,7 @@ class LanternView:
         if crate := room.crate:
             sprite("props/cargo_crate.png", (0, 0, 16, 16), crate.x, crate.y, crate.width, crate.height)
         for index, key in enumerate(room.keys):
-            if index not in room.collected:
-                sprite("props/brass_key.png", (0, 0, 14, 10),
-                       key.x + key.width / 2 - 7, key.y + key.height - 10, 14, 10)
+            draw_key(index, key)
 
         door = room.exit
         door_open = room.complete or (bool(room.exit_socket or room.beacons or room.switch_relays) and room.exit_ready)
@@ -181,6 +210,19 @@ class LanternView:
             draw_combined_darkness(backend, self.camera, room.lights)
         else:
             draw_darkness(backend, self.camera, lx, ly, radius)
+        if room.chamber and room.rotation_control:
+            draw_chamber()
+            for platform in room.platforms:
+                ledge('tiles/lantern_ledge.png', platform, 5)
+            sprite('props/exit_door.png', (13 if door_open else 0, 0, 13, 24),
+                   door.x, door.y, door.width, door.height)
+            for socket in room.sockets:
+                sprite('props/lantern_socket.png', (0, 0, 10, 7), socket.x-5, socket.y-7, 10, 7)
+            for index, key in enumerate(room.keys):
+                draw_key(index, key)
+        for crank in room.cranks:
+            sprite('props/room_handwheel.png', (0, 0, 32, 32), crank.x - 16, crank.y - 53,
+                   32, 32, angle=-room.chamber.angle if room.rotation_control else 0)
         for projector, (target_x, target_y, _) in zip(room.projectors, room.projected_lights):
             x, y = projector.x, projector.y
             copper = x < room.start.x
@@ -216,6 +258,8 @@ class LanternView:
             sprite("props/light_orb.png", (0, 0, 7, 7), round(lx) - 3, round(ly) - 3, 7, 7)
         if target := room.interaction():
             sx, sy = target.x - 2, target.y - 22
+            if target.kind == 'RoomCrank':
+                sy = target.y - 64
             if relay := room.switch_relays.get(target.name):
                 sy = min(sy, relay.y - 15)
             rect(sx - 2, sy - 2, 8, 9, (20, 19, 29))

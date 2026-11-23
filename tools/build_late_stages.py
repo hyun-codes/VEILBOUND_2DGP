@@ -20,14 +20,23 @@ def build(number, filename, title, objects, backdrop='stage_06/reservoir_hall.pn
     for index, (name, kind, x, y, width, height, props) in enumerate(objects, 1):
         obj = dict(id=index, name=name, type=kind, x=x, y=y, width=width, height=height)
         obj['properties'] = properties(props)
-        groups['Terrain' if kind in ('Ground', 'Wall', 'LightPlatform') else 'Objects'].append(obj)
+        groups['Terrain' if kind in ('Ground', 'Wall', 'LightPlatform', 'RotatingPlatform') else 'Objects'].append(obj)
     for index, (name, group) in enumerate(groups.items(), 2):
         layers.append(dict(id=index, name=name, type='objectgroup', objects=group,
                            x=0, y=0, visible=True, opacity=1))
+    if number == 9:
+        for name, image, x, y, role in [
+            ('Rotating frame art', 'rotating_room_frame.png', 68, 20, 'rotating_frame'),
+            ('Handwheel art', 'room_handwheel.png', 10, 117, 'room_crank'),
+        ]:
+            layers.append(dict(id=len(layers)+1, name=name, type='imagelayer', x=0, y=0,
+                               offsetx=x, offsety=y,
+                               visible=True, opacity=1, image='../../assets/props/'+image,
+                               properties=properties({'visualRole': role})))
     data = dict(type='map', version='1.10', tiledversion='1.10.2', orientation='orthogonal',
                 renderorder='right-down', infinite=False, width=33, height=25,
                 tilewidth=8, tileheight=8, backgroundcolor='#101018', layers=layers,
-                nextlayerid=4, nextobjectid=len(objects)+1,
+                nextlayerid=len(layers)+1, nextobjectid=len(objects)+1,
                 properties=properties({'title': title, 'stage': number}))
     path = ROOT / f'maps/stage_{number:02d}' / filename
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
@@ -131,8 +140,38 @@ def reservoir():
     return result
 
 
+def rotating_room():
+    return [
+        obj('Crank gallery', 'Ground', 8, 170, 76, 12),
+        obj('Recovery floor', 'Ground', 80, 184, 144, 12),
+        obj('Exit gallery', 'LightPlatform', 224, 60, 36, 8),
+        obj('PlayerStart', 'Spawn', 22, 170),
+        obj('Starting cradle', 'Socket', 48, 170, initial=True, radius=42),
+        obj('Room crank', 'RoomCrank', 26, 170),
+        obj('Crank pilot', 'FixedLight', 10, 166, radius=30),
+        obj('Room axle', 'RoomPivot', 148, 100, size=128, frameSize=160, exitOrientation=1),
+        obj('Outside lower stair', 'LightPlatform', 12, 148, 22, 5),
+        obj('Outside middle stair', 'LightPlatform', 42, 126, 22, 5),
+        obj('Outside upper dock', 'LightPlatform', 64, 104, 20, 5),
+        obj('Middle shelf left', 'RotatingPlatform', 128, 118, 10, 6),
+        obj('Middle shelf right', 'RotatingPlatform', 148, 118, 20, 6),
+        obj('High outlet shelf', 'RotatingPlatform', 172, 94, 36, 6),
+        obj('Isolated roof shelf', 'RotatingPlatform', 100, 64, 32, 6),
+        obj('Low outlet shelf', 'RotatingPlatform', 180, 144, 28, 6),
+        obj('Inner partition', 'RotatingPlatform', 148, 52, 6, 42),
+        obj('Inner inlet step', 'RotatingPlatform', 104, 98, 24, 5),
+        obj('Transfer rib', 'RotatingPlatform', 140, 114, 6, 44),
+        obj('Outlet transfer rib', 'RotatingPlatform', 128, 36, 6, 18),
+        obj('Roof key', 'Key', 112, 55, 9, 9, rotates=True),
+        obj('Low key', 'Key', 195, 137, 7, 7, rotates=True),
+        obj('High key', 'Key', 192, 87, 7, 7, rotates=True),
+        obj('Outlet cradle', 'Socket', 251, 60, radius=32),
+        obj('Exit', 'Exit', 235, 36, 13, 24, socket='Outlet cradle'),
+    ]
+
+
 if __name__ == '__main__':
     build(6, 'stage6_pressure_foundry.tmj', 'The weight of light', foundry())
     build(7, 'stage7_reverse_foundry.tmj', 'An unloaded path', reversal(), 'stage_01/pump_hall.png')
     build(8, 'stage8_freight_interlock.tmj', 'Borrowed weight', freight(), 'stage_01/pump_hall.png')
-    build(9, 'stage9_reservoir_interlock.tmj', 'Last water, last light', reservoir())
+    build(9, 'stage9_clockwork_chamber.tmj', 'The room turns', rotating_room(), 'stage_01/pump_hall.png')

@@ -6,6 +6,7 @@ from math import ceil, floor, isfinite, sqrt
 from game.collision import CollisionWorld, Solid
 from game.map_loader import MapFormatError, MapObject
 from game.rail_light import RailLight
+from game.rotating_chamber import RotatingChamber
 
 
 def light_span(light, row, fraction=1):
@@ -33,6 +34,17 @@ class LanternRoom:
         self.data = data
         self.start = data.object_named("PlayerStart")
         self.exit = data.object_named("Exit")
+        pivots = tuple(o for o in data.objects if o.kind == 'RoomPivot')
+        self.cranks = tuple(o for o in data.objects if o.kind == 'RoomCrank')
+        if len(pivots) > 1 or bool(pivots) != bool(self.cranks):
+            raise MapFormatError('A rotating room needs one pivot and at least one crank')
+        self.chamber = RotatingChamber(pivots[0]) if pivots else None
+        if self.chamber:
+            # A square orb footprint preserves contact when the room turns by 90 degrees.
+            self.LANTERN_WIDTH = self.LANTERN_HEIGHT = 8
+        self.rotating_platforms = tuple(o for o in data.objects if o.kind == 'RotatingPlatform')
+        if self.rotating_platforms and self.chamber is None:
+            raise MapFormatError('Rotating platforms need a room pivot')
         self.ground = tuple(Solid(o.x, o.y, o.width, o.height) for o in data.objects if o.kind == "Ground")
         self.platforms = tuple(Solid(o.x, o.y, o.width, o.height)
                                for o in data.objects if o.kind == "LightPlatform")
@@ -42,21 +54,38 @@ class LanternRoom:
             raise MapFormatError("A room supports one movable crate")
         self.crate_start = crates[0] if crates else None
         self.keys = tuple(o for o in data.objects if o.kind == "Key")
+        self.key_starts = self.keys
         self.plates = tuple(o for o in data.objects if o.kind == "PressurePlate")
         self.floods = tuple(o for o in data.objects if o.kind == "Flood")
-        self.terrain = self.ground + self.platforms + tuple(
+        self.stationary_terrain = self.ground + self.platforms + tuple(
             Solid(o.x, o.y, o.width, o.height) for o in self.props) + data.solids
+        self.terrain = self.stationary_terrain + tuple(
+            Solid(o.x, o.y, o.width, o.height) for o in self.rotating_platforms)
         self.sockets = tuple(o for o in data.objects if o.kind == "Socket")
         initial = [o for o in self.sockets if o.properties.get("initial") is True]
         if len(initial) != 1 or not self.ground or not (self.platforms or data.solids):
             raise MapFormatError("A lantern room needs ground, light platforms and exactly one starting socket")
-        for obj in (*self.terrain, *self.keys, *crates, *self.floods, *self.plates, self.exit):
+        for obj in (*self.terrain, *self.keys, *crates, *self.floods, *self.plates,
+                    *self.rotating_platforms, self.exit):
             if not (0 <= obj.x < obj.x + obj.width <= data.width
                     and 0 <= obj.y < obj.y + obj.height <= data.height
                     and all(float(value).is_integer() for value in (obj.x, obj.y, obj.width, obj.height))):
                 raise MapFormatError("Room rectangles need whole-pixel coordinates and positive size inside the map")
         ground = CollisionWorld(self.ground)
         terrain = CollisionWorld(self.terrain)
+        if self.chamber:
+            c = self.chamber
+            if not (c.size / 2 <= c.x <= data.width - c.size / 2
+                    and c.size / 2 <= c.y <= data.height - c.size / 2):
+                raise MapFormatError('The rotating chamber must fit inside the map')
+            for crank in self.cranks:
+                if c.contains(crank.x, crank.y) or not ground.supported(crank.x, crank.y, self.WIDTH):
+                    raise MapFormatError('A crank needs a safe stationary floor outside the rotating room')
+            for part in self.rotating_platforms + tuple(k for k in self.keys if k.properties.get('rotates')):
+                if (part.width <= 0 or part.height <= 0
+                        or not all(c.contains(x, y) for x in (part.x, part.x + part.width)
+                                   for y in (part.y, part.y + part.height))):
+                    raise MapFormatError('Rotating rectangles must fit inside the chamber')
         for obj in (*self.sockets, self.start):
             surface = ground if obj is self.start else terrain
             if not (isfinite(obj.x) and self.WIDTH / 2 <= obj.x <= data.width - self.WIDTH / 2
@@ -174,7 +203,53 @@ class LanternRoom:
         self.flood_from = {}
         self.drain_started = 0.0
         self.pressed_plates = set()
+        self.rotation_control = False
+        self.rotation_input = 0
+        if self.chamber:
+            self.chamber.reset()
+            self.sync_rotation()
         self.update_pressure_plates()
+
+    def sync_rotation(self):
+        self.terrain = self.stationary_terrain + tuple(
+            Solid(*self.chamber.rectangle(part)) for part in self.rotating_platforms)
+        self.keys = tuple(replace(key, **dict(zip(('x', 'y', 'width', 'height'),
+                                               self.chamber.rectangle(key))))
+                          if key.properties.get('rotates') else key for key in self.key_starts)
+
+    def step_rotation(self, dt, direction, interact):
+        chamber = self.chamber
+        if chamber is None:
+            return False
+        if chamber.turning:
+            self.elapsed += dt
+            turn = chamber.direction
+            if chamber.advance(dt):
+                if lamp := self.loose_lantern:
+                    if chamber.contains(lamp.x, lamp.y - 4):
+                        x, y = chamber.point(lamp.x, lamp.y - 4, turns=turn)
+                        self.loose_lantern = replace(lamp, x=x, y=y + 4)
+                        self.lantern_vy = 0.0
+                if self.crate and chamber.contains(self.crate.x + self.crate.width / 2,
+                                                   self.crate.y + self.crate.height / 2):
+                    x, y = chamber.point(self.crate.x + self.crate.width / 2,
+                                         self.crate.y + self.crate.height / 2, turns=turn)
+                    self.crate = replace(self.crate, x=x - self.crate.width / 2, y=y - self.crate.height / 2)
+                    self.crate_vy = 0.0
+                self.sync_rotation()
+            self.rotation_input = direction
+            return True
+        if not self.rotation_control:
+            return False
+        self.elapsed += dt
+        if interact:
+            self.rotation_control = False
+            self.rotation_input = 0
+            return True
+        if direction and direction != self.rotation_input:
+            chamber.begin(direction)
+        self.rotation_input = direction
+        return True
 
     def update_pressure_plates(self):
         for plate in self.plates:
@@ -202,7 +277,10 @@ class LanternRoom:
     @property
     def light(self):
         if self.loose_lantern:
-            return self.loose_lantern.x, self.loose_lantern.y - 4, self.CARRY_RADIUS
+            x, y = self.loose_lantern.x, self.loose_lantern.y - 4
+            if self.chamber and self.chamber.turning and self.chamber.contains(x, y):
+                x, y = self.chamber.animated_point(x, y)
+            return x, y, self.CARRY_RADIUS
         if self.in_transit:
             chute, target, started = self.in_transit
             progress = min(1.0, (self.elapsed - started) / self.CHUTE_TRAVEL)
@@ -304,6 +382,7 @@ class LanternRoom:
     @property
     def exit_ready(self):
         return (len(self.collected) == len(self.keys)
+                and (self.chamber is None or self.chamber.orientation == self.chamber.exit_orientation)
                 and len(self.lit_beacons) == len(self.beacons)
                 and (self.exit_socket is None or self.socket is self.exit_socket)
                 and all(self.receiver_lit(receiver) for receiver in self.receivers))
@@ -322,7 +401,7 @@ class LanternRoom:
         switches = tuple(s for s in self.switches
                          if s.name not in self.switch_relays or self.relay_lit(s))
         valves = tuple(v for v in self.valves if self.valve_links[v.name][0] is self.socket)
-        candidates = self.projectors + switches + chutes + valves + tuple(
+        candidates = self.cranks + self.projectors + switches + chutes + valves + tuple(
             o for o in sockets if not self.socket_locked(o))
         candidates = tuple(o for o in candidates if o.name not in
                            {plate.properties["projector"] for plate in self.plates})
@@ -341,6 +420,9 @@ class LanternRoom:
         elif target.kind == "LooseLantern":
             self.loose_lantern = None
             self.lantern_vy = 0.0
+        elif target.kind == 'RoomCrank':
+            self.rotation_control = True
+            self.rotation_input = 0
         elif target.kind == "Beacon":
             self.lit_beacons.add(target.name)
         elif target.kind == "DrainValve":
@@ -378,6 +460,8 @@ class LanternRoom:
             if self.respawn_elapsed >= self.RESPAWN_DURATION:
                 self.respawn_elapsed = None
             return
+        if self.step_rotation(dt, direction, interact):
+            return
         self.elapsed += dt
         if self.in_transit and self.elapsed - self.in_transit[2] >= self.CHUTE_TRAVEL:
             self.socket = self.in_transit[1]
@@ -386,6 +470,8 @@ class LanternRoom:
             self.facing = direction
         if interact:
             self.interact()
+            if self.rotation_control:
+                return
         if self.crate:
             self.move_crate(dt, direction, jump)
             if self.crate.y > self.data.height:
