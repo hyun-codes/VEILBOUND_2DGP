@@ -384,15 +384,34 @@
     },
     {
       "id": 5,
-      "name": "Handwheel art",
+      "name": "Handwheel base",
       "type": "imagelayer",
       "x": 0,
       "y": 0,
-      "offsetx": 10,
-      "offsety": 117,
+      "offsetx": 14,
+      "offsety": 146,
       "visible": true,
       "opacity": 1,
-      "image": "../../assets/props/room_handwheel.png",
+      "image": "../../assets/props/room_handwheel_base.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "room_crank"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Handwheel rotor",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 14,
+      "offsety": 122,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/props/room_handwheel_rotor.png",
       "properties": [
         {
           "name": "visualRole",
@@ -402,7 +421,7 @@
       ]
     }
   ],
-  "nextlayerid": 6,
+  "nextlayerid": 7,
   "nextobjectid": 26,
   "properties": [
     {

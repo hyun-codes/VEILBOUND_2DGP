@@ -221,8 +221,10 @@ class LanternView:
             for index, key in enumerate(room.keys):
                 draw_key(index, key)
         for crank in room.cranks:
-            sprite('props/room_handwheel.png', (0, 0, 32, 32), crank.x - 16, crank.y - 53,
-                   32, 32, angle=-room.chamber.angle if room.rotation_control else 0)
+            sprite('props/room_handwheel_base.png', (0, 0, 24, 3),
+                   crank.x - 12, crank.y - 24, 24, 3)
+            sprite('props/room_handwheel_rotor.png', (0, 0, 24, 24),
+                   crank.x - 12, crank.y - 48, 24, 24, angle=-room.chamber.angle)
         for projector, (target_x, target_y, _) in zip(room.projectors, room.projected_lights):
             x, y = projector.x, projector.y
             copper = x < room.start.x

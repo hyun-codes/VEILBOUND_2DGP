@@ -27,7 +27,8 @@ def build(number, filename, title, objects, backdrop='stage_06/reservoir_hall.pn
     if number == 9:
         for name, image, x, y, role in [
             ('Rotating frame art', 'rotating_room_frame.png', 68, 20, 'rotating_frame'),
-            ('Handwheel art', 'room_handwheel.png', 10, 117, 'room_crank'),
+            ('Handwheel base', 'room_handwheel_base.png', 14, 146, 'room_crank'),
+            ('Handwheel rotor', 'room_handwheel_rotor.png', 14, 122, 'room_crank'),
         ]:
             layers.append(dict(id=len(layers)+1, name=name, type='imagelayer', x=0, y=0,
                                offsetx=x, offsety=y,

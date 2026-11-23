@@ -186,3 +186,21 @@ class RotatingRoomTest(unittest.TestCase):
         self.act(interact=True)
         self.go(241)
         self.assertTrue(self.room.complete)
+
+    def test_handwheel_base_stays_fixed_and_rotor_keeps_angle_after_release(self):
+        from unittest.mock import Mock
+        from game.lantern_view import LanternView
+        view = LanternView(self.room, 800, 600)
+        def parts():
+            backend = Mock()
+            view.draw(backend)
+            return {c.args[0].name: c.args[1:] for c in backend.image.call_args_list
+                    if c.args[0].name.startswith('room_handwheel_')}
+        before = parts()
+        self.room.chamber.orientation = 1
+        self.room.rotation_control = False
+        after = parts()
+        self.assertEqual(before['room_handwheel_base.png'], after['room_handwheel_base.png'])
+        self.assertEqual(after['room_handwheel_base.png'][-1], 0)
+        self.assertNotEqual(before['room_handwheel_rotor.png'][-1], after['room_handwheel_rotor.png'][-1])
+        self.assertEqual(after['room_handwheel_rotor.png'][0], (0, 0, 24, 24))
