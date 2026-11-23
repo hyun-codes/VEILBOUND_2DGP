@@ -104,6 +104,12 @@ class LanternView:
             ledge("tiles/stone_ledge.png", ground, 16)
         for p in room.platforms:
             ledge("tiles/lantern_ledge.png", p, 5)
+        for plate in room.plates:
+            pressed = plate.name in room.pressed_plates
+            sprite("props/cargo_crate.png", (0, 13, 16, 3),
+                   plate.x, plate.y - (1 if pressed else 3), plate.width, 3)
+            sprite("props/chain_carriage.png", (0, 0, 13, 13),
+                   plate.x + plate.width / 2 - 4, plate.y + 2, 8, 8)
         for part in room.data.sprites:
             if part.visual_role not in ("hoist_chain", "hoist_gears", "backdrop"):
                 backend.image(part.image, part.source,

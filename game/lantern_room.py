@@ -42,6 +42,7 @@ class LanternRoom:
             raise MapFormatError("A room supports one movable crate")
         self.crate_start = crates[0] if crates else None
         self.keys = tuple(o for o in data.objects if o.kind == "Key")
+        self.plates = tuple(o for o in data.objects if o.kind == "PressurePlate")
         self.floods = tuple(o for o in data.objects if o.kind == "Flood")
         self.terrain = self.ground + self.platforms + tuple(
             Solid(o.x, o.y, o.width, o.height) for o in self.props) + data.solids
@@ -49,7 +50,7 @@ class LanternRoom:
         initial = [o for o in self.sockets if o.properties.get("initial") is True]
         if len(initial) != 1 or not self.ground or not (self.platforms or data.solids):
             raise MapFormatError("A lantern room needs ground, light platforms and exactly one starting socket")
-        for obj in (*self.terrain, *self.keys, *crates, *self.floods, self.exit):
+        for obj in (*self.terrain, *self.keys, *crates, *self.floods, *self.plates, self.exit):
             if not (0 <= obj.x < obj.x + obj.width <= data.width
                     and 0 <= obj.y < obj.y + obj.height <= data.height
                     and all(float(value).is_integer() for value in (obj.x, obj.y, obj.width, obj.height))):
@@ -93,6 +94,15 @@ class LanternRoom:
                     raise MapFormatError("Focus radius must be positive")
             self.aims[projector.name] = targets
         self.receivers = tuple(o for o in data.objects if o.kind == "Receiver")
+        if len({plate.name for plate in self.plates}) != len(self.plates):
+            raise MapFormatError("Pressure plates need unique names")
+        linked = set()
+        for plate in self.plates:
+            name = plate.properties.get("projector")
+            if (name not in self.aims or len(self.aims[name]) != 2 or name in linked
+                    or plate.width <= 0 or not terrain.supported(plate.x + plate.width / 2, plate.y, plate.width)):
+                raise MapFormatError("A pressure plate needs a supporting floor and its own two-focus projector")
+            linked.add(name)
         required_socket = self.exit.properties.get("socket")
         self.exit_socket = data.object_named(required_socket) if required_socket else None
         if self.exit_socket is not None and self.exit_socket not in self.sockets:
@@ -163,6 +173,27 @@ class LanternRoom:
         self.drained = None
         self.flood_from = {}
         self.drain_started = 0.0
+        self.pressed_plates = set()
+        self.update_pressure_plates()
+
+    def update_pressure_plates(self):
+        for plate in self.plates:
+            player = (self.grounded and self.death_elapsed is None
+                      and abs(self.y - plate.y) < 0.5
+                      and self.x + self.WIDTH / 2 > plate.x
+                      and self.x - self.WIDTH / 2 < plate.x + plate.width)
+            crate = (self.crate is not None and abs(self.crate.y + self.crate.height - plate.y) < 0.5
+                     and self.crate.x + self.crate.width > plate.x
+                     and self.crate.x < plate.x + plate.width)
+            pressed = bool(player or crate)
+            name = plate.properties["projector"]
+            if self.aim_indices[name] != int(pressed):
+                self.turning[name] = self.projected_light(name), self.elapsed
+                self.aim_indices[name] = int(pressed)
+            if pressed:
+                self.pressed_plates.add(plate.name)
+            else:
+                self.pressed_plates.discard(plate.name)
 
     @property
     def carrying_lantern(self):
@@ -293,6 +324,8 @@ class LanternRoom:
         valves = tuple(v for v in self.valves if self.valve_links[v.name][0] is self.socket)
         candidates = self.projectors + switches + chutes + valves + tuple(
             o for o in sockets if not self.socket_locked(o))
+        candidates = tuple(o for o in candidates if o.name not in
+                           {plate.properties["projector"] for plate in self.plates})
         candidates += tuple(beacon for name, (beacon, _) in self.beacons.items()
                             if name not in self.lit_beacons
                             and self.illuminated(beacon.x, beacon.y - 8))
@@ -358,6 +391,7 @@ class LanternRoom:
             if self.crate.y > self.data.height:
                 self.reset()
                 return
+        self.update_pressure_plates()
         collision = self.collision()
         if lamp := self.loose_lantern:
             self.lantern_vy = min(350.0, self.lantern_vy + 960.0 * dt)
@@ -379,6 +413,7 @@ class LanternRoom:
             self.x, self.y, self.WIDTH, self.HEIGHT, direction * 72.0 * dt, self.vy * dt)
         self.x = max(self.WIDTH / 2, min(self.x, self.data.width - self.WIDTH / 2))
         self.grounded = landed
+        self.update_pressure_plates()
         if landed or ceiling:
             self.vy = 0.0
         self.walk_time = self.walk_time + dt if landed and self.x != previous_x else 0.0
@@ -388,6 +423,7 @@ class LanternRoom:
                 for flood in self.floods):
             self.y = min(self.y, self.data.height - 1)
             self.death_elapsed = 0.0
+            self.update_pressure_plates()
             return
         for index, key in enumerate(self.keys):
             if index not in self.collected and any(self._touches(part) for part in self.exposed(key)):
