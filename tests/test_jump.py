@@ -7,6 +7,28 @@ from game.map_loader import load_map
 
 
 class JumpTest(unittest.TestCase):
+    def test_quick_tap_has_useful_height_and_no_velocity_snap(self):
+        self.room.step(1/60, 0, jump=True, jump_held=False)
+        self.assertAlmostEqual(self.room.vy, -222)
+        peak = self.room.y
+        previous = self.room.vy
+        for _ in range(35):
+            self.room.step(1/60, 0, jump_held=False)
+            if previous < 0 and self.room.vy < 0:
+                self.assertLessEqual(self.room.vy - previous, 40.01)
+            previous = self.room.vy
+            peak = min(peak, self.room.y)
+        self.assertGreaterEqual(100-peak, 18)
+        self.assertLess(100-peak, 23)
+
+    def test_buffered_jump_starts_on_landing_frame(self):
+        self.room.y, self.room.vy, self.room.grounded = 99, 100, False
+        self.room.jump_grace = 0
+        self.room.step(1/60, 0, jump=True, jump_held=False)
+        self.assertEqual(self.room.y, 100)
+        self.assertLess(self.room.vy, 0)
+        self.assertFalse(self.room.grounded)
+
     def setUp(self):
         self.room = LanternRoom(load_map(STAGE_1))
         self.solids = [Solid(0, 100, 60, 6)]
@@ -94,7 +116,18 @@ class JumpTest(unittest.TestCase):
                 self.room.step(1/60, 0, jump_held=held)
                 peak = min(peak, self.room.y)
             return 100-peak
-        self.assertGreater(height(True), height(False)+10)
+        full, short = height(True), height(False)
+        self.assertGreaterEqual(full, 27)
+        self.assertLessEqual(full, 28)
+        self.assertGreater(full, short+8)
+
+    def test_reholding_after_release_does_not_restore_upward_boost(self):
+        self.room.step(1/60, 0, jump=True, jump_held=True)
+        for _ in range(5):
+            self.room.step(1/60, 0, jump_held=False)
+        before = self.room.vy
+        self.room.step(1/60, 0, jump_held=True)
+        self.assertAlmostEqual(self.room.vy-before, 40)
 
     def test_small_ceiling_corner_is_corrected_without_going_through_wall(self):
         self.solids = [Solid(32, 60, 15, 5)]

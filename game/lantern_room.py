@@ -31,7 +31,8 @@ class LanternRoom:
     LANTERN_WIDTH, LANTERN_HEIGHT = 5, 9
     COYOTE_TIME, JUMP_BUFFER = 0.10, 0.12
     JUMP_SPEED, RISE_GRAVITY, FALL_GRAVITY = 238.0, 960.0, 1056.0
-    JUMP_CUT_SPEED = 110.0
+    MIN_RISE_TIME = 0.06
+    RELEASE_GRAVITY = 2400.0
 
     def __init__(self, data):
         self.data = data
@@ -190,6 +191,8 @@ class LanternRoom:
         self.grounded = True
         self.jump_grace = self.jump_buffer = 0.0
         self.jump_support = None
+        self.jump_time = 0.0
+        self.jump_released = False
         self.complete = False
         self.death_elapsed = None
         self.respawn_elapsed = None
@@ -451,6 +454,13 @@ class LanternRoom:
         else:
             self.socket = None if self.socket else target
 
+    def start_jump(self, held):
+        self.vy = -self.JUMP_SPEED
+        self.jump_buffer = self.jump_grace = self.jump_time = 0.0
+        self.jump_support = None
+        self.jump_released = not held
+        self.grounded = False
+
     def step(self, dt, direction, jump=False, interact=False, *, jump_held=True):
         if self.complete:
             return
@@ -510,12 +520,13 @@ class LanternRoom:
                 and not collision.supported(*self.jump_support, self.WIDTH)):
             self.jump_grace = 0.0
         if self.jump_buffer > 0 and self.jump_grace > 0:
-            self.vy = -self.JUMP_SPEED
-            self.jump_buffer = self.jump_grace = 0.0
-            self.jump_support = None
-        if not jump_held and self.vy < -self.JUMP_CUT_SPEED:
-            self.vy = -self.JUMP_CUT_SPEED
+            self.start_jump(jump_held)
         gravity = self.RISE_GRAVITY if self.vy < 0 else self.FALL_GRAVITY
+        if self.vy < 0:
+            self.jump_released |= not jump_held
+            if self.jump_released and self.jump_time >= self.MIN_RISE_TIME:
+                gravity = self.RELEASE_GRAVITY
+            self.jump_time += dt
         self.vy = min(350.0, self.vy + gravity * dt)
         previous_x = self.x
         previous_y = self.y
@@ -537,6 +548,9 @@ class LanternRoom:
         self.update_pressure_plates()
         if landed or ceiling:
             self.vy = 0.0
+        if landed and self.jump_buffer > 0:
+            self.start_jump(jump_held)
+            landed = False
         self.walk_time = self.walk_time + dt if landed and self.x != previous_x else 0.0
         if (not landed and self.y >= self.data.height) or any(
                 flood.x <= self.x < flood.x + flood.width
