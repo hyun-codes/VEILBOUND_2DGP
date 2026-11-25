@@ -29,6 +29,9 @@ class LanternRoom:
     WIDTH, HEIGHT = 6, 13
     CHEST_HEIGHT = 7
     LANTERN_WIDTH, LANTERN_HEIGHT = 5, 9
+    COYOTE_TIME, JUMP_BUFFER = 0.10, 0.12
+    JUMP_SPEED, RISE_GRAVITY, FALL_GRAVITY = 238.0, 960.0, 1056.0
+    JUMP_CUT_SPEED = 110.0
 
     def __init__(self, data):
         self.data = data
@@ -185,6 +188,8 @@ class LanternRoom:
         self.walk_time = 0.0
         self.facing = 1
         self.grounded = True
+        self.jump_grace = self.jump_buffer = 0.0
+        self.jump_support = None
         self.complete = False
         self.death_elapsed = None
         self.respawn_elapsed = None
@@ -446,7 +451,7 @@ class LanternRoom:
         else:
             self.socket = None if self.socket else target
 
-    def step(self, dt, direction, jump=False, interact=False):
+    def step(self, dt, direction, jump=False, interact=False, *, jump_held=True):
         if self.complete:
             return
         if self.death_elapsed is not None:
@@ -461,6 +466,8 @@ class LanternRoom:
                 self.respawn_elapsed = None
             return
         if self.step_rotation(dt, direction, interact):
+            self.jump_grace = self.jump_buffer = 0.0
+            self.jump_support = None
             return
         self.elapsed += dt
         if self.in_transit and self.elapsed - self.in_transit[2] >= self.CHUTE_TRAVEL:
@@ -491,12 +498,40 @@ class LanternRoom:
             if feet != lamp.y:
                 self.loose_lantern = replace(lamp, y=feet)
                 collision = self.collision()
-        if jump and self.grounded and collision.supported(self.x, self.y, self.WIDTH):
-            self.vy = -238.0
-        self.vy = min(350.0, self.vy + 960.0 * dt)
+        self.jump_buffer = self.JUMP_BUFFER if jump else max(0.0, self.jump_buffer - dt)
+        supported = collision.supported(self.x, self.y, self.WIDTH)
+        if self.grounded and supported:
+            self.jump_grace = self.COYOTE_TIME
+            self.jump_support = (self.x, self.y)
+        else:
+            self.jump_grace = max(0.0, self.jump_grace - dt)
+        # Losing a surface to darkness must not create an invisible launch platform.
+        if (self.jump_grace > 0 and not supported and self.jump_support
+                and not collision.supported(*self.jump_support, self.WIDTH)):
+            self.jump_grace = 0.0
+        if self.jump_buffer > 0 and self.jump_grace > 0:
+            self.vy = -self.JUMP_SPEED
+            self.jump_buffer = self.jump_grace = 0.0
+            self.jump_support = None
+        if not jump_held and self.vy < -self.JUMP_CUT_SPEED:
+            self.vy = -self.JUMP_CUT_SPEED
+        gravity = self.RISE_GRAVITY if self.vy < 0 else self.FALL_GRAVITY
+        self.vy = min(350.0, self.vy + gravity * dt)
         previous_x = self.x
+        previous_y = self.y
         self.x, self.y, _, landed, ceiling = collision.move(
             self.x, self.y, self.WIDTH, self.HEIGHT, direction * 72.0 * dt, self.vy * dt)
+        if ceiling:
+            for offset in (-1, 1):
+                x, _, side, _, _ = collision.move(
+                    self.x, previous_y, self.WIDTH, self.HEIGHT, offset, 0)
+                if side or collision.overlaps(x, previous_y, self.WIDTH, self.HEIGHT):
+                    continue
+                _, y, _, _, blocked = collision.move(
+                    x, previous_y, self.WIDTH, self.HEIGHT, 0, self.vy * dt)
+                if not blocked and not collision.overlaps(x, y, self.WIDTH, self.HEIGHT):
+                    self.x, self.y, ceiling = x, y, False
+                    break
         self.x = max(self.WIDTH / 2, min(self.x, self.data.width - self.WIDTH / 2))
         self.grounded = landed
         self.update_pressure_plates()

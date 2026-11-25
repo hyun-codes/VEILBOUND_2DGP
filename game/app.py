@@ -69,7 +69,8 @@ def run(room, frames, screenshot, next_room=None):
                 transition = None
             return
         direction = int(bool(keys & {"d", "right"})) - int(bool(keys & {"a", "left"}))
-        room.step(dt, direction, "space" in pending, "e" in pending)
+        room.step(dt, direction, "space" in pending, "e" in pending,
+                  jump_held="space" in keys)
         pending.clear()
         if room.complete and next_room is not None:
             transition = 0.0
