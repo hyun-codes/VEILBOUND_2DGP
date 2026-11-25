@@ -61,7 +61,7 @@ class LanternRoomTest(unittest.TestCase):
         self.assertIsNotNone(self.room.death_elapsed)
         self.assertLess(self.room.y, self.room.data.height)
         self.assertIsNone(self.room.interaction())
-        self.move(30)
+        self.move(round(self.room.DEATH_DURATION * 60) + 1)
         self.assertIsNone(self.room.death_elapsed)
         self.assertIsNotNone(self.room.respawn_elapsed)
         self.move(7, -1)

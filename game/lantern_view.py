@@ -13,7 +13,8 @@ MASK_SIZE = 221
 CHAIN_FRAMES = 8
 CHAIN_FRAME_TRAVEL = 1.5
 DEATH_KICK = ((4, -1), (-3, 1), (2, -1), (-1, 0))
-DEATH_FADE_START = 0.36
+DEATH_FRAME_STARTS = (0, 0.08, 0.16, 0.25, 0.35, 0.50)
+DEATH_FADE_START = 0.55
 
 
 def draw_darkness(backend, camera, x, y, radius):
@@ -239,9 +240,9 @@ class LanternView:
             sprite("props/chain_carriage.png", (0, 0, 13, 13), round(rx) - 6, round(ry) - 6, 13, 13)
 
         x, y = round(room.x), round(room.y)
-        if room.death_elapsed is not None:
-            frame = min(5, int(6 * room.death_elapsed / room.DEATH_DURATION))
-            sheet = "characters/player/raincoat_child_death.png"
+        if death is not None:
+            frame = sum(death >= start for start in DEATH_FRAME_STARTS[1:])
+            sheet = "characters/player/raincoat_child_shadow_death.png"
         else:
             sheet = "characters/player/raincoat_child.png"
             if not room.grounded:
@@ -253,7 +254,7 @@ class LanternView:
         sprite(sheet, (frame * 21, 0, 21, 22), x - 10, y - 20, 21, 22, flip=room.facing < 0)
 
         if room.carrying_lantern:
-            if room.death_elapsed is None:
+            if death is None or death < DEATH_FRAME_STARTS[1]:
                 sprite("props/light_orb.png", (16, 2, 3, 3),
                        round(lx) - 1, round(ly) - 1, 3, 3)
         else:

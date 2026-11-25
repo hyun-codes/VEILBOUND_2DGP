@@ -24,7 +24,8 @@ class LanternRoom:
     PROJECTOR_TURN = 0.60
     CHUTE_TRAVEL = 0.70
     FLOOD_TRAVEL = 0.65
-    DEATH_DURATION = 0.48
+    DEATH_DURATION = 0.70
+    DEATH_LIGHT_DURATION = 0.25
     RESPAWN_DURATION = 0.18
     WIDTH, HEIGHT = 6, 13
     CHEST_HEIGHT = 7
@@ -297,7 +298,7 @@ class LanternRoom:
         if self.socket is None:
             radius = self.CARRY_RADIUS
             if self.death_elapsed is not None:
-                radius = max(3, radius * (1 - self.death_elapsed / self.DEATH_DURATION))
+                radius = max(3, radius * (1 - self.death_elapsed / self.DEATH_LIGHT_DURATION))
             return self.x, self.y - self.CHEST_HEIGHT, radius
         radius = self.socket.properties.get(
             "radius", self.START_RADIUS if self.socket is self.initial_socket else self.RADIUS)
