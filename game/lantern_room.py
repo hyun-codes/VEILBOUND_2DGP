@@ -34,6 +34,7 @@ class LanternRoom:
     JUMP_SPEED, RISE_GRAVITY, FALL_GRAVITY = 238.0, 960.0, 1056.0
     MIN_RISE_TIME = 0.06
     RELEASE_GRAVITY = 2400.0
+    APEX_FALL_SPEED = 40.0
 
     def __init__(self, data):
         self.data = data
@@ -591,11 +592,14 @@ class LanternRoom:
         if self.jump_buffer > 0 and self.jump_grace > 0:
             self.start_jump(jump_held)
         gravity = self.RISE_GRAVITY if self.vy < 0 else self.FALL_GRAVITY
+        self.jump_released |= not jump_held
         if self.vy < 0:
-            self.jump_released |= not jump_held
             if self.jump_released and self.jump_time >= self.MIN_RISE_TIME:
                 gravity = self.RELEASE_GRAVITY
             self.jump_time += dt
+        elif self.jump_time > 0 and not self.jump_released and self.vy < self.APEX_FALL_SPEED:
+            # Ease into descent after the apex without raising the jump ceiling.
+            gravity *= 0.5
         self.vy = min(350.0, self.vy + gravity * dt)
         previous_x = self.x
         previous_y = self.y
@@ -617,6 +621,7 @@ class LanternRoom:
         self.update_pressure_plates()
         if landed or ceiling:
             self.vy = 0.0
+            self.jump_time = 0.0
         if landed and self.jump_buffer > 0:
             self.start_jump(jump_held)
             landed = False

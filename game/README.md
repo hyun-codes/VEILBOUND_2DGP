@@ -10,4 +10,4 @@
 
 설계 참고: [Celeste 개발자의 입력 보정 설명](https://www.mattmakesgames.com/articles/celeste_and_forgiveness/index.html), [Kyle Pittman의 Building a Better Jump 발표 소개](https://www.gdcvault.com/play/1023148/Math-for-Game-Programmers-Building). 적용 수치와 빛 소멸 시 예외는 VEILBOUND의 설계 판단이다. 정점 체공 보정이나 수평 관성은 추가하지 않았다. `tests/test_jump.py`는 입력 유예·만료, 빛 소멸, 높이 조절, 모서리/천장 충돌, 실제 앱의 Space 유지·해제 전달을 검사한다.
 
-착지 전 저장된 점프는 착지 프레임에 시작한다. 해제 후 다시 Space를 유지해도 같은 점프의 제동을 취소하지 않는다. 조사 범위·측정값과 검증 한계는 [점프 조작 개선 기록](../docs/jump_controls.md)을 따른다.
+착지 전 저장된 점프는 착지 프레임에 시작한다. Space를 유지한 점프는 정점 직후 하강 중력을 잠깐 줄인다. 버튼을 놓거나 천장에 닿으면 일반 하강으로 이어진다. 조사 범위·측정값과 검증 한계는 [점프 조작 개선 기록](../docs/jump_controls.md)을 따른다.

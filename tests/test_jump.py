@@ -7,6 +7,31 @@ from game.map_loader import load_map
 
 
 class JumpTest(unittest.TestCase):
+    def test_holding_jump_softens_descent_just_past_the_apex(self):
+        self.room.step(1 / 60, 0, jump=True, jump_held=True)
+        for _ in range(14):
+            self.room.step(1 / 60, 0, jump_held=True)
+        self.assertGreaterEqual(self.room.vy, 0)
+        before = self.room.vy
+        self.room.step(1 / 60, 0, jump_held=True)
+        self.assertLess(self.room.vy - before, self.room.FALL_GRAVITY / 60)
+
+        before = self.room.vy
+        self.room.step(1 / 60, 0, jump_held=False)
+        self.assertAlmostEqual(self.room.vy - before, self.room.FALL_GRAVITY / 60)
+        before = self.room.vy
+        self.room.step(1 / 60, 0, jump_held=True)
+        self.assertAlmostEqual(self.room.vy - before, self.room.FALL_GRAVITY / 60)
+
+    def test_walking_off_after_a_jump_uses_normal_fall_gravity(self):
+        self.room.step(1 / 60, 0, jump=True, jump_held=True)
+        for _ in range(55):
+            self.room.step(1 / 60, 0, jump_held=True)
+        self.assertTrue(self.room.grounded)
+        self.room.x = 64
+        self.room.step(1 / 60, 0, jump_held=True)
+        self.assertAlmostEqual(self.room.vy, self.room.FALL_GRAVITY / 60)
+
     def test_quick_tap_has_useful_height_and_no_velocity_snap(self):
         self.room.step(1/60, 0, jump=True, jump_held=False)
         self.assertAlmostEqual(self.room.vy, -222)
