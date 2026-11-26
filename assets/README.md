@@ -4,7 +4,14 @@
 
 잠긴 문 안내에는 [Gowun Batang Regular](https://github.com/google/fonts/tree/main/ofl/gowunbatang)에서 안내 문구와 숫자 0~9의 글자만 남긴 `ui/fonts/GowunBatang-Hints.ttf`를 사용한다. 문구를 변경할 때는 `game/lantern_view.py`의 `exit_hint`에 필요한 글자가 모두 포함되도록 다시 추출한다. [Gowun Batang 라이선스](ui/fonts/GowunBatang-OFL.txt)
 
-스토리 캠페인의 새 배경 네 장과 공유 통로, 젖은 석재는 ImageGen의 빗물 시설 배경판과 석재 원화를 잘라 배치한 이미지다. `characters/story`의 동생과 기상 포즈 네 장도 ImageGen으로 따로 제작했다. 기상 포즈는 기존 우비 아이를 외형 참고로 삼았다. 원화를 자르고 최근접 축소한 PNG를 게임에서 읽는다.
+스토리 캠페인의 새 배경 네 장과 공유 통로, 젖은 석재는 ImageGen의 빗물 시설 배경판과 석재 원화를 잘라 배치한 이미지다. `characters/story`의 동생과 기상 동작도 ImageGen 기본 도구로 제작했다. `characters/story/wake.png`는 원화를 최근접 축소해 같은 발 높이로 정렬한 24×22 셀 12개를 담는다. 마지막에 실제 게임 대기 자세로 이어진다.
+
+<details>
+<summary>기상 애니메이션 생성 프롬프트</summary>
+
+> Create a production-ready 12-frame pixel art waking-up animation sheet for the exact same original VEILBOUND mustard hooded child in the references. First reference provides design and key posture, second tiny sprite provides pixel style and final idle silhouette. Show exactly 12 isolated images of THIS SAME character in a precise 4-column × 3-row regular grid, chronological row-major reading order. Transparent background, no checkerboard, no lines or text, ample 15% cell gutters. Within each cell use same camera side-view facing right, uniform character scale, root stable near horizontal center, common invisible floor at 80% of each cell. Keep proportions and plain muted mustard pointed hood, face is dark and hidden, plain yellow coat and black-brown boots, strictly empty hands and no accessories. Low-res hard-edge integer pixel clusters, intended 28×22 at game scale. The sequence is progressive, no reuse, no major leap between cells. Row one: (1) curled compactly on the side belly almost on the floor, (2) curled but hood lifts a tiny amount and hand slides forward, (3) head rises higher, elbow on floor, (4) palm plants forward, shoulder lifts. Row two: (5) weight on hands and both knees, hips a little lifted, (6) one boot plants under hips, head low, (7) one knee up, back stays leaning, steady hand presses on raised thigh, (8) shifts weight over that planted foot and lifts hips with knees still deeply bent. Row three: (9) hips halfway up, both feet in contact, arms lowering, (10) legs almost straight, still leaning forward, (11) upright but chin tucked, arms dropping to neutral, (12) full neutral standing facing right, head up, match the reference standing idle. Breathing, heavy sleepy body language, consistent hood and same bone lengths, shifts of pressure carry over. No extra characters or scenery.
+
+</details>
 
 Stage 1 전용 배경과 공용으로 쓸 수 있는 지형·소품 PNG를 직접 제작했다. 좌표와 충돌은 Tiled의 방 데이터가 결정한다.
 

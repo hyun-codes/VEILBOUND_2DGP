@@ -18,6 +18,8 @@ DEATH_FRAME_STARTS = (0, 0.08, 0.16, 0.25, 0.35, 0.50)
 DEATH_FADE_START = 0.55
 FIRE_FRAMES = (0, 1, 2, 1, 3, 2)
 FIRE_ATLAS = "props/beacon_fire.png"
+WAKE_FRAME_STARTS = (0.55, 0.68, 0.81, 0.94, 1.07, 1.22, 1.36, 1.50, 1.64, 1.79, 1.94)
+WAKE_IDLE_TIME = 2.09
 
 
 def draw_darkness(backend, camera, x, y, radius):
@@ -313,9 +315,9 @@ class LanternView:
                 frame = 1 + int(room.walk_time * 12) % 4
             else:
                 frame = 0
-        if self.intro is not None:
-            pose = sum(self.intro >= mark for mark in (0.92, 1.52, 2.20))
-            sprite(f"characters/story/rise_{pose}.png", (0, 0, 21, 20), x - 10, y - 20, 21, 20)
+        if self.intro is not None and self.intro < WAKE_IDLE_TIME:
+            pose = sum(self.intro >= mark for mark in WAKE_FRAME_STARTS)
+            sprite("characters/story/wake.png", (pose * 24, 0, 24, 22), x - 12, y - 20, 24, 22)
         else:
             sprite(sheet, (frame * 21, 0, 21, 22), x - 10, y - 20, 21, 22, flip=room.facing < 0)
 

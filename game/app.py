@@ -86,7 +86,7 @@ def run(room, frames, screenshot, next_room=None):
         if intro is not None:
             intro += dt
             skip_held = skip_held + dt if "space" in keys else 0.0
-            if intro >= 2.8 or skip_held >= 0.7:
+            if intro >= 2.45 or skip_held >= 0.7:
                 intro = None
             view.intro = intro
             return
