@@ -8,6 +8,7 @@ from game.lantern_room import light_span
 
 
 ASSETS = Path(__file__).resolve().parents[1] / "assets"
+HINT_FONT = ASSETS / "ui/fonts/GowunBatang-Hints.ttf"
 DARKNESS_MASK = ASSETS / "environments/stage_01/lantern_darkness.png"
 MASK_SIZE = 221
 CHAIN_FRAMES = 8
@@ -60,6 +61,30 @@ def draw_projector_beam(backend, camera, x, y, target_x, target_y, color):
             if len(edges) == 2:
                 left, right = sorted(edges)
                 backend.overlay(camera.screen_rect(left, row, right - left, 1), (*color, alpha))
+
+
+def exit_hint(room):
+    unlit = [beacon for name, (beacon, _) in room.beacons.items() if name not in room.lit_beacons]
+    if unlit:
+        if all(beacon.properties.get("socket") for beacon in unlit) and not any(
+                room.socket and room.socket.name == beacon.properties["socket"] for beacon in unlit):
+            action = "받침대에 구슬을 두고 등잔 앞에서 E를 누르자."
+        elif all(beacon.properties.get("beam") for beacon in unlit):
+            action = "투광기로 등잔을 비춘 뒤 가까이서 E를 누르자."
+        else:
+            action = "빛이 닿은 등잔 앞에서 E를 눌러 켜자."
+        return f"아직 꺼진 등잔이 {len(unlit)}개 남았다.", action
+    if remaining := len(room.keys) - len(room.collected):
+        return f"아직 찾지 못한 열쇠가 {remaining}개 남았다.", "빛을 옮겨 어두운 길을 살펴보자."
+    if any(not room.receiver_lit(receiver) for receiver in room.receivers):
+        return "수광부에 빛이 닿지 않는다.", "투광기를 돌려 수광부를 비추자."
+    if room.exit_socket and room.socket is not room.exit_socket:
+        return "받침대가 비어 있다.", "구슬을 마지막 받침대에 놓자."
+    if room.exit.properties.get("waitSibling"):
+        return "동생이 아직 건너는 중이다.", "빛을 남겨 두고 문턱에서 기다리자."
+    if room.exit.properties.get("carry") and not room.carrying_lantern:
+        return "구슬이 뒤에 남아 있다.", "구슬을 다시 품고 길을 나서자."
+    return None
 
 
 class LanternView:
@@ -163,7 +188,8 @@ class LanternView:
 
         door = room.exit
         door_open = room.complete or (bool(room.exit_socket or room.beacons or room.switch_relays) and room.exit_ready)
-        if not story or room.story_door_closed:
+        locked = room.story_door_closed
+        if not story or locked:
             sprite("props/exit_door.png", (13 if door_open else 0, 0, 13, 24),
                    door.x, door.y, door.width, door.height)
         for socket in room.sockets:
@@ -197,7 +223,7 @@ class LanternView:
             frame = 11 if name in room.lit_beacons else 0
             sprite("props/vault_beacon.png", (frame, 0, 11, 14),
                    beacon.x - 5, beacon.y - 14, 11, 14)
-            if not story or room.story_door_closed:
+            if not story or locked:
                 sprite("props/vault_beacon.png", (frame + 4, 4, 3, 3),
                        door.x - 2 + i % 3 * 6, door.y - 9 + i // 3 * 4, 3, 3)
 
@@ -293,6 +319,19 @@ class LanternView:
             rect(sx, sy, 1, 5, (255, 221, 170))
             for offset in (0, 2, 4):
                 rect(sx, sy + offset, 3, 1, (255, 221, 170))
+
+        if (locked and self.intro is None and death is None and room.respawn_elapsed is None
+                and abs(room.x - (door.x + door.width / 2)) <= 29
+                and abs(room.y - (door.y + door.height)) <= 23
+                and (hint := exit_hint(room))):
+            x, y, _, _ = self.camera.screen_rect(door.x + door.width / 2, door.y, 0, 0)
+            panel_width = 432
+            margin = panel_width // 2 + 12
+            x = max(margin, min(self.camera.width - margin, x))
+            y = min(y + 16, self.camera.height - 78)
+            backend.overlay((x - panel_width // 2, y, panel_width, 64), (11, 14, 21, 229))
+            backend.text(HINT_FONT, 22, hint[0], x, y + 43, (235, 218, 183))
+            backend.text(HINT_FONT, 18, hint[1], x, y + 19, (207, 211, 215))
 
         if self.intro is not None and self.intro < 0.55:
             backend.overlay((0, 0, self.camera.width, self.camera.height),

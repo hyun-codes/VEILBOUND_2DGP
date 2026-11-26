@@ -2,6 +2,8 @@
 
 타이틀 저수조 배경은 `ui/title_reservoir.png`에 있다. 타이틀에서 사용하는 [Cinzel 라이선스](ui/fonts/Cinzel-OFL.txt)는 글꼴과 함께 넣었다.
 
+잠긴 문 안내에는 [Gowun Batang Regular](https://github.com/google/fonts/tree/main/ofl/gowunbatang)에서 안내 문구와 숫자 0~9의 글자만 남긴 `ui/fonts/GowunBatang-Hints.ttf`를 사용한다. 문구를 변경할 때는 `game/lantern_view.py`의 `exit_hint`에 필요한 글자가 모두 포함되도록 다시 추출한다. [Gowun Batang 라이선스](ui/fonts/GowunBatang-OFL.txt)
+
 스토리 캠페인의 새 배경 네 장과 공유 통로, 젖은 석재는 ImageGen의 빗물 시설 배경판과 석재 원화를 잘라 배치한 이미지다. `characters/story`의 동생과 기상 포즈 네 장도 ImageGen으로 따로 제작했다. 기상 포즈는 기존 우비 아이를 외형 참고로 삼았다. 원화를 자르고 최근접 축소한 PNG를 게임에서 읽는다.
 
 Stage 1 전용 배경과 공용으로 쓸 수 있는 지형·소품 PNG를 직접 제작했다. 좌표와 충돌은 Tiled의 방 데이터가 결정한다.

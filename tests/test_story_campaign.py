@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import Mock
 
 from game.app import STAGES, walk_into_room
 from game.lantern_room import LanternRoom
@@ -29,6 +30,35 @@ ROUTES = {
 
 
 class StoryCampaignTest(unittest.TestCase):
+    def test_unlit_wicks_show_a_live_hint_only_by_the_locked_exit(self):
+        room = LanternRoom(load_map(STAGES[6]))
+        room.socket = None
+        view = LanternView(room, 800, 600)
+        backend = Mock()
+        view.draw(backend)
+        backend.text.assert_not_called()
+
+        room.x, room.y = room.exit.x - 3, room.exit.y + room.exit.height
+        view.camera.focus(room.x, room.y)
+        view.draw(backend)
+        self.assertEqual(backend.text.call_args_list[0].args[2], "아직 꺼진 등잔이 2개 남았다.")
+
+        backend.text.reset_mock()
+        room.lit_beacons.add("Sunken wick")
+        view.draw(backend)
+        self.assertEqual(backend.text.call_args_list[0].args[2], "아직 꺼진 등잔이 1개 남았다.")
+        self.assertIn("받침대", backend.text.call_args_list[1].args[2])
+
+        backend.text.reset_mock()
+        room.lit_beacons.update(room.beacons)
+        view.draw(backend)
+        self.assertEqual(backend.text.call_args_list[0].args[2], "아직 찾지 못한 열쇠가 1개 남았다.")
+
+        backend.text.reset_mock()
+        room.collected.update(range(len(room.keys)))
+        view.draw(backend)
+        backend.text.assert_not_called()
+
     def replay(self, room, route):
         if room.exit.properties.get("carry"):
             route += f" {room.exit.x - room.start.x + 1:g}"
