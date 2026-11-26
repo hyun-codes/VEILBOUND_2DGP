@@ -1,6 +1,6 @@
 # Stage 9 회전 공방
 
-일반 진행과 `python main.py --stage 9`는 [stage9_clockwork_chamber.tmj](stage9_clockwork_chamber.tmj)를 연다. 기존 저수조 맵은 보존되어 회귀 검사에 사용한다.
+[stage9_clockwork_chamber.tmj](stage9_clockwork_chamber.tmj)는 이전 캠페인의 회전 공방이다. 현재 일반 진행의 9번 방은 [story.tmj](story.tmj)다. 회전 공방과 저수조는 보존되어 회귀 검사에 사용한다.
 
 ## 조작과 규칙
 

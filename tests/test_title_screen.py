@@ -33,12 +33,12 @@ class TitleScreenTest(unittest.TestCase):
                 patch.object(app, "load_map", wraps=app.load_map) as load, \
                 patch.object(app, "LanternView") as view:
             app.run(None, 2, None)
-        load.assert_called_once_with(app.STAGE_1)
-        self.assertEqual(view.call_args.args[0].data.path, app.STAGE_1)
+        load.assert_called_once_with(app.STAGES[1])
+        self.assertEqual(view.call_args.args[0].data.path, app.STAGES[1])
         backend.text.assert_any_call(unittest.mock.ANY, 74, "VEILBOUND", 400, 438, unittest.mock.ANY)
         backend.close.assert_called_once()
 
     def test_stage_argument_bypasses_title(self):
         with patch.object(app, "run") as run:
             self.assertEqual(app.main(["--stage", "6", "--frames", "1"]), 0)
-        self.assertEqual(run.call_args.args[0].data.path, app.STAGE_6)
+        self.assertEqual(run.call_args.args[0].data.path, app.STAGES[6])

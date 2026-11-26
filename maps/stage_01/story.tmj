@@ -1,0 +1,248 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 88,
+  "height": 28,
+  "tilewidth": 8,
+  "tileheight": 8,
+  "backgroundcolor": "#090c10",
+  "layers": [
+    {
+      "id": 1,
+      "name": "gallery_0",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 241,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/gallery_0.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "gallery_0",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 138,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/gallery_0.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 362,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 458,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Light geometry",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 3,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 0,
+          "y": 144,
+          "width": 265,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 4,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 288,
+          "y": 135,
+          "width": 41,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 6,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 345,
+          "y": 144,
+          "width": 23,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 7,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 368,
+          "y": 144,
+          "width": 336,
+          "height": 12,
+          "properties": []
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Gameplay",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 1,
+          "name": "PlayerStart",
+          "type": "Spawn",
+          "x": 192,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": []
+        },
+        {
+          "id": 2,
+          "name": "Loose light",
+          "type": "Socket",
+          "x": 197,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 39
+            },
+            {
+              "name": "initial",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "name": "Sibling",
+          "type": "Sibling",
+          "x": 178,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "destination",
+              "type": "int",
+              "value": 226
+            },
+            {
+              "name": "trigger",
+              "type": "int",
+              "value": 212
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "name": "Exit",
+          "type": "Exit",
+          "x": 512,
+          "y": 120,
+          "width": 10,
+          "height": 24,
+          "properties": [
+            {
+              "name": "carry",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "nextlayerid": 7,
+  "nextobjectid": 9,
+  "properties": [
+    {
+      "name": "title",
+      "type": "string",
+      "value": "잠든 방"
+    },
+    {
+      "name": "stage",
+      "type": "int",
+      "value": 1
+    },
+    {
+      "name": "walkThrough",
+      "type": "bool",
+      "value": true
+    },
+    {
+      "name": "ending",
+      "type": "bool",
+      "value": false
+    }
+  ]
+}

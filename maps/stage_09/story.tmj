@@ -1,0 +1,641 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 122,
+  "height": 28,
+  "tilewidth": 8,
+  "tileheight": 8,
+  "backgroundcolor": "#090c10",
+  "layers": [
+    {
+      "id": 1,
+      "name": "gallery_1",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 241,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/gallery_1.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 138,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 634,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 730,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Light geometry",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 3,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 0,
+          "y": 144,
+          "width": 302,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 4,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 308,
+          "y": 165,
+          "width": 25,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 5,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 340,
+          "y": 185,
+          "width": 206,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 6,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 348,
+          "y": 159,
+          "width": 35,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 7,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 382,
+          "y": 135,
+          "width": 34,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 8,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 418,
+          "y": 111,
+          "width": 34,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 9,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 461,
+          "y": 90,
+          "width": 38,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 10,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 502,
+          "y": 115,
+          "width": 39,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 11,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 543,
+          "y": 137,
+          "width": 39,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 12,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 589,
+          "y": 159,
+          "width": 29,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 13,
+          "name": "Pier",
+          "type": "Wall",
+          "x": 457,
+          "y": 16,
+          "width": 6,
+          "height": 154,
+          "properties": []
+        },
+        {
+          "id": 14,
+          "name": "Pier",
+          "type": "Wall",
+          "x": 512,
+          "y": 22,
+          "width": 7,
+          "height": 78,
+          "properties": []
+        },
+        {
+          "id": 15,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 519,
+          "y": 163,
+          "width": 27,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 33,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 633,
+          "y": 144,
+          "width": 7,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 34,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 640,
+          "y": 144,
+          "width": 336,
+          "height": 12,
+          "properties": []
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Gameplay",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 1,
+          "name": "PlayerStart",
+          "type": "Spawn",
+          "x": 192,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": []
+        },
+        {
+          "id": 2,
+          "name": "Loose light",
+          "type": "Socket",
+          "x": 192,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 39
+            },
+            {
+              "name": "initial",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 16,
+          "name": "Transfer cradle",
+          "type": "Socket",
+          "x": 405,
+          "y": 185,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 50
+            }
+          ]
+        },
+        {
+          "id": 17,
+          "name": "Bottom lens",
+          "type": "Projector",
+          "x": 385,
+          "y": 185,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": []
+        },
+        {
+          "id": 18,
+          "name": "Bottom lens: 1",
+          "type": "Focus",
+          "x": 475,
+          "y": 169,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Bottom lens"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 37
+            }
+          ]
+        },
+        {
+          "id": 19,
+          "name": "Bottom lens: 2",
+          "type": "Focus",
+          "x": 366,
+          "y": 151,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Bottom lens"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 34
+            }
+          ]
+        },
+        {
+          "id": 20,
+          "name": "Bottom lens: 3",
+          "type": "Focus",
+          "x": 446,
+          "y": 114,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Bottom lens"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 53
+            }
+          ]
+        },
+        {
+          "id": 21,
+          "name": "Bottom lens: 4",
+          "type": "Focus",
+          "x": 496,
+          "y": 83,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Bottom lens"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 47
+            }
+          ]
+        },
+        {
+          "id": 22,
+          "name": "Upper lens",
+          "type": "Projector",
+          "x": 513,
+          "y": 115,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": []
+        },
+        {
+          "id": 23,
+          "name": "Upper lens: 1",
+          "type": "Focus",
+          "x": 541,
+          "y": 134,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Upper lens"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 42
+            }
+          ]
+        },
+        {
+          "id": 24,
+          "name": "Upper lens: 2",
+          "type": "Focus",
+          "x": 480,
+          "y": 87,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Upper lens"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 35
+            }
+          ]
+        },
+        {
+          "id": 25,
+          "name": "Upper lens: 3",
+          "type": "Focus",
+          "x": 501,
+          "y": 177,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Upper lens"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 56
+            }
+          ]
+        },
+        {
+          "id": 26,
+          "name": "Vault wick",
+          "type": "Beacon",
+          "x": 491,
+          "y": 90,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 30
+            }
+          ]
+        },
+        {
+          "id": 27,
+          "name": "Well wick",
+          "type": "Beacon",
+          "x": 504,
+          "y": 185,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 24
+            },
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Transfer cradle"
+            },
+            {
+              "name": "beam",
+              "type": "string",
+              "value": "Upper lens"
+            }
+          ]
+        },
+        {
+          "id": 28,
+          "name": "Return wick",
+          "type": "Beacon",
+          "x": 366,
+          "y": 159,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 23
+            },
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Transfer cradle"
+            },
+            {
+              "name": "beam",
+              "type": "string",
+              "value": "Bottom lens"
+            }
+          ]
+        },
+        {
+          "id": 29,
+          "name": "Top latch",
+          "type": "Key",
+          "x": 486,
+          "y": 81,
+          "width": 6,
+          "height": 9,
+          "properties": []
+        },
+        {
+          "id": 30,
+          "name": "Return latch",
+          "type": "Key",
+          "x": 351,
+          "y": 150,
+          "width": 6,
+          "height": 9,
+          "properties": []
+        },
+        {
+          "id": 31,
+          "name": "Reservoir latch",
+          "type": "Key",
+          "x": 527,
+          "y": 176,
+          "width": 6,
+          "height": 9,
+          "properties": []
+        },
+        {
+          "id": 32,
+          "name": "Return beam",
+          "type": "Receiver",
+          "x": 541,
+          "y": 134,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": []
+        },
+        {
+          "id": 35,
+          "name": "Exit",
+          "type": "Exit",
+          "x": 784,
+          "y": 120,
+          "width": 10,
+          "height": 24,
+          "properties": [
+            {
+              "name": "carry",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "nextlayerid": 7,
+  "nextobjectid": 36,
+  "properties": [
+    {
+      "name": "title",
+      "type": "string",
+      "value": "접힌 통로"
+    },
+    {
+      "name": "stage",
+      "type": "int",
+      "value": 9
+    },
+    {
+      "name": "walkThrough",
+      "type": "bool",
+      "value": true
+    },
+    {
+      "name": "ending",
+      "type": "bool",
+      "value": false
+    }
+  ]
+}

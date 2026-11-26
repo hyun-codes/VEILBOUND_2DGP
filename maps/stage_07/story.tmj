@@ -1,0 +1,482 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 116,
+  "height": 28,
+  "tilewidth": 8,
+  "tileheight": 8,
+  "backgroundcolor": "#090c10",
+  "layers": [
+    {
+      "id": 1,
+      "name": "gallery_2",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 241,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/gallery_2.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 138,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 586,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 682,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Light geometry",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 3,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 0,
+          "y": 144,
+          "width": 308,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 4,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 297,
+          "y": 165,
+          "width": 35,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 5,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 335,
+          "y": 182,
+          "width": 179,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 6,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 347,
+          "y": 151,
+          "width": 73,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 7,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 415,
+          "y": 133,
+          "width": 62,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 8,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 476,
+          "y": 109,
+          "width": 53,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 9,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 284,
+          "y": 130,
+          "width": 36,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 10,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 307,
+          "y": 107,
+          "width": 31,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 11,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 322,
+          "y": 83,
+          "width": 43,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 12,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 364,
+          "y": 83,
+          "width": 73,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 13,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 437,
+          "y": 83,
+          "width": 49,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 14,
+          "name": "Pier",
+          "type": "Wall",
+          "x": 408,
+          "y": 3,
+          "width": 11,
+          "height": 127,
+          "properties": []
+        },
+        {
+          "id": 15,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 493,
+          "y": 158,
+          "width": 27,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 16,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 511,
+          "y": 129,
+          "width": 51,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 25,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 576,
+          "y": 144,
+          "width": 16,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 26,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 592,
+          "y": 144,
+          "width": 336,
+          "height": 12,
+          "properties": []
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Gameplay",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 1,
+          "name": "PlayerStart",
+          "type": "Spawn",
+          "x": 192,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": []
+        },
+        {
+          "id": 2,
+          "name": "Loose light",
+          "type": "Socket",
+          "x": 192,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 39
+            },
+            {
+              "name": "initial",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 17,
+          "name": "Landing cradle",
+          "type": "Socket",
+          "x": 355,
+          "y": 182,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 52
+            }
+          ]
+        },
+        {
+          "id": 18,
+          "name": "Paired gallery lens",
+          "type": "Projector",
+          "x": 365,
+          "y": 182,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": []
+        },
+        {
+          "id": 19,
+          "name": "Paired gallery lens: 1",
+          "type": "Focus",
+          "x": 456,
+          "y": 93,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Paired gallery lens"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 61
+            }
+          ]
+        },
+        {
+          "id": 20,
+          "name": "Paired gallery lens: 2",
+          "type": "Focus",
+          "x": 443,
+          "y": 160,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Paired gallery lens"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 46
+            }
+          ]
+        },
+        {
+          "id": 21,
+          "name": "Upper bridge wick",
+          "type": "Beacon",
+          "x": 459,
+          "y": 83,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 33
+            }
+          ]
+        },
+        {
+          "id": 22,
+          "name": "Footing wick",
+          "type": "Beacon",
+          "x": 474,
+          "y": 182,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 28
+            },
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Landing cradle"
+            },
+            {
+              "name": "beam",
+              "type": "string",
+              "value": "Paired gallery lens"
+            }
+          ]
+        },
+        {
+          "id": 23,
+          "name": "Overpass latch",
+          "type": "Key",
+          "x": 455,
+          "y": 74,
+          "width": 6,
+          "height": 9,
+          "properties": []
+        },
+        {
+          "id": 24,
+          "name": "Sump latch",
+          "type": "Key",
+          "x": 486,
+          "y": 173,
+          "width": 6,
+          "height": 9,
+          "properties": []
+        },
+        {
+          "id": 27,
+          "name": "Exit",
+          "type": "Exit",
+          "x": 736,
+          "y": 120,
+          "width": 10,
+          "height": 24,
+          "properties": [
+            {
+              "name": "carry",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "nextlayerid": 7,
+  "nextobjectid": 28,
+  "properties": [
+    {
+      "name": "title",
+      "type": "string",
+      "value": "겹친 계단"
+    },
+    {
+      "name": "stage",
+      "type": "int",
+      "value": 7
+    },
+    {
+      "name": "walkThrough",
+      "type": "bool",
+      "value": true
+    },
+    {
+      "name": "ending",
+      "type": "bool",
+      "value": false
+    }
+  ]
+}

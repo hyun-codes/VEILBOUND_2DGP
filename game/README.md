@@ -4,6 +4,8 @@
 
 `title_screen.py`는 시작 화면의 메뉴 입력과 그리기를 맡는다. `--stage`를 지정하면 해당 방으로 바로 들어간다.
 
+기본 진행은 `maps/stage_XX/story.tmj` 열 곳을 사용한다. `app.py`의 `walk_into_room`은 연결 통로에서 위치와 이동 상태를 다음 방의 로컬 좌표로 옮긴다. `LanternRoom`은 Tiled의 동생 오브젝트를 갱신하고, `LanternView`는 기상과 동생 스프라이트를 그린다. [캠페인 편집 기록](../maps/story_campaign.md)을 참고한다.
+
 점프는 `lantern_room.py`의 공통 물리로 처리한다. `app.py`는 Space의 누른 순간과 유지 상태(`jump_held`)를 각각 전달한다. 기존 입력 재생 호출은 유지 상태를 생략하면 최대 높이 점프로 실행된다. 발판 이탈 유예 0.10초, 착지 입력 버퍼 0.12초, 최소 상승 0.06초와 버튼 해제 후 상승 중력 2400, 상승/하강 중력 960/1056, 1픽셀 천장 모서리 보정을 적용한다. 코요테 타임은 마지막 지지면이 현재 빛 충돌에도 남아 있어야 유효하다. 모서리 보정도 현재 밝은 고체와 이동 경로를 검사한다.
 
 설계 참고: [Celeste 개발자의 입력 보정 설명](https://www.mattmakesgames.com/articles/celeste_and_forgiveness/index.html), [Kyle Pittman의 Building a Better Jump 발표 소개](https://www.gdcvault.com/play/1023148/Math-for-Game-Programmers-Building). 적용 수치와 빛 소멸 시 예외는 VEILBOUND의 설계 판단이다. 정점 체공 보정이나 수평 관성은 추가하지 않았다. `tests/test_jump.py`는 입력 유예·만료, 빛 소멸, 높이 조절, 모서리/천장 충돌, 실제 앱의 Space 유지·해제 전달을 검사한다.

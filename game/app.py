@@ -21,12 +21,34 @@ STAGE_6 = STAGE_1.parent.parent / "stage_06/stage6_pressure_foundry.tmj"
 STAGE_7 = STAGE_1.parent.parent / "stage_07/stage7_reverse_foundry.tmj"
 STAGE_8 = STAGE_1.parent.parent / "stage_08/stage8_freight_interlock.tmj"
 STAGE_9 = STAGE_1.parent.parent / "stage_09/stage9_clockwork_chamber.tmj"
-STAGES = {1: STAGE_1, 2: STAGE_2, 3: STAGE_3, 4: STAGE_4, 5: STAGE_5,
-          6: STAGE_6, 7: STAGE_7, 8: STAGE_8, 9: STAGE_9}
+STAGES = {number: STAGE_1.parents[1] / f"stage_{number:02d}/story.tmj"
+          for number in range(1, 11)}
 WIDTH, HEIGHT = 800, 600
 FADE_OUT = 0.28
 BLACKOUT = 0.14
 FADE_IN = 0.30
+
+
+def walk_into_room(view, next_room):
+    """Both maps draw the same corridor around the seam in local coordinates."""
+    room = view.room
+    dx = next_room.start.x - room.exit.x
+    dy = next_room.start.y - (room.exit.y + room.exit.height)
+    next_room.x, next_room.y = room.x + dx, room.y + dy
+    next_room.walk_time, next_room.facing = room.walk_time, room.facing
+    next_room.vy, next_room.grounded = room.vy, room.grounded
+    next_room.jump_time, next_room.jump_released = room.jump_time, room.jump_released
+    next_room.jump_buffer, next_room.jump_grace = room.jump_buffer, room.jump_grace
+    if room.jump_support:
+        x, y = room.jump_support
+        next_room.jump_support = x + dx, y + dy
+    next_room.socket = None
+    incoming = LanternView(next_room, view.camera.width, view.camera.height)
+    scale = view.camera.scale
+    incoming.camera.set_position((round(view.camera.x * scale) + dx * scale) / scale,
+                                 (round(view.camera.y * scale) + dy * scale) / scale)
+    incoming.camera.look_ahead = view.camera.look_ahead
+    return incoming
 
 
 def draw_stage_transition(backend, elapsed):
@@ -55,9 +77,25 @@ def run(room, frames, screenshot, next_room=None):
     pending = set()
     paused = False
     transition = None
+    intro = None
+    skip_held = 0.0
+    ending = None
 
     def step(dt):
-        nonlocal room, view, next_room, transition
+        nonlocal room, view, next_room, transition, intro, skip_held, ending
+        if intro is not None:
+            intro += dt
+            skip_held = skip_held + dt if "space" in keys else 0.0
+            if intro >= 2.8 or skip_held >= 0.7:
+                intro = None
+            view.intro = intro
+            return
+        if ending is not None:
+            ending += dt
+            skip_held = skip_held + dt if "space" in keys else 0.0
+            if skip_held >= 0.7:
+                ending = max(ending, 1.2)
+            return
         if transition is not None:
             previous = transition
             transition += dt
@@ -72,9 +110,20 @@ def run(room, frames, screenshot, next_room=None):
         room.step(dt, direction, "space" in pending, "e" in pending,
                   jump_held="space" in keys)
         pending.clear()
+        if room.walk_through is True:
+            view.camera.follow(room.x, room.y, direction, dt)
         if room.complete and next_room is not None:
-            transition = 0.0
-            keys.clear()
+            if room.walk_through is True:
+                room = LanternRoom(load_map(STAGES[next_room]))
+                view = walk_into_room(view, room)
+                next_room = next_room + 1 if next_room + 1 in STAGES else None
+            else:
+                transition = 0.0
+                keys.clear()
+        elif room.complete and room.data.properties.get("ending") is True:
+            ending = 0.0
+            skip_held = 0.0
+            keys.discard("space")
 
     try:
         backend.open(WIDTH, HEIGHT)
@@ -98,16 +147,34 @@ def run(room, frames, screenshot, next_room=None):
                         if action == "quit":
                             return
                         if action == "play":
-                            room = LanternRoom(load_map(STAGE_1))
+                            room = LanternRoom(load_map(STAGES[1]))
                             view = LanternView(room, WIDTH, HEIGHT)
                             next_room = 2
                             title = None
+                            intro = view.intro = 0.0
+                            skip_held = 0.0
                             elapsed = 0.0
                             break
                     continue
                 if event.kind == "key_down" and event.key == "escape":
                     return
+                if (intro is not None or ending is not None) and event.key == "space":
+                    if event.kind == "key_up":
+                        keys.discard("space")
+                    elif event.kind == "key_down" and not paused:
+                        keys.add("space")
+                    continue
+                if ending is not None:
+                    if ending >= 1.2 and event.kind == "key_down" and event.key == "enter":
+                        title = TitleScreen()
+                        ending = None
+                        keys.clear()
+                        pending.clear()
+                        stepper.reset()
+                    continue
                 if transition is not None:
+                    continue
+                if intro is not None:
                     continue
                 if event.kind == "key_up":
                     keys.discard(event.key)
@@ -115,6 +182,8 @@ def run(room, frames, screenshot, next_room=None):
                     keys.add(event.key)
                     if event.key == "r":
                         room.reset()
+                        if room.walk_through is True:
+                            view.camera.focus(room.x, room.y)
                         keys.clear()
                         pending.clear()
                         stepper.reset()
@@ -129,6 +198,13 @@ def run(room, frames, screenshot, next_room=None):
                 view.draw(backend)
                 if transition is not None:
                     draw_stage_transition(backend, transition)
+                if ending is not None:
+                    fraction = min(1, ending / 1.2)
+                    backend.overlay((0, 0, WIDTH, HEIGHT), (5, 8, 12, round(255 * fraction)))
+                    if fraction == 1:
+                        font = ASSETS / "ui/fonts/Cinzel.ttf"
+                        backend.text(font, 32, "VEILBOUND", WIDTH // 2, 320, (191, 198, 202))
+                        backend.text(font, 16, "Enter", WIDTH // 2, 263, (145, 156, 164))
             count += 1
             if screenshot and count == frames:
                 backend.save_screenshot(screenshot, WIDTH, HEIGHT)

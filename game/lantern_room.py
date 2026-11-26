@@ -39,6 +39,11 @@ class LanternRoom:
         self.data = data
         self.start = data.object_named("PlayerStart")
         self.exit = data.object_named("Exit")
+        self.walk_through = data.properties.get("walkThrough") is True
+        siblings = tuple(obj for obj in data.objects if obj.kind == "Sibling")
+        self.sibling = siblings[0] if siblings else None
+        if len(siblings) > 1 or (self.exit.properties.get("waitSibling") and not self.sibling):
+            raise MapFormatError("A story room needs one sibling for a reunion exit")
         pivots = tuple(o for o in data.objects if o.kind == 'RoomPivot')
         self.cranks = tuple(o for o in data.objects if o.kind == 'RoomCrank')
         if len(pivots) > 1 or bool(pivots) != bool(self.cranks):
@@ -182,6 +187,25 @@ class LanternRoom:
                     and 8 <= beacon.y <= data.height
                     and terrain.supported(beacon.x, beacon.y, self.WIDTH)):
                 raise MapFormatError("A beacon needs a supporting surface and positive radius")
+            socket = beacon.properties.get("socket")
+            if socket and data.object_named(socket) not in self.sockets:
+                raise MapFormatError("A beacon's socket must refer to a socket")
+            if beacon.properties.get("beam") and beacon.properties["beam"] not in self.aims:
+                raise MapFormatError("A beacon's beam must name a projector")
+        if self.sibling:
+            point = self.sibling
+            destination = point.properties.get("destination")
+            socket = point.properties.get("socket")
+            landing = point.properties.get("fallY", point.y)
+            trigger = point.properties.get("trigger", 0)
+            if (type(trigger) not in (int, float) or not 0 <= trigger < data.width
+                    or type(destination) not in (int, float) or not 0 <= destination < data.width
+                    or not terrain.supported(point.x, point.y, 5)
+                    or not terrain.supported(destination, point.y, 5)
+                    or type(landing) not in (int, float) or not point.y <= landing < data.height
+                    or not terrain.supported(point.x, landing, 5)
+                    or (socket and data.object_named(socket) not in self.sockets)):
+                raise MapFormatError("A sibling needs supported start and destination points")
         self.reset()
 
     def reset(self):
@@ -214,6 +238,10 @@ class LanternRoom:
         self.pressed_plates = set()
         self.rotation_control = False
         self.rotation_input = 0
+        self.sibling_x = self.sibling.x if self.sibling else None
+        self.sibling_y = self.sibling.y if self.sibling else None
+        self.sibling_vy = 0.0
+        self.sibling_travel = 0.0
         if self.chamber:
             self.chamber.reset()
             self.sync_rotation()
@@ -356,6 +384,8 @@ class LanternRoom:
 
     def collision(self, *, include_crate=True):
         bodies = self.terrain + ((self.crate,) if include_crate and self.crate else ())
+        if self.story_door_closed:
+            bodies += (self.exit,)
         return CollisionWorld(strip for body in bodies for strip in self.exposed(body))
 
     def move_crate(self, dt, direction, jumping):
@@ -391,10 +421,17 @@ class LanternRoom:
     @property
     def exit_ready(self):
         return (len(self.collected) == len(self.keys)
+                and (not self.exit.properties.get("carry") or self.carrying_lantern)
                 and (self.chamber is None or self.chamber.orientation == self.chamber.exit_orientation)
                 and len(self.lit_beacons) == len(self.beacons)
                 and (self.exit_socket is None or self.socket is self.exit_socket)
+                and (not self.exit.properties.get("waitSibling") or
+                     self.sibling_x == self.sibling.properties["destination"])
                 and all(self.receiver_lit(receiver) for receiver in self.receivers))
+
+    @property
+    def story_door_closed(self):
+        return self.walk_through and not self.exit_ready
 
     def interaction(self):
         if self.complete or self.death_elapsed is not None or self.respawn_elapsed is not None:
@@ -405,6 +442,8 @@ class LanternRoom:
         if not self.grounded:
             return None
         sockets = self.sockets if self.carrying_lantern else (self.socket,) if self.socket else ()
+        if self.walk_through and self.carrying_lantern:
+            sockets = tuple(socket for socket in sockets if socket is not self.initial_socket)
         chutes = tuple(o for o in self.chutes
                        if self.carrying_lantern or self.socket is self.chute_targets[o.name])
         switches = tuple(s for s in self.switches
@@ -416,7 +455,11 @@ class LanternRoom:
                            {plate.properties["projector"] for plate in self.plates})
         candidates += tuple(beacon for name, (beacon, _) in self.beacons.items()
                             if name not in self.lit_beacons
-                            and self.illuminated(beacon.x, beacon.y - 8))
+                            and self.illuminated(beacon.x, beacon.y - 8)
+                            and (not beacon.properties.get("socket") or
+                                 (self.socket and self.socket.name == beacon.properties["socket"]))
+                            and (not (beam := beacon.properties.get("beam")) or
+                                 self.receiver_lit(replace(beacon, y=beacon.y - 8), projector=beam)))
         return min((o for o in candidates if abs(self.x - o.x) <= 9 and abs(self.y - o.y) <= 2),
                    key=lambda o: abs(self.x - o.x), default=None)
 
@@ -461,6 +504,31 @@ class LanternRoom:
         self.jump_support = None
         self.jump_released = not held
         self.grounded = False
+
+    def move_sibling(self, dt, collision):
+        if not self.sibling:
+            return
+        point = self.sibling
+        self.sibling_travel = 0.0
+        socket = point.properties.get("socket")
+        if self.x < point.properties.get("trigger", 0) or (socket and (
+                self.socket is None or self.socket.name != socket)):
+            return
+        if (landing := point.properties.get("fallY")) and self.sibling_y < landing:
+            if self.sibling_vy or not collision.supported(self.sibling_x, self.sibling_y, 5):
+                self.sibling_vy += self.FALL_GRAVITY * dt
+                self.sibling_y = min(landing, self.sibling_y + self.sibling_vy * dt)
+            return
+        destination = point.properties["destination"]
+        distance = destination - self.sibling_x
+        speed = 48 if socket else 30
+        dx = max(-speed * dt, min(distance, speed * dt))
+        if not dx:
+            return
+        x, _, side, _, _ = collision.move(self.sibling_x, point.y, 5, 11, dx, 0)
+        if not side and collision.supported(x, point.y, 5):
+            self.sibling_x = x
+            self.sibling_travel = dx
 
     def step(self, dt, direction, jump=False, interact=False, *, jump_held=True):
         if self.complete:
@@ -564,7 +632,12 @@ class LanternRoom:
         for index, key in enumerate(self.keys):
             if index not in self.collected and any(self._touches(part) for part in self.exposed(key)):
                 self.collected.add(index)
-        self.complete = (landed and self.exit_ready
-                         and self.exit.x <= self.x <= self.exit.x + self.exit.width
-                         and self.exit.y <= self.y <= self.exit.y + self.exit.height
-                         and self.illuminated(self.x, self.y))
+        self.move_sibling(dt, collision)
+        if self.walk_through and self.exit.properties.get("carry"):
+            crossed = self.x >= self.exit.x and self.y <= self.exit.y + self.exit.height
+        elif self.walk_through:
+            crossed = landed and self.x >= self.exit.x and self.y <= self.exit.y + self.exit.height
+        else:
+            crossed = (landed and self.exit.x <= self.x <= self.exit.x + self.exit.width
+                       and self.exit.y <= self.y <= self.exit.y + self.exit.height)
+        self.complete = crossed and self.exit_ready and self.illuminated(self.x, self.y)

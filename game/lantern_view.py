@@ -66,6 +66,9 @@ class LanternView:
     def __init__(self, room, width, height):
         self.room = room
         self.camera = Camera(room.data.width, room.data.height, width, height, scale=3)
+        self.intro = None
+        if room.walk_through:
+            self.camera.focus(room.x, room.y)
 
     def draw(self, backend):
         room = self.room
@@ -114,8 +117,10 @@ class LanternView:
                 angle = -room.chamber.angle
             sprite('props/brass_key.png', (0, 0, 14, 10), cx - 7, cy - 5, 14, 10, angle=angle)
 
+        story = room.walk_through
         backend.begin(room.data.background)
-        sprite("environments/stage_01/pump_hall.png", (0, 0, 264, 200), 0, 0, room.data.width, room.data.height)
+        if not story:
+            sprite("environments/stage_01/pump_hall.png", (0, 0, 264, 200), 0, 0, room.data.width, room.data.height)
         for part in room.data.sprites:
             if part.visual_role == "backdrop":
                 backend.image(part.image, part.source,
@@ -132,10 +137,11 @@ class LanternView:
                 backend.image(part.image, (sx + frame * sw, sy, sw, sh), (x, y, w, h))
         if room.chamber:
             draw_chamber()
+        stone = "environments/story/stone.png" if story else "tiles/stone_ledge.png"
         for ground in room.ground:
-            ledge("tiles/stone_ledge.png", ground, 16)
+            ledge(stone, ground, 16)
         for p in room.platforms:
-            ledge("tiles/lantern_ledge.png", p, 5)
+            ledge(stone if story else "tiles/lantern_ledge.png", p, 5)
         for plate in room.plates:
             pressed = plate.name in room.pressed_plates
             sprite("props/pressure_treadle.png", (3, 13, 26, 11),
@@ -146,7 +152,7 @@ class LanternView:
                               self.camera.screen_rect(part.x, part.y, part.width, part.height))
         for prop in room.props:
             if prop.kind == "Wall":
-                ledge("tiles/stone_ledge.png", prop, 16)
+                ledge(stone, prop, 16)
             else:
                 rect(prop.x, prop.y, prop.width, prop.height, (121, 88, 61))
                 rect(prop.x, prop.y, prop.width, prop.height, (196, 151, 102), False)
@@ -157,15 +163,19 @@ class LanternView:
 
         door = room.exit
         door_open = room.complete or (bool(room.exit_socket or room.beacons or room.switch_relays) and room.exit_ready)
-        sprite("props/exit_door.png", (13 if door_open else 0, 0, 13, 24),
-               door.x, door.y, door.width, door.height)
+        if not story or room.story_door_closed:
+            sprite("props/exit_door.png", (13 if door_open else 0, 0, 13, 24),
+                   door.x, door.y, door.width, door.height)
         for socket in room.sockets:
+            if story and socket is room.initial_socket:
+                continue
             sprite("props/lantern_socket.png", (0, 0, 10, 7), socket.x - 5, socket.y - 7, 10, 7)
             if socket.properties.get("releaseInLight"):
                 open_cell = 9 if room.receiver_lit(socket) else 0
                 sprite("props/lens_receiver.png", (open_cell, 0, 9, 11), socket.x + 6, socket.y - 11, 9, 11)
-        for fixture in room.fixtures:
-            sprite("props/light_orb.png", (7, 0, 7, 9), fixture.x - 3, fixture.y - 4, 7, 9)
+        if not story:
+            for fixture in room.fixtures:
+                sprite("props/light_orb.png", (7, 0, 7, 9), fixture.x - 3, fixture.y - 4, 7, 9)
         for chute in room.chutes:
             sprite("props/lantern_chute.png", (0, 0, 14, 15), chute.x - 7, chute.y - 15, 14, 15)
         for valve in room.valves:
@@ -187,8 +197,9 @@ class LanternView:
             frame = 11 if name in room.lit_beacons else 0
             sprite("props/vault_beacon.png", (frame, 0, 11, 14),
                    beacon.x - 5, beacon.y - 14, 11, 14)
-            sprite("props/vault_beacon.png", (frame + 4, 4, 3, 3),
-                   door.x - 2 + i % 3 * 6, door.y - 9 + i // 3 * 4, 3, 3)
+            if not story or room.story_door_closed:
+                sprite("props/vault_beacon.png", (frame + 4, 4, 3, 3),
+                       door.x - 2 + i % 3 * 6, door.y - 9 + i // 3 * 4, 3, 3)
 
         for flood in room.floods:
             depth = round(room.water_depth(flood))
@@ -206,9 +217,18 @@ class LanternView:
                     sprite("environments/stage_06/reservoir_water.png", (ripple, 3, width, 5),
                            x, surface + rim, width, depth - rim)
 
+        if room.sibling:
+            bob = bool(room.sibling_travel) and int(room.elapsed * 12) % 2
+            sprite("characters/story/sibling.png", (0, 0, 8, 15),
+                   round(room.sibling_x) - 4, round(room.sibling_y) - 15 - bob, 8, 15,
+                   flip=room.sibling_travel < 0 or (not room.sibling_travel and room.sibling_x > room.x))
         lx, ly, radius = room.light
-        if len(room.lights) > 1:
-            draw_combined_darkness(backend, self.camera, room.lights)
+        left, top, width, height = self.camera.view
+        visible_lights = (room.light, *(light for light in room.lights[1:] if
+                          left < light[0] + light[2] and light[0] - light[2] < left + width
+                          and top < light[1] + light[2] and light[1] - light[2] < top + height))
+        if len(visible_lights) > 1:
+            draw_combined_darkness(backend, self.camera, visible_lights)
         else:
             draw_darkness(backend, self.camera, lx, ly, radius)
         if room.chamber and room.rotation_control:
@@ -251,7 +271,11 @@ class LanternView:
                 frame = 1 + int(room.walk_time * 12) % 4
             else:
                 frame = 0
-        sprite(sheet, (frame * 21, 0, 21, 22), x - 10, y - 20, 21, 22, flip=room.facing < 0)
+        if self.intro is not None:
+            pose = sum(self.intro >= mark for mark in (0.92, 1.52, 2.20))
+            sprite(f"characters/story/rise_{pose}.png", (0, 0, 21, 20), x - 10, y - 20, 21, 20)
+        else:
+            sprite(sheet, (frame * 21, 0, 21, 22), x - 10, y - 20, 21, 22, flip=room.facing < 0)
 
         if room.carrying_lantern:
             if death is None or death < DEATH_FRAME_STARTS[1]:
@@ -259,7 +283,7 @@ class LanternView:
                        round(lx) - 1, round(ly) - 1, 3, 3)
         else:
             sprite("props/light_orb.png", (0, 0, 7, 7), round(lx) - 3, round(ly) - 3, 7, 7)
-        if target := room.interaction():
+        if self.intro is None and (target := room.interaction()):
             sx, sy = target.x - 2, target.y - 22
             if target.kind == 'RoomCrank':
                 sy = target.y - 64
@@ -270,7 +294,10 @@ class LanternView:
             for offset in (0, 2, 4):
                 rect(sx, sy + offset, 3, 1, (255, 221, 170))
 
-        if death is not None and death >= DEATH_FADE_START:
+        if self.intro is not None and self.intro < 0.55:
+            backend.overlay((0, 0, self.camera.width, self.camera.height),
+                            (0, 0, 0, round(255 * (1 - self.intro / 0.55))))
+        elif death is not None and death >= DEATH_FADE_START:
             fade = (death - DEATH_FADE_START) / (room.DEATH_DURATION - DEATH_FADE_START)
             backend.overlay((0, 0, self.camera.width, self.camera.height), (0, 0, 0, round(255 * fade)))
         elif room.respawn_elapsed is not None:

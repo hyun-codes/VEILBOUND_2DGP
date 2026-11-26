@@ -1,0 +1,296 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 98,
+  "height": 28,
+  "tilewidth": 8,
+  "tileheight": 8,
+  "backgroundcolor": "#090c10",
+  "layers": [
+    {
+      "id": 1,
+      "name": "gallery_0",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 241,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/gallery_0.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 138,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 442,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 538,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Light geometry",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 3,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 0,
+          "y": 144,
+          "width": 270,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 4,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 279,
+          "y": 128,
+          "width": 35,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 5,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 318,
+          "y": 109,
+          "width": 32,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 6,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 342,
+          "y": 128,
+          "width": 46,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 7,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 399,
+          "y": 115,
+          "width": 30,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 8,
+          "name": "Pier",
+          "type": "Wall",
+          "x": 297,
+          "y": 47,
+          "width": 37,
+          "height": 44,
+          "properties": []
+        },
+        {
+          "id": 9,
+          "name": "Pier",
+          "type": "Wall",
+          "x": 382,
+          "y": 23,
+          "width": 25,
+          "height": 60,
+          "properties": []
+        },
+        {
+          "id": 12,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 446,
+          "y": 144,
+          "width": 2,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 13,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 448,
+          "y": 144,
+          "width": 336,
+          "height": 12,
+          "properties": []
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Gameplay",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 1,
+          "name": "PlayerStart",
+          "type": "Spawn",
+          "x": 192,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": []
+        },
+        {
+          "id": 2,
+          "name": "Loose light",
+          "type": "Socket",
+          "x": 192,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 39
+            },
+            {
+              "name": "initial",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "name": "Window latch",
+          "type": "Key",
+          "x": 334,
+          "y": 100,
+          "width": 6,
+          "height": 9,
+          "properties": []
+        },
+        {
+          "id": 11,
+          "name": "Drain latch",
+          "type": "Key",
+          "x": 405,
+          "y": 106,
+          "width": 6,
+          "height": 9,
+          "properties": []
+        },
+        {
+          "id": 14,
+          "name": "Exit",
+          "type": "Exit",
+          "x": 592,
+          "y": 120,
+          "width": 10,
+          "height": 24,
+          "properties": [
+            {
+              "name": "carry",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "nextlayerid": 7,
+  "nextobjectid": 15,
+  "properties": [
+    {
+      "name": "title",
+      "type": "string",
+      "value": "비어 있는 다락"
+    },
+    {
+      "name": "stage",
+      "type": "int",
+      "value": 3
+    },
+    {
+      "name": "walkThrough",
+      "type": "bool",
+      "value": true
+    },
+    {
+      "name": "ending",
+      "type": "bool",
+      "value": false
+    }
+  ]
+}

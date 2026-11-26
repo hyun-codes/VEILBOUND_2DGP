@@ -1,0 +1,349 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 90,
+  "height": 28,
+  "tilewidth": 8,
+  "tileheight": 8,
+  "backgroundcolor": "#090c10",
+  "layers": [
+    {
+      "id": 1,
+      "name": "gallery_3",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 241,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/gallery_3.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 138,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "gallery_3",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 474,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/gallery_3.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Light geometry",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 3,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 0,
+          "y": 144,
+          "width": 297,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 4,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 295,
+          "y": 162,
+          "width": 30,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 5,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 322,
+          "y": 179,
+          "width": 66,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 6,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 334,
+          "y": 144,
+          "width": 82,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 7,
+          "name": "Pier",
+          "type": "Wall",
+          "x": 358,
+          "y": 10,
+          "width": 7,
+          "height": 132,
+          "properties": []
+        },
+        {
+          "id": 12,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 389,
+          "y": 162,
+          "width": 43,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 13,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 417,
+          "y": 144,
+          "width": 303,
+          "height": 12,
+          "properties": []
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Gameplay",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 1,
+          "name": "PlayerStart",
+          "type": "Spawn",
+          "x": 192,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": []
+        },
+        {
+          "id": 2,
+          "name": "Loose light",
+          "type": "Socket",
+          "x": 192,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 39
+            },
+            {
+              "name": "initial",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "name": "Last recess",
+          "type": "Socket",
+          "x": 360,
+          "y": 179,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 27
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "name": "West shutter",
+          "type": "FixedLight",
+          "x": 327,
+          "y": 150,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 23
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "name": "Under the sill",
+          "type": "FixedLight",
+          "x": 318,
+          "y": 174,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "name": "East shutter",
+          "type": "FixedLight",
+          "x": 393,
+          "y": 150,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 25
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "name": "Morning at the door",
+          "type": "FixedLight",
+          "x": 486,
+          "y": 132,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 83
+            }
+          ]
+        },
+        {
+          "id": 15,
+          "name": "Sibling",
+          "type": "Sibling",
+          "x": 347,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "destination",
+              "type": "int",
+              "value": 505
+            },
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Last recess"
+            }
+          ]
+        },
+        {
+          "id": 16,
+          "name": "Exit",
+          "type": "Exit",
+          "x": 528,
+          "y": 120,
+          "width": 10,
+          "height": 24,
+          "properties": [
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Last recess"
+            },
+            {
+              "name": "waitSibling",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "nextlayerid": 6,
+  "nextobjectid": 17,
+  "properties": [
+    {
+      "name": "title",
+      "type": "string",
+      "value": "마지막 문턱"
+    },
+    {
+      "name": "stage",
+      "type": "int",
+      "value": 10
+    },
+    {
+      "name": "walkThrough",
+      "type": "bool",
+      "value": true
+    },
+    {
+      "name": "ending",
+      "type": "bool",
+      "value": true
+    }
+  ]
+}

@@ -1,0 +1,474 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 118,
+  "height": 28,
+  "tilewidth": 8,
+  "tileheight": 8,
+  "backgroundcolor": "#090c10",
+  "layers": [
+    {
+      "id": 1,
+      "name": "gallery_2",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 241,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/gallery_2.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 138,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 602,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 698,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Light geometry",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 3,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 0,
+          "y": 144,
+          "width": 309,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 4,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 307,
+          "y": 125,
+          "width": 40,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 5,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 348,
+          "y": 102,
+          "width": 48,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 6,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 413,
+          "y": 126,
+          "width": 41,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 7,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 395,
+          "y": 152,
+          "width": 19,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 8,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 365,
+          "y": 176,
+          "width": 25,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 9,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 385,
+          "y": 198,
+          "width": 149,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 10,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 492,
+          "y": 174,
+          "width": 34,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 11,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 518,
+          "y": 150,
+          "width": 36,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 12,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 549,
+          "y": 126,
+          "width": 36,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 13,
+          "name": "Pier",
+          "type": "Wall",
+          "x": 451,
+          "y": 22,
+          "width": 11,
+          "height": 160,
+          "properties": []
+        },
+        {
+          "id": 22,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 603,
+          "y": 144,
+          "width": 5,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 23,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 608,
+          "y": 144,
+          "width": 336,
+          "height": 12,
+          "properties": []
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Gameplay",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 1,
+          "name": "PlayerStart",
+          "type": "Spawn",
+          "x": 192,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": []
+        },
+        {
+          "id": 2,
+          "name": "Loose light",
+          "type": "Socket",
+          "x": 192,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 39
+            },
+            {
+              "name": "initial",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "name": "Drain foot",
+          "type": "Socket",
+          "x": 415,
+          "y": 198,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 56
+            }
+          ]
+        },
+        {
+          "id": 15,
+          "name": "Drain lens",
+          "type": "Projector",
+          "x": 419,
+          "y": 198,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": []
+        },
+        {
+          "id": 16,
+          "name": "Drain lens: 1",
+          "type": "Focus",
+          "x": 443,
+          "y": 155,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Drain lens"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 25
+            }
+          ]
+        },
+        {
+          "id": 17,
+          "name": "Drain lens: 2",
+          "type": "Focus",
+          "x": 506,
+          "y": 169,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Drain lens"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 41
+            }
+          ]
+        },
+        {
+          "id": 18,
+          "name": "Drain lens: 3",
+          "type": "Focus",
+          "x": 423,
+          "y": 126,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "projector",
+              "type": "string",
+              "value": "Drain lens"
+            },
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 34
+            }
+          ]
+        },
+        {
+          "id": 19,
+          "name": "Overhang wick",
+          "type": "Beacon",
+          "x": 434,
+          "y": 126,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 27
+            },
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Drain foot"
+            },
+            {
+              "name": "beam",
+              "type": "string",
+              "value": "Drain lens"
+            }
+          ]
+        },
+        {
+          "id": 20,
+          "name": "Drain wick",
+          "type": "Beacon",
+          "x": 478,
+          "y": 198,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 25
+            },
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Drain foot"
+            },
+            {
+              "name": "beam",
+              "type": "string",
+              "value": "Drain lens"
+            }
+          ]
+        },
+        {
+          "id": 21,
+          "name": "Silt latch",
+          "type": "Key",
+          "x": 463,
+          "y": 189,
+          "width": 6,
+          "height": 9,
+          "properties": []
+        },
+        {
+          "id": 24,
+          "name": "Exit",
+          "type": "Exit",
+          "x": 752,
+          "y": 120,
+          "width": 10,
+          "height": 24,
+          "properties": [
+            {
+              "name": "carry",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "nextlayerid": 7,
+  "nextobjectid": 25,
+  "properties": [
+    {
+      "name": "title",
+      "type": "string",
+      "value": "무너진 집수정"
+    },
+    {
+      "name": "stage",
+      "type": "int",
+      "value": 8
+    },
+    {
+      "name": "walkThrough",
+      "type": "bool",
+      "value": true
+    },
+    {
+      "name": "ending",
+      "type": "bool",
+      "value": false
+    }
+  ]
+}

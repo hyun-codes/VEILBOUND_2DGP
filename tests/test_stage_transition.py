@@ -36,7 +36,7 @@ class StageTransitionTest(unittest.TestCase):
                 patch.object(app, "LanternView", side_effect=lambda room, *size: draw(room)):
             app.run(old_room, 55, None, next_room=2)
 
-        load_map.assert_called_once_with(app.STAGE_2)
+        load_map.assert_called_once_with(app.STAGES[2])
         first_new = next(i for i, frame in enumerate(frames) if frame["room"] is new_room)
         self.assertTrue(any(0 < f["overlays"][0] < 255 for f in frames[:first_new] if f["overlays"]))
         self.assertEqual(frames[first_new]["overlays"][0], 255)

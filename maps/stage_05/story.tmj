@@ -1,0 +1,359 @@
+{
+  "type": "map",
+  "version": "1.10",
+  "tiledversion": "1.10.2",
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "infinite": false,
+  "width": 114,
+  "height": 28,
+  "tilewidth": 8,
+  "tileheight": 8,
+  "backgroundcolor": "#090c10",
+  "layers": [
+    {
+      "id": 1,
+      "name": "gallery_1",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 241,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/gallery_1.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 138,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 570,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "threshold",
+      "type": "imagelayer",
+      "x": 0,
+      "y": 0,
+      "offsetx": 666,
+      "offsety": 0,
+      "visible": true,
+      "opacity": 1,
+      "image": "../../assets/environments/story/threshold.png",
+      "properties": [
+        {
+          "name": "visualRole",
+          "type": "string",
+          "value": "backdrop"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Light geometry",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 3,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 0,
+          "y": 144,
+          "width": 369,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 4,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 357,
+          "y": 169,
+          "width": 25,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 5,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 391,
+          "y": 186,
+          "width": 28,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 6,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 427,
+          "y": 198,
+          "width": 84,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 7,
+          "name": "Pier",
+          "type": "Wall",
+          "x": 461,
+          "y": 30,
+          "width": 9,
+          "height": 152,
+          "properties": []
+        },
+        {
+          "id": 8,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 510,
+          "y": 176,
+          "width": 31,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 9,
+          "name": "Ledge",
+          "type": "LightPlatform",
+          "x": 537,
+          "y": 156,
+          "width": 23,
+          "height": 5,
+          "properties": []
+        },
+        {
+          "id": 15,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 569,
+          "y": 144,
+          "width": 7,
+          "height": 12,
+          "properties": []
+        },
+        {
+          "id": 16,
+          "name": "Stone floor",
+          "type": "Ground",
+          "x": 576,
+          "y": 144,
+          "width": 336,
+          "height": 12,
+          "properties": []
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Gameplay",
+      "type": "objectgroup",
+      "x": 0,
+      "y": 0,
+      "visible": true,
+      "opacity": 1,
+      "objects": [
+        {
+          "id": 1,
+          "name": "PlayerStart",
+          "type": "Spawn",
+          "x": 192,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": []
+        },
+        {
+          "id": 2,
+          "name": "Loose light",
+          "type": "Socket",
+          "x": 192,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 39
+            },
+            {
+              "name": "initial",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "name": "Catch basin",
+          "type": "Socket",
+          "x": 446,
+          "y": 198,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 48
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "name": "Shaft window",
+          "type": "FixedLight",
+          "x": 380,
+          "y": 157,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 30
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "name": "Drop lip",
+          "type": "Chute",
+          "x": 364,
+          "y": 144,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Catch basin"
+            }
+          ]
+        },
+        {
+          "id": 13,
+          "name": "Bottom wick",
+          "type": "Beacon",
+          "x": 486,
+          "y": 198,
+          "width": 0,
+          "height": 0,
+          "point": true,
+          "properties": [
+            {
+              "name": "radius",
+              "type": "int",
+              "value": 18
+            },
+            {
+              "name": "socket",
+              "type": "string",
+              "value": "Catch basin"
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "name": "Fallen clasp",
+          "type": "Key",
+          "x": 433,
+          "y": 189,
+          "width": 6,
+          "height": 9,
+          "properties": []
+        },
+        {
+          "id": 17,
+          "name": "Exit",
+          "type": "Exit",
+          "x": 720,
+          "y": 120,
+          "width": 10,
+          "height": 24,
+          "properties": [
+            {
+              "name": "carry",
+              "type": "bool",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "nextlayerid": 7,
+  "nextobjectid": 18,
+  "properties": [
+    {
+      "name": "title",
+      "type": "string",
+      "value": "낙하 통로"
+    },
+    {
+      "name": "stage",
+      "type": "int",
+      "value": 5
+    },
+    {
+      "name": "walkThrough",
+      "type": "bool",
+      "value": true
+    },
+    {
+      "name": "ending",
+      "type": "bool",
+      "value": false
+    }
+  ]
+}
