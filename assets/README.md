@@ -16,6 +16,15 @@ Stage 1 전용 배경과 공용으로 쓸 수 있는 지형·소품 PNG를 직�
 - `characters/player/raincoat_child_death.png`는 같은 기준점을 사용하는 21×22 셀 여섯 장에 노란 후드 아이가 쓰러지는 모션을 담았다.
 - `props/light_orb.png`는 바닥·받침대에 놓인 구슬, 고정 조명, 가슴에 끼운 광원을 담았다. `props/lantern_socket.png`(10×7)는 구슬 받침대에 재사용한다.
 
+`props/beacon_fire.png`는 ImageGen 기본 도구로 만든 투명 불꽃 아틀라스다. 위쪽은 12×12 불꽃 네 자세, 아래쪽은 각 열 첫 4×4에 밝은 불티부터 어두운 불티까지 담는다. 켜진 등잔마다 다른 위상으로 재생한다.
+
+<details>
+<summary>불꽃 생성 프롬프트</summary>
+
+> A production sprite atlas of fire VFX for an original side-view pixel-platformer. Exactly EIGHT distinct tiny-scale retro hard-edged pixel-art fire shapes, FOUR columns and TWO rows, equal size cells with generous fully transparent gutters. In top row: four frames of a stationary small torch flame flickering slowly, the shape alternates between left, tall, right, compressed, root at identical center-bottom in each cell, matte dull vermilion outline, gold body, pale golden tiny hot center. In bottom row: four different isolated small fire embers, one per cell, each an individual simple pixel-cluster shape, from brightest pale amber tiny cross to dim red speck. Each ember is relatively easy to crop in its own cell. Square pixel clusters with deliberately low detail produced for final first-row flames only 9 x 10 game pixels and bottom-row embers 1 to 3 pixels wide. Transparent background everywhere, no bloom, no smoke, no floor, no labels, no lantern body, no handles, no spatial shadows, no checkerboard pattern baked in. Landscape, evenly spaced sprite sheet. Moderately warm and aged torchlight to suit bleak dark blue industrial ruins.
+
+</details>
+
 Stage 2의 발판은 `tiles/stage_02/`의 기계 부품 세 종류를 사용한다. 구부러진 배관은 완만한 계단, 깨진 기어는 가파른 층계, 터빈 날개는 기울어진 착지면으로 그렸다. Tiled에서 볼 수 있는 발판 배치와 충돌 윤곽은 [맵 편집 안내](../maps/README.md)에 있다.
 
 Stage 2의 `environments/stage_02/hoist_chain.png`는 사슬 고리와 톱니를 두 줄로 나눠 각 131×75 프레임 여덟 개를 담는다. 고리는 운반대가 이동할 때 최대 2화면 픽셀 위아래로 움직이며, 톱니는 고정된 축에서 회전한다. `props/chain_carriage.png`는 사슬을 따라 움직이는 13×13 광원 운반대다.

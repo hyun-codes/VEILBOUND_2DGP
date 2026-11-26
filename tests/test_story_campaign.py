@@ -30,6 +30,33 @@ ROUTES = {
 
 
 class StoryCampaignTest(unittest.TestCase):
+    def test_lit_beacons_animate_fire_and_embers_until_reset(self):
+        room = LanternRoom(load_map(STAGES[6]))
+        beacon, radius = room.beacons["Sunken wick"]
+        room.x, room.y, room.socket = beacon.x, beacon.y, None
+        view = LanternView(room, 800, 600)
+        backend = Mock()
+
+        def effects():
+            backend.image.reset_mock()
+            view.draw(backend)
+            return [(call.args[1], call.args[2]) for call in backend.image.call_args_list
+                    if call.args[0].name == "beacon_fire.png"]
+
+        self.assertEqual(effects(), [])
+        room.step(1 / 60, 0, interact=True)
+        self.assertIn(beacon.name, room.lit_beacons)
+        first = effects()
+        self.assertEqual(len(first), 4)
+        for _ in range(12):
+            room.step(1 / 60, 0)
+        second = effects()
+        self.assertNotEqual(first[0][0], second[0][0])
+        self.assertNotEqual([ember[1] for ember in first[1:]], [ember[1] for ember in second[1:]])
+        self.assertIn((beacon.x, beacon.y - 8, radius), room.lights)
+        room.reset()
+        self.assertEqual(effects(), [])
+
     def test_unlit_wicks_show_a_live_hint_only_by_the_locked_exit(self):
         room = LanternRoom(load_map(STAGES[6]))
         room.socket = None

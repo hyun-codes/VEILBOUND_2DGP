@@ -16,6 +16,8 @@ CHAIN_FRAME_TRAVEL = 1.5
 DEATH_KICK = ((4, -1), (-3, 1), (2, -1), (-1, 0))
 DEATH_FRAME_STARTS = (0, 0.08, 0.16, 0.25, 0.35, 0.50)
 DEATH_FADE_START = 0.55
+FIRE_FRAMES = (0, 1, 2, 1, 3, 2)
+FIRE_ATLAS = "props/beacon_fire.png"
 
 
 def draw_darkness(backend, camera, x, y, radius):
@@ -85,6 +87,16 @@ def exit_hint(room):
     if room.exit.properties.get("carry") and not room.carrying_lantern:
         return "구슬이 뒤에 남아 있다.", "구슬을 다시 품고 길을 나서자."
     return None
+
+
+def draw_beacon_fire(sprite, x, wick, elapsed):
+    frame = FIRE_FRAMES[int(elapsed * 11) % len(FIRE_FRAMES)]
+    sprite(FIRE_ATLAS, (frame * 12, 0, 12, 12), x - 6, wick - 12, 12, 12)
+    for index, drift in enumerate((-5, 2, 6)):
+        age = (elapsed + index * 0.31) % 0.94 / 0.94
+        ember = int(age * 4)
+        sprite(FIRE_ATLAS, (ember * 12, 12, 4, 4),
+               x - 2 + round(drift * age), wick - 7 - round(17 * age), 4, 4)
 
 
 class LanternView:
@@ -221,8 +233,9 @@ class LanternView:
                    receiver.x - 4, receiver.y - 5, 9, 11)
         for i, (name, (beacon, _)) in enumerate(room.beacons.items()):
             frame = 11 if name in room.lit_beacons else 0
-            sprite("props/vault_beacon.png", (frame, 0, 11, 14),
-                   beacon.x - 5, beacon.y - 14, 11, 14)
+            top = 5 if frame else 0
+            sprite("props/vault_beacon.png", (frame, top, 11, 14 - top),
+                   beacon.x - 5, beacon.y - 14 + top, 11, 14 - top)
             if not story or locked:
                 sprite("props/vault_beacon.png", (frame + 4, 4, 3, 3),
                        door.x - 2 + i % 3 * 6, door.y - 9 + i // 3 * 4, 3, 3)
@@ -257,6 +270,9 @@ class LanternView:
             draw_combined_darkness(backend, self.camera, visible_lights)
         else:
             draw_darkness(backend, self.camera, lx, ly, radius)
+        for i, (name, (beacon, _)) in enumerate(room.beacons.items()):
+            if name in room.lit_beacons:
+                draw_beacon_fire(sprite, beacon.x, beacon.y - 9, room.elapsed + i * 0.16)
         if room.chamber and room.rotation_control:
             draw_chamber()
             for platform in room.platforms:
